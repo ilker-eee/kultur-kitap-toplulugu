@@ -33,6 +33,97 @@
     --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+/* === Dark Theme === */
+[data-theme="dark"] {
+    --primary: #3b82f6;
+    --primary-dark: #60a5fa;
+    --primary-light: #93c5fd;
+    --primary-lighter: #1e3a5f;
+    --primary-bg: #1e293b;
+    --accent: #38bdf8;
+    --accent-dark: #7dd3fc;
+    --gradient: linear-gradient(135deg, #3b82f6 0%, #38bdf8 100%);
+    --gradient-text: linear-gradient(135deg, #60a5fa 0%, #38bdf8 50%, #93c5fd 100%);
+    --text-dark: #f1f5f9;
+    --text-body: #cbd5e1;
+    --text-muted: #94a3b8;
+    --bg-white: #0f172a;
+    --bg-light: #1e293b;
+    --bg-alt: #1e293b;
+    --border: #334155;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .navbar {
+    background: rgba(15, 23, 42, 0.85);
+}
+
+[data-theme="dark"] .navbar.scrolled {
+    background: rgba(15, 23, 42, 0.95);
+}
+
+[data-theme="dark"] .hero {
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+}
+
+[data-theme="dark"] .hero-badge {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .nav-toggle span {
+    background: #e2e8f0;
+}
+
+[data-theme="dark"] .footer {
+    background: #020617;
+}
+
+[data-theme="dark"] .event-badge {
+    background: #1e293b;
+    color: var(--primary-light);
+}
+
+[data-theme="dark"] .event-badge.upcoming {
+    background: #1e3a5f;
+}
+
+[data-theme="dark"] .contact-icon.location {
+    background: #1e293b;
+}
+
+/* === Theme Toggle Button === */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.theme-toggle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg-light);
+    color: var(--text-body);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: var(--transition);
+}
+
+.theme-toggle:hover {
+    background: var(--primary-bg);
+    color: var(--primary);
+    border-color: var(--primary-lighter);
+    transform: rotate(15deg);
+}
+
 /* === Reset & Base === */
 *, *::before, *::after {
     margin: 0;
