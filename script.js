@@ -1096,6 +1096,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const name = document.getElementById('memberRegName').value.trim();
             const identifier = document.getElementById('memberRegIdentifier').value.trim();
             const department = document.getElementById('memberRegDept').value.trim();
+            const grade = document.getElementById('memberRegGrade') ? document.getElementById('memberRegGrade').value : '';
+            const phone = document.getElementById('memberRegPhone') ? document.getElementById('memberRegPhone').value.trim() : '';
             const password = document.getElementById('memberRegPassword').value;
 
             try {
@@ -1116,6 +1118,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     name,
                     identifier,
                     department,
+                    grade,
+                    phone,
                     password,
                     role: 'member',
                     joinedAt: new Date().toLocaleDateString('tr-TR'),

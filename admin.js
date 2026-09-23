@@ -547,6 +547,7 @@
         renderBookSection(data);
         renderEventsSection(data);
         renderApplicationsSection(data);
+        renderMembersSection();
         renderSuggestionsSection(data);
         renderBroadcastSection(data);
         renderUsersSection(data);
@@ -777,6 +778,62 @@
         renderOverview(data);
         showToast('Başvuru silindi.', 'fas fa-trash-alt');
     };
+
+    // 4.5 ÜYELER (HIZLI KAYIT)
+    function renderMembersSection() {
+        const tbody = document.getElementById('membersTableBody');
+        const countEl = document.getElementById('memberTotalCount');
+        const badgeEl = document.getElementById('badgeMembers');
+        if (!tbody) return;
+
+        let members = [];
+        try {
+            const raw = localStorage.getItem('sdu_members_db');
+            if (raw) members = JSON.parse(raw);
+        } catch(e) {}
+
+        if (countEl) countEl.textContent = members.length;
+        if (badgeEl) {
+            badgeEl.textContent = members.length;
+            badgeEl.style.display = members.length > 0 ? 'inline-block' : 'none';
+        }
+
+        tbody.innerHTML = '';
+        if (members.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Henüz hızlı kayıt ile katılan üye yok.</td></tr>`;
+            return;
+        }
+
+        members.forEach(m => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${m.name || 'İsimsiz'}</strong></td>
+                <td>${m.identifier || '-'}</td>
+                <td>${m.department || '-'}</td>
+                <td>${m.joinedAt || '-'}</td>
+                <td><span class="status-badge" style="background:#e0f2fe;color:#0284c7;">${m.role === 'member' ? 'Üye' : m.role}</span></td>
+                <td>
+                    <button class="btn-action btn-delete" onclick="deleteMember('${m.id}')" title="Üyeyi Sil"><i class="fas fa-trash"></i></button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    window.deleteMember = function(id) {
+        if (!confirm('Bu üyeyi tamamen silmek istediğinize emin misiniz?')) return;
+        try {
+            let raw = localStorage.getItem('sdu_members_db');
+            if (!raw) return;
+            let members = JSON.parse(raw);
+            members = members.filter(m => m.id !== id);
+            localStorage.setItem('sdu_members_db', JSON.stringify(members));
+            renderMembersSection();
+            showToast('Üye silindi.', 'fas fa-trash-alt');
+        } catch(e) {}
+    };
+
+
 
     // 5. ETKİNLİK ÖNERİLERİ
     function renderSuggestionsSection(data) {

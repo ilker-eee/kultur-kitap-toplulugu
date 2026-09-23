@@ -156,6 +156,12 @@
                     <span class="nav-counter" id="badgeApplications">0</span>
                 </button>
 
+                <button class="nav-item" data-tab="members" data-role="moderator">
+                    <i class="fas fa-users"></i>
+                    <span>Üyeler (Hızlı Kayıt)</span>
+                    <span class="nav-counter" id="badgeMembers">0</span>
+                </button>
+
                 <button class="nav-item" data-tab="suggestions" data-role="moderator">
                     <i class="fas fa-lightbulb"></i>
                     <span>Etkinlik Önerileri</span>
@@ -380,6 +386,10 @@
                                         <i class="fas fa-user-check"></i>
                                         <span>Başvuruları Gör</span>
                                     </button>
+                                    <button class="action-box" onclick="switchAdminTab('members')">
+                                        <i class="fas fa-users"></i>
+                                        <span>Üyeler Listesi</span>
+                                    </button>
                                     <button class="action-box" onclick="switchAdminTab('broadcast')">
                                         <i class="fab fa-whatsapp"></i>
                                         <span>Duyuru Hazırla</span>
@@ -583,6 +593,40 @@
                                         </tr>
                                     </thead>
                                     <tbody id="applicationsTableBody">
+                                        <!-- Dinamik doldurulacak -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4.5. ÜYELER SEKME -->
+                <section class="tab-pane" id="pane-members">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div>
+                                <h3><i class="fas fa-users"></i> Aktif Üyeler (<span id="memberTotalCount">0</span>)</h3>
+                                <p class="card-desc">Ana siteden "Hızlı Kayıt" ile hesap açan üyeler.</p>
+                            </div>
+                            <div class="table-filters">
+                                <input type="text" id="searchMemberInput" placeholder="İsim veya e-posta ara..." class="search-input">
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="data-table" id="membersTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Ad Soyad</th>
+                                            <th>E-posta</th>
+                                            <th>Bölüm & Sınıf</th>
+                                            <th>Tarih</th>
+                                            <th>Rol</th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="membersTableBody">
                                         <!-- Dinamik doldurulacak -->
                                     </tbody>
                                 </table>
