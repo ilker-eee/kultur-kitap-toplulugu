@@ -847,8 +847,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="phoneNum"><i class="fas fa-phone-alt"></i> Telefon / WhatsApp *</label>
-                            <input type="tel" id="phoneNum" name="phone" placeholder="05XX XXX XX XX" required>
+                            <label for="phoneNum"><i class="fas fa-phone-alt"></i> Telefon / WhatsApp (İsteğe Bağlı)</label>
+                            <input type="tel" id="phoneNum" name="phone" placeholder="05XX XXX XX XX">
                         </div>
 
                         <div class="form-group">
@@ -1030,8 +1030,8 @@
             <!-- 1. Giriş Formu -->
             <form class="auth-form" id="memberLoginForm">
                 <div class="auth-input-group">
-                    <label for="memberLoginIdentifier"><i class="fas fa-envelope"></i> E-posta veya Öğrenci No *</label>
-                    <input type="text" id="memberLoginIdentifier" placeholder="Öğrenci No veya E-posta" required>
+                    <label for="memberLoginIdentifier"><i class="fas fa-envelope"></i> E-posta *</label>
+                    <input type="email" id="memberLoginIdentifier" placeholder="E-posta adresiniz" required>
                 </div>
                 <div class="auth-input-group">
                     <label for="memberLoginPassword"><i class="fas fa-lock"></i> Şifre *</label>
@@ -1050,12 +1050,30 @@
                 </div>
                 <div class="auth-row-2">
                     <div class="auth-input-group">
-                        <label for="memberRegIdentifier"><i class="fas fa-id-card"></i> Öğrenci No / E-posta *</label>
-                        <input type="text" id="memberRegIdentifier" placeholder="Öğrenci Numaranız" required>
+                        <label for="memberRegIdentifier"><i class="fas fa-envelope"></i> E-posta *</label>
+                        <input type="email" id="memberRegIdentifier" placeholder="E-posta adresiniz" required>
                     </div>
+                    <div class="auth-input-group">
+                        <label for="memberRegPhone"><i class="fas fa-phone"></i> Telefon (İsteğe Bağlı)</label>
+                        <input type="tel" id="memberRegPhone" placeholder="05XX...">
+                    </div>
+                </div>
+                <div class="auth-row-2">
                     <div class="auth-input-group">
                         <label for="memberRegDept"><i class="fas fa-graduation-cap"></i> Bölüm *</label>
                         <input type="text" id="memberRegDept" placeholder="Bölümünüz" required>
+                    </div>
+                    <div class="auth-input-group">
+                        <label for="memberRegGrade"><i class="fas fa-layer-group"></i> Sınıf *</label>
+                        <select id="memberRegGrade" style="width: 100%; padding: 0.8rem 1rem; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 8px; font-family: inherit; font-size: 0.95rem; outline: none; transition: border-color 0.3s ease, box-shadow 0.3s ease; background-color: var(--card-bg); color: var(--text-color);" required>
+                            <option value="" disabled selected>Seçiniz</option>
+                            <option value="Hazırlık">Hazırlık</option>
+                            <option value="1. Sınıf">1. Sınıf</option>
+                            <option value="2. Sınıf">2. Sınıf</option>
+                            <option value="3. Sınıf">3. Sınıf</option>
+                            <option value="4. Sınıf">4. Sınıf</option>
+                            <option value="Lisansüstü">Lisansüstü</option>
+                        </select>
                     </div>
                 </div>
                 <div class="auth-input-group">
