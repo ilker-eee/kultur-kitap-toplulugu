@@ -485,6 +485,24 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
         });
     });
 
+    const btnRefreshApps = document.getElementById('btnRefreshApps');
+    if (btnRefreshApps) {
+        btnRefreshApps.addEventListener('click', () => {
+            const updatedData = getData();
+            renderApplicationsSection(updatedData);
+            renderOverview(updatedData);
+            showToast('Yönetim başvuruları yenilendi.', 'fas fa-sync-alt');
+        });
+    }
+    
+    const btnRefreshMembers = document.getElementById('btnRefreshMembers');
+    if (btnRefreshMembers) {
+        btnRefreshMembers.addEventListener('click', () => {
+            renderMembersSection();
+            showToast('Üye listesi yenilendi.', 'fas fa-sync-alt');
+        });
+    }
+
     // Mobil Menü Aç/Kapat
     if (sidebarToggleBtn) {
         sidebarToggleBtn.addEventListener('click', () => sidebar.classList.toggle('open'));
