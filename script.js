@@ -813,28 +813,45 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     const isCompleted = ev.badge === 'Tamamlandı';
                     
-                    let actionRowHtml = `
-                        <div class="event-action-row">
-                            <span class="event-attendees-badge"><i class="fas fa-users"></i> <strong class="participant-count">${pCount}</strong> Katılımcı</span>
-                            <button type="button" class="btn-event-join" data-event-id="${ev.id}" data-event-title="${ev.title}">
-                                <i class="fas fa-plus-circle"></i> <span>Katılmak İstiyorum</span>
-                            </button>
-                        </div>
-                    `;
-                    
-                    if (isCompleted) {
+                    let actionRowHtml = '';
+                    if (!isCompleted) {
                         actionRowHtml = `
                             <div class="event-action-row">
-                                <span class="event-attendees-badge" style="width: 100%; justify-content: center;"><i class="fas fa-users"></i> <strong class="participant-count">${pCount}</strong> Katılımcı ile Gerçekleşti</span>
+                                <span class="event-attendees-badge"><i class="fas fa-users"></i> <strong class="participant-count">${pCount}</strong> Katılımcı</span>
+                                <button type="button" class="btn-event-join" data-event-id="${ev.id}" data-event-title="${ev.title}">
+                                    <i class="fas fa-plus-circle"></i> <span>Katılmak İstiyorum</span>
+                                </button>
                             </div>
                         `;
                     }
                     
+                    // Kategoriye göre yüksek kaliteli rastgele fotoğraflar (Unsplash)
+                    let imgUrl = 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&q=80&w=600&h=400';
+                    if (ev.category === 'kitap') {
+                        const kitapResimleri = [
+                            'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=600&h=400',
+                            'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=600&h=400',
+                            'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&q=80&w=600&h=400'
+                        ];
+                        imgUrl = kitapResimleri[ev.id % kitapResimleri.length];
+                    } else if (ev.category === 'soylesi') {
+                        const soylesiResimleri = [
+                            'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&q=80&w=600&h=400',
+                            'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&q=80&w=600&h=400',
+                            'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?auto=format&fit=crop&q=80&w=600&h=400'
+                        ];
+                        imgUrl = soylesiResimleri[ev.id % soylesiResimleri.length];
+                    } else if (ev.category === 'gezi') {
+                        const geziResimleri = [
+                            'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&q=80&w=600&h=400',
+                            'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&q=80&w=600&h=400'
+                        ];
+                        imgUrl = geziResimleri[ev.id % geziResimleri.length];
+                    }
+                    
                     card.innerHTML = `
                         <div class="event-image">
-                            <div class="event-placeholder">
-                                <i class="${ev.icon || 'fas fa-calendar-day'}"></i>
-                            </div>
+                            <img src="${imgUrl}" alt="Etkinlik Görseli" style="width: 100%; height: 100%; object-fit: cover;">
                             <span class="event-badge ${ev.badge === 'Önümüzdeki Ay' ? 'upcoming' : ''} ${isCompleted ? 'completed' : ''}">${ev.badge || 'Yaklaşan'}</span>
                         </div>
                         <div class="event-content">
