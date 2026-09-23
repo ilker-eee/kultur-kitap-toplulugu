@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function addScrollAnimations() {
         // Add fade-in class to elements
         const animatedElements = document.querySelectorAll(
-            '.about-card, .team-card, .event-card, .gallery-item, .contact-card'
+            '.about-card, .team-card, .event-card, .gallery-item, .contact-card, .book-showcase, .past-book-card, .faq-item, .join-wrapper'
         );
 
         animatedElements.forEach((el, index) => {
@@ -239,6 +239,142 @@ document.addEventListener('DOMContentLoaded', () => {
 
         lightbox.addEventListener('click', () => lightbox.remove());
         document.body.appendChild(lightbox);
+    }
+
+    // === LITERARY QUOTES ROTATOR ===
+    const quotes = [
+        { text: "Kitapsız yaşamak; kör, sağır, dilsiz yaşamaktır.", author: "Mustafa Kemal Atatürk" },
+        { text: "Bir kitap okudum ve bütün hayatım değişti.", author: "Orhan Pamuk" },
+        { text: "Dünyayı güzellik kurtaracak, bir insanı sevmekle başlayacak her şey.", author: "Sait Faik Abasıyanık" },
+        { text: "İnsan ancak anladığı şeyleri duyar.", author: "Ahmet Hamdi Tanpınar" },
+        { text: "Kitaplar, soğuk ama güvenilir dostlardır.", author: "Victor Hugo" },
+        { text: "Bizi ancak kitaplar ve samimi fikirler kurtarabilir.", author: "Sabahattin Ali" },
+        { text: "İyi kitaplar okumak, geçmiş yüzyılların en iyi insanlarıyla sohbet etmektir.", author: "René Descartes" }
+    ];
+
+    let currentQuoteIndex = 0;
+    const quoteTextEl = document.getElementById('quoteText');
+    const quoteAuthorEl = document.getElementById('quoteAuthor');
+    const nextQuoteBtn = document.getElementById('nextQuoteBtn');
+
+    function showQuote(index) {
+        if (!quoteTextEl || !quoteAuthorEl) return;
+        quoteTextEl.style.opacity = '0';
+        quoteAuthorEl.style.opacity = '0';
+        setTimeout(() => {
+            quoteTextEl.textContent = `"${quotes[index].text}"`;
+            quoteAuthorEl.textContent = `— ${quotes[index].author}`;
+            quoteTextEl.style.opacity = '1';
+            quoteAuthorEl.style.opacity = '1';
+        }, 250);
+    }
+
+    if (nextQuoteBtn) {
+        nextQuoteBtn.addEventListener('click', () => {
+            currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+            showQuote(currentQuoteIndex);
+        });
+    }
+
+    // Auto rotate quotes every 12 seconds
+    setInterval(() => {
+        currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+        showQuote(currentQuoteIndex);
+    }, 12000);
+
+    // === EVENT FILTERS ===
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const eventCards = document.querySelectorAll('.event-card[data-category]');
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const filterValue = btn.getAttribute('data-filter');
+
+            eventCards.forEach(card => {
+                const category = card.getAttribute('data-category');
+                if (filterValue === 'all' || category === filterValue) {
+                    card.style.display = 'block';
+                    card.classList.remove('hidden');
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 50);
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(15px)';
+                    setTimeout(() => {
+                        card.style.display = 'none';
+                        card.classList.add('hidden');
+                    }, 300);
+                }
+            });
+        });
+    });
+
+    // === FAQ ACCORDION ===
+    const faqItems = document.querySelectorAll('.faq-item');
+
+    faqItems.forEach(item => {
+        const questionBtn = item.querySelector('.faq-question');
+        const answerEl = item.querySelector('.faq-answer');
+
+        if (questionBtn && answerEl) {
+            questionBtn.addEventListener('click', () => {
+                const isOpen = item.classList.contains('active');
+
+                // Close other accordion items
+                faqItems.forEach(otherItem => {
+                    if (otherItem !== item) {
+                        otherItem.classList.remove('active');
+                        const otherAnswer = otherItem.querySelector('.faq-answer');
+                        if (otherAnswer) otherAnswer.style.maxHeight = null;
+                    }
+                });
+
+                if (isOpen) {
+                    item.classList.remove('active');
+                    answerEl.style.maxHeight = null;
+                } else {
+                    item.classList.add('active');
+                    answerEl.style.maxHeight = answerEl.scrollHeight + 'px';
+                }
+            });
+        }
+    });
+
+    // === JOIN FORM SUBMISSION ===
+    const joinForm = document.getElementById('joinForm');
+    const formSuccessMessage = document.getElementById('formSuccessMessage');
+    const waRedirectBtn = document.getElementById('waRedirectBtn');
+
+    if (joinForm) {
+        joinForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const fullName = document.getElementById('fullName').value.trim();
+            const department = document.getElementById('facultyDepartment').value.trim();
+            const grade = document.getElementById('studentGrade').value;
+            const phone = document.getElementById('phoneNum').value.trim();
+            const interest = document.getElementById('interest').value;
+
+            // Generate WhatsApp message
+            const message = `Merhaba! Ben ${fullName}. SDÜ ${department} (${grade}) öğrencisiyim. Kültür ve Kitap Topluluğu'na katılmak istiyorum.%0A%0Aİlgi Alanım: ${interest}%0ATelefon: ${phone}`;
+            const waUrl = `https://wa.me/905XXXXXXXXX?text=${encodeURIComponent(message)}`;
+
+            if (waRedirectBtn) {
+                waRedirectBtn.href = waUrl;
+            }
+
+            // Hide form and show success message
+            joinForm.style.display = 'none';
+            if (formSuccessMessage) {
+                formSuccessMessage.style.display = 'block';
+                formSuccessMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
     }
 
     // Initial call

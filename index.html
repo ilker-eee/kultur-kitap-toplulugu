@@ -23,10 +23,12 @@
             <ul class="nav-menu" id="navMenu">
                 <li><a href="#anasayfa" class="nav-link active">Ana Sayfa</a></li>
                 <li><a href="#hakkimizda" class="nav-link">Hakkımızda</a></li>
+                <li><a href="#ayin-kitabi" class="nav-link">Ayın Kitabı</a></li>
                 <li><a href="#etkinlikler" class="nav-link">Etkinlikler</a></li>
                 <li><a href="#galeri" class="nav-link">Galeri</a></li>
+                <li><a href="#sss" class="nav-link">SSS</a></li>
                 <li><a href="#iletisim" class="nav-link">İletişim</a></li>
-                <li><a href="#iletisim" class="nav-link nav-cta">Bize Katıl</a></li>
+                <li><a href="#bize-katil" class="nav-link nav-cta">Bize Katıl</a></li>
             </ul>
             <div class="nav-actions">
                 <button class="theme-toggle" id="themeToggle" aria-label="Tema değiştir" title="Karanlık / Aydınlık Tema">
@@ -66,7 +68,7 @@
                     <i class="fas fa-compass"></i>
                     Topluluğu Keşfet
                 </a>
-                <a href="#iletisim" class="btn btn-outline">
+                <a href="#bize-katil" class="btn btn-outline">
                     <i class="fas fa-users"></i>
                     Bize Katıl
                 </a>
@@ -87,6 +89,24 @@
             </div>
         </div>
     </section>
+
+    <!-- ========== GÜNÜN ALINTISI ========== -->
+    <div class="quote-strip">
+        <div class="container">
+            <div class="quote-card">
+                <div class="quote-icon">
+                    <i class="fas fa-quote-left"></i>
+                </div>
+                <div class="quote-content">
+                    <p class="quote-text" id="quoteText">"Kitapsız yaşamak; kör, sağır, dilsiz yaşamaktır."</p>
+                    <span class="quote-author" id="quoteAuthor">— Mustafa Kemal Atatürk</span>
+                </div>
+                <button class="quote-btn" id="nextQuoteBtn" aria-label="Yeni Alıntı" title="Yeni bir edebiyat sözü gör">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- ========== HAKKIMIZDA ========== -->
     <section class="section" id="hakkimizda">
@@ -158,8 +178,115 @@
         </div>
     </section>
 
+    <!-- ========== AYIN KİTABI ========== -->
+    <section class="section section-alt" id="ayin-kitabi">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Birlikte Okuyoruz</span>
+                <h2 class="section-title">Ayın Kitabı & Okuma Listemiz</h2>
+                <p class="section-desc">Her ay seçtiğimiz eseri hep birlikte okuyor, ay sonunda samimi bir tahlil oturumunda buluşuyoruz.</p>
+            </div>
+
+            <div class="book-showcase">
+                <div class="book-cover-wrapper">
+                    <div class="book-3d">
+                        <div class="book-spine"></div>
+                        <div class="book-front">
+                            <div class="book-tag">Ekim 2026 Seçkisi</div>
+                            <h3 class="book-title">Kürk Mantolu Madonna</h3>
+                            <p class="book-author">Sabahattin Ali</p>
+                            <div class="book-ornament"><i class="fas fa-feather-alt"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="book-details">
+                    <div class="book-meta-badges">
+                        <span class="badge"><i class="fas fa-bookmark"></i> Türk Klasikleri</span>
+                        <span class="badge"><i class="fas fa-file-alt"></i> 160 Sayfa</span>
+                        <span class="badge"><i class="fas fa-users"></i> 85 Okur</span>
+                    </div>
+
+                    <h3 class="book-heading">Kürk Mantolu Madonna</h3>
+                    <p class="book-writer">Sabahattin Ali</p>
+                    
+                    <p class="book-synopsis">
+                        "İnsanlara inanmak, onlara güvenmek lazım geldiğini biliyorum... Fakat bir kere aldanan bir adamın bir daha inanmasına imkân var mıdır?"
+                        <br><br>
+                        Topluluğumuzla bu ay Türk edebiyatının derin aşk ve yabancılaşma başyapıtını tahlil ediyoruz. Yalnızlık, sanat ve ruh bağları üzerine konuşacağımız bu özel oturuma tüm üniversitemiz davetlidir.
+                    </p>
+
+                    <div class="reading-progress-box">
+                        <div class="progress-info">
+                            <span>Topluluk Okuma İlerlemesi</span>
+                            <span class="progress-percent">%75</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: 75%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="book-meeting-card">
+                        <div class="meeting-item">
+                            <i class="fas fa-calendar-check"></i>
+                            <div>
+                                <strong>Tahlil Tarihi</strong>
+                                <span>28 Ekim 2026, Çarşamba 17:00</span>
+                            </div>
+                        </div>
+                        <div class="meeting-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <strong>Buluşma Yeri</strong>
+                                <span>Merkez Kütüphane Kitap Kafe</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="book-actions">
+                        <a href="#bize-katil" class="btn btn-primary">
+                            <i class="fas fa-check-circle"></i>
+                            Tahlil Oturumuna Katıl
+                        </a>
+                        <a href="https://wa.me/905XXXXXXXXX" target="_blank" rel="noopener" class="btn btn-outline">
+                            <i class="fab fa-whatsapp"></i>
+                            Okuma Grubuna Dahil Ol
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Geçmiş Okumalar -->
+            <div class="past-books-section">
+                <h4 class="past-books-title">Geçtiğimiz Aylarda Neler Okuduk?</h4>
+                <div class="past-books-grid">
+                    <div class="past-book-card">
+                        <div class="past-book-icon"><i class="fas fa-book"></i></div>
+                        <h5>Saatleri Ayarlama Enstitüsü</h5>
+                        <span>Ahmet Hamdi Tanpınar</span>
+                    </div>
+                    <div class="past-book-card">
+                        <div class="past-book-icon"><i class="fas fa-book"></i></div>
+                        <h5>Dönüşüm</h5>
+                        <span>Franz Kafka</span>
+                    </div>
+                    <div class="past-book-card">
+                        <div class="past-book-icon"><i class="fas fa-book"></i></div>
+                        <h5>Simyacı</h5>
+                        <span>Paulo Coelho</span>
+                    </div>
+                    <div class="past-book-card">
+                        <div class="past-book-icon"><i class="fas fa-book"></i></div>
+                        <h5>Beyaz Zambaklar Ülkesinde</h5>
+                        <span>Grigory Petrov</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ========== ETKİNLİKLER ========== -->
-    <section class="section section-alt" id="etkinlikler">
+    <section class="section" id="etkinlikler">
         <div class="container">
             <div class="section-header">
                 <span class="section-tag">Neler Yapıyoruz?</span>
@@ -167,8 +294,16 @@
                 <p class="section-desc">Her ay düzenlediğimiz etkinliklerle kampüs hayatını renklendiriyoruz.</p>
             </div>
 
+            <!-- Etkinlik Filtreleri -->
+            <div class="event-filters">
+                <button class="filter-btn active" data-filter="all">Tüm Etkinlikler</button>
+                <button class="filter-btn" data-filter="kitap">Kitap Kulübü</button>
+                <button class="filter-btn" data-filter="soylesi">Söyleşi & Dinleti</button>
+                <button class="filter-btn" data-filter="gezi">Kültür Gezisi</button>
+            </div>
+
             <div class="events-grid">
-                <div class="event-card">
+                <div class="event-card" data-category="kitap">
                     <div class="event-image">
                         <div class="event-placeholder">
                             <i class="fas fa-book"></i>
@@ -189,7 +324,7 @@
                     </div>
                 </div>
 
-                <div class="event-card">
+                <div class="event-card" data-category="soylesi">
                     <div class="event-image">
                         <div class="event-placeholder">
                             <i class="fas fa-microphone"></i>
@@ -210,7 +345,7 @@
                     </div>
                 </div>
 
-                <div class="event-card">
+                <div class="event-card" data-category="soylesi">
                     <div class="event-image">
                         <div class="event-placeholder">
                             <i class="fas fa-feather-alt"></i>
@@ -231,11 +366,12 @@
                     </div>
                 </div>
 
-                <div class="event-card">
+                <div class="event-card" data-category="gezi">
                     <div class="event-image">
                         <div class="event-placeholder">
                             <i class="fas fa-bus"></i>
                         </div>
+                        <span class="event-badge">Kayıt Açık</span>
                     </div>
                     <div class="event-content">
                         <div class="event-date">
@@ -327,6 +463,192 @@
         </div>
     </section>
 
+    <!-- ========== SSS (FAQ) ========== -->
+    <section class="section section-alt" id="sss">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Aklınıza Takılanlar</span>
+                <h2 class="section-title">Sıkça Sorulan Sorular</h2>
+                <p class="section-desc">Topluluğumuz, üyelik süreci ve etkinliklerimiz hakkında en çok merak edilen soruların yanıtları.</p>
+            </div>
+
+            <div class="faq-container">
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Topluluğa kimler katılabilir?</span>
+                        <i class="fas fa-chevron-down faq-chevron"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p>Süleyman Demirel Üniversitesi bünyesinde öğrenim gören tüm lisans, ön lisans ve lisansüstü öğrencilerimiz topluluğumuza hiçbir kısıtlama olmaksızın katılabilir. Edebiyata ve kültüre ilgi duyan herkesi bekliyoruz!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Üyelik veya etkinliklere katılım ücretli mi?</span>
+                        <i class="fas fa-chevron-down faq-chevron"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p>Kesinlikle hayır! Topluluğumuz kâr amacı gütmeyen resmi bir üniversite öğrenci topluluğudur. Kayıt olmak, toplantılara, tahlillere ve söyleşilere katılmak tamamen ücretsizdir.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Her etkinliğe düzenli olarak katılmak zorunda mıyım?</span>
+                        <i class="fas fa-chevron-down faq-chevron"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p>Hayır, herhangi bir devam zorunluluğu bulunmamaktadır. Ders programınıza, sınav haftalarınıza ve kişisel ilgi alanlarınıza göre dilediğiniz etkinliği seçip katılabilirsiniz.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Okunacak kitapları nasıl temin ediyoruz?</span>
+                        <i class="fas fa-chevron-down faq-chevron"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p>Ayın kitabını üniversitemizin merkez kütüphanesinden ödünç alabilir, kendi kütüphanenizden getirebilir veya üyelerimiz arasındaki kitap paylaşım havuzundan faydalanabilirsiniz.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Yönetim ve organizasyon ekibinde nasıl görev alabilirim?</span>
+                        <i class="fas fa-chevron-down faq-chevron"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p>Dönem başlarında ve yıl boyunca etkinlik koordinasyonu, sosyal medya, tasarım veya tahlil moderatörlüğü ekiplerimiz için gönüllü çağrısı yapıyoruz. İstekli tüm üyelerimiz aktif rol alabilir.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== BİZE KATIL (BAŞVURU) ========== -->
+    <section class="section" id="bize-katil">
+        <div class="container">
+            <div class="join-wrapper">
+                <div class="join-info">
+                    <span class="section-tag">Aramıza Katıl</span>
+                    <h2 class="section-title">Yeni Hikâyeni Birlikte Yazalım</h2>
+                    <p class="join-desc">
+                        Kitap kokusu eşliğinde derin sohbetler, ilham veren yazarlar ve unutulmaz kampüs anıları seni bekliyor.
+                        Hemen formu doldur, SDÜ Kültür ve Kitap Topluluğu ailesinin bir parçası ol!
+                    </p>
+
+                    <div class="join-features">
+                        <div class="join-feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <h4>Ücretsiz & Hızlı Kayıt</h4>
+                                <p>Herhangi bir aidat ya da zorunlu bağış yok.</p>
+                            </div>
+                        </div>
+                        <div class="join-feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <h4>Özel Söyleşiler & Atölyeler</h4>
+                                <p>Yazar buluşmaları ve yaratıcı okuma atölyelerine öncelikli katılım.</p>
+                            </div>
+                        </div>
+                        <div class="join-feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <h4>Geniş Bir Çevre</h4>
+                                <p>Kampüste senin gibi edebiyat tutkunu yüzlerce yeni arkadaş.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="join-direct-wa">
+                        <p><i class="fab fa-whatsapp"></i> Form doldurmadan doğrudan katılmak ister misin?</p>
+                        <a href="https://wa.me/905XXXXXXXXX" target="_blank" rel="noopener" class="direct-wa-link">
+                            WhatsApp Duyuru Grubumuza Katıl <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="join-form-card">
+                    <h3 class="form-title">Hızlı Katılım Formu</h3>
+                    <p class="form-subtitle">1 dakikada topluluğumuza üye ol</p>
+
+                    <form id="joinForm" class="join-form">
+                        <div class="form-group">
+                            <label for="fullName"><i class="fas fa-user"></i> Ad Soyad *</label>
+                            <input type="text" id="fullName" name="fullName" placeholder="Örn: Ayşe Demir" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="facultyDepartment"><i class="fas fa-graduation-cap"></i> Bölüm *</label>
+                                <input type="text" id="facultyDepartment" name="department" placeholder="Örn: Türk Dili ve Edebiyatı" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentGrade"><i class="fas fa-layer-group"></i> Sınıf *</label>
+                                <select id="studentGrade" name="grade" required>
+                                    <option value="" disabled selected>Seçiniz</option>
+                                    <option value="Hazırlık">Hazırlık</option>
+                                    <option value="1. Sınıf">1. Sınıf</option>
+                                    <option value="2. Sınıf">2. Sınıf</option>
+                                    <option value="3. Sınıf">3. Sınıf</option>
+                                    <option value="4. Sınıf">4. Sınıf</option>
+                                    <option value="Lisansüstü">Lisansüstü</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phoneNum"><i class="fas fa-phone-alt"></i> Telefon / WhatsApp *</label>
+                            <input type="tel" id="phoneNum" name="phone" placeholder="05XX XXX XX XX" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="interest"><i class="fas fa-star"></i> En Çok İlgilendiğin Alan</label>
+                            <select id="interest" name="interest">
+                                <option value="Kitap Okuma Kulübü & Tahliller">Kitap Okuma Kulübü & Tahliller</option>
+                                <option value="Yazar Söyleşileri & Paneller">Yazar Söyleşileri & Paneller</option>
+                                <option value="Şiir Dinletileri & Edebiyat Geceleri">Şiir Dinletileri & Edebiyat Geceleri</option>
+                                <option value="Kültür & Müze Gezileri">Kültür & Müze Gezileri</option>
+                                <option value="Sosyal Medya, Tasarım & Fotoğrafçılık">Sosyal Medya, Tasarım & Fotoğrafçılık</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-submit">
+                            <i class="fas fa-paper-plane"></i>
+                            Aramıza Katıl
+                        </button>
+
+                        <div class="form-note">
+                            <i class="fas fa-shield-alt"></i> Bilgilerin yalnızca topluluk iletişimi için kullanılır.
+                        </div>
+                    </form>
+
+                    <!-- Başarı Mesajı (Form Gönderildiğinde Gösterilir) -->
+                    <div id="formSuccessMessage" class="form-success-box" style="display: none;">
+                        <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+                        <h4>Aramıza Hoş Geldin!</h4>
+                        <p id="successDesc">Başvurun başarıyla alındı. Aşağıdaki butona tıklayarak WhatsApp grubumuza doğrudan katılabilirsin.</p>
+                        <a href="https://wa.me/905XXXXXXXXX" target="_blank" rel="noopener" class="btn btn-primary btn-wa-group" id="waRedirectBtn">
+                            <i class="fab fa-whatsapp"></i> WhatsApp Grubuna Giriş Yap
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ========== İLETİŞİM ========== -->
     <section class="section section-alt" id="iletisim">
         <div class="container">
@@ -389,8 +711,11 @@
                     <ul>
                         <li><a href="#anasayfa">Ana Sayfa</a></li>
                         <li><a href="#hakkimizda">Hakkımızda</a></li>
+                        <li><a href="#ayin-kitabi">Ayın Kitabı</a></li>
                         <li><a href="#etkinlikler">Etkinlikler</a></li>
                         <li><a href="#galeri">Galeri</a></li>
+                        <li><a href="#sss">SSS</a></li>
+                        <li><a href="#bize-katil">Bize Katıl</a></li>
                         <li><a href="#iletisim">İletişim</a></li>
                     </ul>
                 </div>
