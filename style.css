@@ -217,6 +217,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-shrink: 0;
 }
 
 .theme-toggle {
@@ -319,9 +320,10 @@ img {
 }
 
 .nav-container {
-    max-width: 1200px;
+    max-width: 1400px;
+    width: 100%;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -331,32 +333,43 @@ img {
 .nav-logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     font-weight: 700;
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     color: var(--primary-dark);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .nav-logo i {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     color: var(--primary);
 }
 
 .nav-menu {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     margin-left: auto;
-    margin-right: 12px;
+    margin-right: 10px;
+    flex-shrink: 1;
+}
+
+.nav-menu li {
+    display: inline-flex;
+    align-items: center;
+    list-style: none;
+    flex-shrink: 0;
 }
 
 .nav-link {
-    padding: 8px 16px;
-    font-size: 0.9rem;
+    padding: 6px 12px;
+    font-size: 0.86rem;
     font-weight: 500;
     color: var(--text-body);
     border-radius: var(--radius-sm);
     transition: var(--transition);
+    white-space: nowrap;
 }
 
 .nav-link:hover,
@@ -369,8 +382,9 @@ img {
     background: var(--gradient) !important;
     color: white !important;
     font-weight: 600;
-    padding: 10px 20px !important;
+    padding: 8px 18px !important;
     border-radius: 50px !important;
+    white-space: nowrap !important;
 }
 
 .nav-cta:hover {
@@ -2065,7 +2079,7 @@ img {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .nav-toggle {
         display: flex;
     }
@@ -2100,6 +2114,9 @@ img {
         text-align: center;
         margin-top: 16px;
     }
+}
+
+@media (max-width: 768px) {
 
     .hero {
         padding: 100px 20px 60px;
@@ -3024,25 +3041,29 @@ img {
 .nav-brand-group {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
+    flex-shrink: 0;
 }
 
 .nav-user-widget {
     position: relative;
     z-index: 1020;
+    flex-shrink: 0;
 }
 
 .nav-user-pill {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    padding: 6px 14px 6px 8px;
+    gap: 8px;
+    padding: 5px 10px 5px 6px;
     background: rgba(255, 255, 255, 0.7);
     border: 1px solid var(--border);
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.25s ease;
     backdrop-filter: blur(10px);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .nav-user-pill:hover {
