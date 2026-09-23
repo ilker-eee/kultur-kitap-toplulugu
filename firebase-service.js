@@ -58,6 +58,20 @@ export async function loginMember(identifier, password) {
 // EVENTS LOGIC
 // ========================
 
+export async function getMembers() {
+    const membersSnapshot = await getDocs(collection(db, "members"));
+    const members = [];
+    membersSnapshot.forEach((doc) => {
+        members.push({ id: doc.id, ...doc.data() });
+    });
+    return members;
+}
+
+export async function deleteMember(memberId) {
+    const { deleteDoc, doc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+    await deleteDoc(doc(db, "members", memberId));
+}
+
 export async function getEvents() {
     const eventsSnapshot = await getDocs(collection(db, "events"));
     const events = [];

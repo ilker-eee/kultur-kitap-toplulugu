@@ -1356,6 +1356,12 @@ img {
     color: var(--accent-dark);
 }
 
+.event-badge.completed {
+    background: var(--surface-bg);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+}
+
 .event-content {
     padding: 24px;
 }

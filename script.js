@@ -3,6 +3,8 @@
    JavaScript: Navigation, Animations, Counters
    ========================================== */
 
+import { registerMember, loginMember } from './firebase-service.js';
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // === DARK THEME TOGGLE ===
@@ -622,21 +624,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function getAllEventsList() {
+        const defaultEvents = [
+            { id: 1, title: "Kitap Okuma Kulübü", category: "kitap", date: "15 Ekim 2026", time: "14:00", place: "Merkez Kütüphane", desc: "Bu ayki kitabımızı birlikte tartışacağımız okuma grubu buluşması." },
+            { id: 2, title: "Yazar Söyleşisi", category: "soylesi", date: "22 Ekim 2026", time: "15:30", place: "Konferans Salonu", desc: "Ünlü yazarımız ile edebiyat ve yaratıcı yazarlık üzerine keyifli bir söyleşi." },
+            { id: 3, title: "Şiir Dinletisi", category: "soylesi", date: "5 Kasım 2026", time: "18:00", place: "Amfi Tiyatro", desc: "Öğrencilerimizin kendi şiirlerini seslendireceği özel bir akşam etkinliği." },
+            { id: 4, title: "Kültür Gezisi", category: "gezi", date: "12 Kasım 2026", time: "09:00", place: "Şehir Merkezi", desc: "Tarihi ve kültürel mekanları keşfedeceğimiz bir günlük gezi programı." },
+            { id: 5, title: "Yazma Etkinliği", category: "kitap", date: "5 Mart 2026", time: "14:00", place: "Etkinlik Salonu", badge: "Tamamlandı", desc: "Geçmiş Etkinlik - Workshop formatında gerçekleştirilen yazma etkinliğimiz." },
+            { id: 6, title: "Adem'den Önce Kitap Kritiği", category: "kitap", date: "10 Aralık 2025", time: "15:00", place: "Okuma Salonu", badge: "Tamamlandı", desc: "Geçmiş Etkinlik - Adem'den Önce kitabı üzerine gerçekleştirdiğimiz söyleşi." },
+            { id: 7, title: "Matrix Film İzleme Etkinliği", category: "soylesi", date: "24 Ekim 2025", time: "19:00", place: "Sinema Salonu", badge: "Tamamlandı", desc: "Geçmiş Etkinlik - Üyelerimizle birlikte gerçekleştirdiğimiz film izleme ve tahlil etkinliği." },
+            { id: 8, title: "Tanışma Toplantısı", category: "soylesi", date: "15 Ekim 2025", time: "17:00", place: "Merkez Kütüphane", badge: "Tamamlandı", desc: "Geçmiş Etkinlik - SDÜ Kültür ve Kitap Topluluğu tanışma toplantısı." },
+            { id: 9, title: "Bir Zamanlar Anadolu'da Film İzleme", category: "soylesi", date: "20 Haziran 2025", time: "18:00", place: "Sinema Salonu", badge: "Tamamlandı", desc: "Geçmiş Etkinlik - Anma programı kapsamında film gösterimi." },
+            { id: 10, title: "Sagalassos Antik Kenti Gezisi", category: "gezi", date: "30 Mayıs 2025", time: "09:00", place: "Sagalassos", badge: "Tamamlandı", desc: "Geçmiş Etkinlik - Sosyal ve kültürel gezi." },
+            { id: 11, title: "Üç Anadolu Efsanesi Kitap İncelemesi", category: "kitap", date: "13 Mayıs 2025", time: "16:00", place: "Okuma Salonu", badge: "Tamamlandı", desc: "Geçmiş Etkinlik - Kitap inceleme etkinliği." },
+            { id: 12, title: "Film Gösterimi: 12 Kızgın Adam", category: "soylesi", date: "02 Mayıs 2025", time: "19:00", place: "Sinema Salonu", badge: "Tamamlandı", desc: "Geçmiş Etkinlik - Film gösterimi." }
+        ];
+
         try {
             const raw = localStorage.getItem('sdu_topluluk_data');
             if (raw) {
                 const parsed = JSON.parse(raw);
-                if (parsed.events && parsed.events.length > 0) return parsed.events;
+                if (parsed.events && parsed.events.length > 0) {
+                    // Check if past events are merged. If they don't have id 5, merge them.
+                    const hasPastEvents = parsed.events.find(e => e.id === 5 || e.title === "Yazma Etkinliği");
+                    if (!hasPastEvents) {
+                        const merged = [...parsed.events, ...defaultEvents.filter(e => e.id >= 5)];
+                        parsed.events = merged;
+                        localStorage.setItem('sdu_topluluk_data', JSON.stringify(parsed));
+                        return merged;
+                    }
+                    return parsed.events;
+                }
+            } else {
+                // Initialize default events in local storage
+                localStorage.setItem('sdu_topluluk_data', JSON.stringify({ events: defaultEvents, applications: [] }));
             }
         } catch (e) {}
 
-        // Varsayılan etkinlik listesi
-        return [
-            { id: 1, title: "Kitap Okuma Kulübü", category: "kitap", date: "15 Ekim 2026", time: "14:00", place: "Merkez Kütüphane", desc: "Bu ayki kitabımızı birlikte tartışacağımız okuma grubu buluşması." },
-            { id: 2, title: "Yazar Söyleşisi", category: "soylesi", date: "22 Ekim 2026", time: "15:30", place: "Konferans Salonu", desc: "Ünlü yazarımız ile edebiyat ve yaratıcı yazarlık üzerine keyifli bir söyleşi." },
-            { id: 3, title: "Şiir Dinletisi", category: "soylesi", date: "5 Kasım 2026", time: "18:00", place: "Amfi Tiyatro", desc: "Öğrencilerimizin kendi şiirlerini seslendireceği özel bir akşam etkinliği." },
-            { id: 4, title: "Kültür Gezisi", category: "gezi", date: "12 Kasım 2026", time: "09:00", place: "Şehir Merkezi", desc: "Tarihi ve kültürel mekanları keşfedeceğimiz bir günlük gezi programı." }
-        ];
+        return defaultEvents;
     }
 
     function renderCalendar(month, year) {
@@ -718,9 +742,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ==========================================
     // DİNAMİK VERİ SENKRONİZASYONU (LOCALSTORAGE)
-    // ==========================================
     function syncDynamicSiteContent() {
         try {
+            // First ensure data is initialized/merged with defaults
+            getAllEventsList();
+            
             const raw = localStorage.getItem('sdu_topluluk_data');
             if (!raw) return;
             const data = JSON.parse(raw);
@@ -786,7 +812,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div class="event-placeholder">
                                     <i class="${ev.icon || 'fas fa-calendar-day'}"></i>
                                 </div>
-                                <span class="event-badge ${ev.badge === 'Önümüzdeki Ay' ? 'upcoming' : ''}">${ev.badge || 'Yaklaşan'}</span>
+                                <span class="event-badge ${ev.badge === 'Önümüzdeki Ay' ? 'upcoming' : ''} ${ev.badge === 'Tamamlandı' ? 'completed' : ''}">${ev.badge || 'Yaklaşan'}</span>
                             </div>
                             <div class="event-content">
                                 <div class="event-date">
@@ -872,7 +898,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const bizeKatilSec = document.getElementById('bize-katil');
         const suggFormRow = document.querySelector('#suggestEventForm .form-row');
         const navCtaBtn = document.querySelector('.nav-cta');
-        const heroCtaBtn = document.querySelector('.hero-buttons .btn-primary');
+        const heroCtaBtn = document.querySelector('.hero-buttons .btn-outline[href="#bize-katil"]');
 
         if (currentMember.role === 'member') {
             // Üye Görünümü
@@ -911,8 +937,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 navCtaBtn.href = '#etkinlik-oner';
             }
             if (heroCtaBtn) {
-                heroCtaBtn.innerHTML = '<i class="fas fa-calendar-alt"></i> Etkinlikleri İncele';
-                heroCtaBtn.href = '#etkinlikler';
+                heroCtaBtn.style.display = 'none'; // Üye olunca hero'daki Bize Katıl butonunu tamamen gizle
             }
 
             const eventCount = (currentMember.attendedEvents || []).length;
@@ -1105,47 +1130,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Giriş İşlemi
     if (memberLoginForm) {
-        memberLoginForm.addEventListener('submit', (e) => {
+        memberLoginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const identifier = document.getElementById('memberLoginIdentifier').value.trim();
             const password = document.getElementById('memberLoginPassword').value;
+            const submitBtn = memberLoginForm.querySelector('button[type="submit"]');
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Giriş Yapılıyor...';
+            }
 
             try {
-                const raw = localStorage.getItem('sdu_members_db');
-                const members = raw ? JSON.parse(raw) : [];
-                const user = members.find(m => m.identifier.toLowerCase() === identifier.toLowerCase());
-
-                if (user && user.password === password) {
-                    saveMemberSession(user);
-                    closeAuthModal();
-                    renderUserWidget();
-                    bindEventJoinButtons();
-                    showToast(`🎉 Hoş geldiniz, ${user.name}! Topluluk üyesi olarak giriş yapıldı.`, 'fas fa-user-check');
-                    if (typeof pendingPostAuthAction === 'function') {
-                        pendingPostAuthAction(user);
-                        pendingPostAuthAction = null;
-                    }
-                } else if (!user) {
-                    // Kullanıcı veritabanında yoksa hızlı otomatik üyelik uyarısı
-                    if (authErrorMsg) {
-                        authErrorMsg.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Bu öğrenci no/e-posta ile kayıt bulunamadı. Lütfen <strong>Hızlı Üye Ol</strong> sekmesinden 10 saniyede kaydolun.';
-                        authErrorMsg.style.display = 'block';
-                    }
-                } else {
-                    if (authErrorMsg) {
-                        authErrorMsg.innerHTML = '<i class="fas fa-lock"></i> Şifre hatalı. Lütfen tekrar deneyin.';
-                        authErrorMsg.style.display = 'block';
-                    }
+                // Firebase Login
+                const user = await loginMember(identifier, password);
+                
+                saveMemberSession(user);
+                closeAuthModal();
+                renderUserWidget();
+                bindEventJoinButtons();
+                showToast(`🎉 Hoş geldiniz, ${user.name}! Topluluk üyesi olarak giriş yapıldı.`, 'fas fa-user-check');
+                if (typeof pendingPostAuthAction === 'function') {
+                    pendingPostAuthAction(user);
+                    pendingPostAuthAction = null;
                 }
             } catch (err) {
                 console.warn(err);
+                if (authErrorMsg) {
+                    if (err.message.includes('Giriş bilgileri hatalı') || err.message.includes('kayıt bulunamadı')) {
+                        authErrorMsg.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Bu e-posta/numara ile kayıt bulunamadı veya şifre hatalı.';
+                    } else {
+                        authErrorMsg.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Giriş yapılırken bir hata oluştu: ' + err.message;
+                    }
+                    authErrorMsg.style.display = 'block';
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Giriş Yap';
+                }
             }
         });
     }
 
     // Kayıt İşlemi
     if (memberRegisterForm) {
-        memberRegisterForm.addEventListener('submit', (e) => {
+        memberRegisterForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('memberRegName').value.trim();
             const identifier = document.getElementById('memberRegIdentifier').value.trim();
@@ -1153,37 +1183,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const grade = document.getElementById('memberRegGrade') ? document.getElementById('memberRegGrade').value : '';
             const phone = document.getElementById('memberRegPhone') ? document.getElementById('memberRegPhone').value.trim() : '';
             const password = document.getElementById('memberRegPassword').value;
+            const submitBtn = memberRegisterForm.querySelector('button[type="submit"]');
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kayıt Yapılıyor...';
+            }
 
             try {
-                const raw = localStorage.getItem('sdu_members_db');
-                const members = raw ? JSON.parse(raw) : [];
-
-                const existing = members.find(m => m.identifier.toLowerCase() === identifier.toLowerCase());
-                if (existing) {
-                    if (authErrorMsg) {
-                        authErrorMsg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Bu öğrenci no/e-posta zaten kayıtlı. Lütfen giriş yapın.';
-                        authErrorMsg.style.display = 'block';
-                    }
-                    return;
-                }
-
-                const newMember = {
-                    id: 'mbr_' + Date.now(),
+                // Firebase Register
+                const newMemberData = {
                     name,
                     identifier,
+                    phone,
                     department,
                     grade,
-                    phone,
-                    password,
-                    role: 'member',
-                    joinedAt: new Date().toLocaleDateString('tr-TR'),
-                    attendedEvents: []
+                    password
                 };
 
-                members.push(newMember);
-                localStorage.setItem('sdu_members_db', JSON.stringify(members));
-                saveMemberSession(newMember);
+                const newMember = await registerMember(newMemberData);
 
+                saveMemberSession(newMember);
                 closeAuthModal();
                 renderUserWidget();
                 bindEventJoinButtons();
@@ -1194,7 +1214,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     pendingPostAuthAction = null;
                 }
             } catch (err) {
-                console.warn(err);
+                console.warn('Registration error:', err);
+                if (authErrorMsg) {
+                    if (err.message.includes('zaten kayıtlı')) {
+                        authErrorMsg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Bu e-posta/numara ile zaten kayıtlısınız. Lütfen giriş yapın.';
+                    } else {
+                        authErrorMsg.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Kayıt hatası: ${err.message}`;
+                    }
+                    authErrorMsg.style.display = 'block';
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-sparkles"></i> 10 Saniyede Üye Ol';
+                }
             }
         });
     }

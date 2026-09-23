@@ -4,6 +4,8 @@
    Zero-cost static sync with LocalStorage & SessionStorage
    ========================================== */
 
+import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.js';
+
 (function () {
     'use strict';
 
@@ -66,6 +68,50 @@
                 badge: "Kayıt Açık",
                 icon: "fas fa-bus",
                 desc: "Tarihi ve kültürel mekanları keşfedeceğimiz bir günlük gezi programı."
+            },
+            {
+                id: 5,
+                title: "Yazma Etkinliği",
+                category: "kitap",
+                date: "05 Mart 2026",
+                time: "14:00",
+                place: "Etkinlik Salonu",
+                badge: "Tamamlandı",
+                icon: "fas fa-pencil-alt",
+                desc: "Geçmiş Etkinlik - Workshop formatında gerçekleştirilen yazma etkinliğimiz."
+            },
+            {
+                id: 6,
+                title: "Adem'den Önce Kitap Kritiği",
+                category: "kitap",
+                date: "10 Aralık 2025",
+                time: "15:00",
+                place: "Okuma Salonu",
+                badge: "Tamamlandı",
+                icon: "fas fa-book-open",
+                desc: "Geçmiş Etkinlik - Adem'den Önce kitabı üzerine gerçekleştirdiğimiz söyleşi."
+            },
+            {
+                id: 7,
+                title: "Matrix Film İzleme Etkinliği",
+                category: "soylesi",
+                date: "24 Ekim 2025",
+                time: "19:00",
+                place: "Sinema Salonu",
+                badge: "Tamamlandı",
+                icon: "fas fa-film",
+                desc: "Geçmiş Etkinlik - Üyelerimizle birlikte gerçekleştirdiğimiz film izleme ve tahlil etkinliği."
+            },
+            {
+                id: 8,
+                title: "Tanışma Toplantısı",
+                category: "soylesi",
+                date: "15 Ekim 2025",
+                time: "17:00",
+                place: "Merkez Kütüphane",
+                badge: "Tamamlandı",
+                icon: "fas fa-users",
+                desc: "Geçmiş Etkinlik - SDÜ Kültür ve Kitap Topluluğu tanışma toplantısı."
             }
         ],
         applications: [
@@ -780,7 +826,7 @@
     };
 
     // 4.5 ÜYELER (HIZLI KAYIT)
-    function renderMembersSection() {
+    async function renderMembersSection() {
         const tbody = document.getElementById('membersTableBody');
         const countEl = document.getElementById('memberTotalCount');
         const badgeEl = document.getElementById('badgeMembers');
@@ -788,9 +834,16 @@
 
         let members = [];
         try {
-            const raw = localStorage.getItem('sdu_members_db');
-            if (raw) members = JSON.parse(raw);
-        } catch(e) {}
+            members = await getMembers();
+            // Sort members by registered date descending
+            members.sort((a, b) => {
+                const dateA = a.registeredAt ? new Date(a.registeredAt) : new Date(0);
+                const dateB = b.registeredAt ? new Date(b.registeredAt) : new Date(0);
+                return dateB - dateA;
+            });
+        } catch(e) {
+            console.error('Error fetching members:', e);
+        }
 
         if (countEl) countEl.textContent = members.length;
         if (badgeEl) {
@@ -806,12 +859,20 @@
 
         members.forEach(m => {
             const tr = document.createElement('tr');
+            
+            // Handle date formatting
+            let dateStr = '-';
+            if (m.registeredAt) {
+                const d = new Date(m.registeredAt);
+                dateStr = d.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' });
+            }
+            
             tr.innerHTML = `
                 <td><strong>${m.name || 'İsimsiz'}</strong></td>
                 <td>${m.identifier || '-'}</td>
                 <td>${m.department || '-'}</td>
-                <td>${m.joinedAt || '-'}</td>
-                <td><span class="status-badge" style="background:#e0f2fe;color:#0284c7;">${m.role === 'member' ? 'Üye' : m.role}</span></td>
+                <td>${dateStr}</td>
+                <td><span class="status-badge" style="background:#e0f2fe;color:#0284c7;">${m.role === 'member' || m.role === 'üye' ? 'Üye' : m.role}</span></td>
                 <td>
                     <button class="btn-action btn-delete" onclick="deleteMember('${m.id}')" title="Üyeyi Sil"><i class="fas fa-trash"></i></button>
                 </td>
@@ -820,17 +881,19 @@
         });
     }
 
-    window.deleteMember = function(id) {
+    window.deleteMember = async function(id) {
         if (!confirm('⚠️ BU ÜYEYİ SİLMEK İSTEDİĞİNİZE EMİN MİSİNİZ?\n\nBu üyeyi sildiğinizde, üyenin sitedeki aktif oturumu otomatik olarak kapatılacak ve hesabı tamamen silinecektir.')) return;
         try {
-            let raw = localStorage.getItem('sdu_members_db');
-            if (!raw) return;
-            let members = JSON.parse(raw);
-            members = members.filter(m => m.id !== id);
-            localStorage.setItem('sdu_members_db', JSON.stringify(members));
-            renderMembersSection();
+            // Tell Firebase to delete it
+            await fbDeleteMember(id);
+            // Optionally, we could still keep local session clearing sync via checking if user exists, 
+            // but the next time the frontend loads `getMembers` or `loginMember` it won't be there.
+            await renderMembersSection();
             showToast('Üye silindi.', 'fas fa-trash-alt');
-        } catch(e) {}
+        } catch(e) {
+            console.error('Error deleting member:', e);
+            showToast('Üye silinirken bir hata oluştu.', 'fas fa-exclamation-triangle');
+        }
     };
 
 
