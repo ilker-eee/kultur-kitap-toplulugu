@@ -825,29 +825,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         `;
                     }
                     
-                    // Kategoriye göre yüksek kaliteli rastgele fotoğraflar (Unsplash)
-                    let imgUrl = 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&q=80&w=600&h=400';
-                    if (ev.category === 'kitap') {
-                        const kitapResimleri = [
-                            'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=600&h=400',
-                            'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=600&h=400',
-                            'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&q=80&w=600&h=400'
-                        ];
-                        imgUrl = kitapResimleri[ev.id % kitapResimleri.length];
-                    } else if (ev.category === 'soylesi') {
-                        const soylesiResimleri = [
-                            'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&q=80&w=600&h=400',
-                            'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&q=80&w=600&h=400',
-                            'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?auto=format&fit=crop&q=80&w=600&h=400'
-                        ];
-                        imgUrl = soylesiResimleri[ev.id % soylesiResimleri.length];
-                    } else if (ev.category === 'gezi') {
-                        const geziResimleri = [
-                            'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&q=80&w=600&h=400',
-                            'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&q=80&w=600&h=400'
-                        ];
-                        imgUrl = geziResimleri[ev.id % geziResimleri.length];
-                    }
+                    // Kategoriye göre AI ile oluşturulan özel etkinlik görselleri
+                    const eventImages = {
+                        kitap: ['images/events/kitap-1.jpg', 'images/events/kitap-2.jpg', 'images/events/kitap-3.jpg'],
+                        soylesi: ['images/events/film-1.jpg', 'images/events/soylesi-1.jpg', 'images/events/siir-1.jpg'],
+                        gezi: ['images/events/gezi-1.jpg', 'images/events/gezi-2.jpg']
+                    };
+                    const categoryImgs = eventImages[ev.category] || eventImages.kitap;
+                    const imgUrl = categoryImgs[ev.id % categoryImgs.length];
                     
                     card.innerHTML = `
                         <div class="event-image">
