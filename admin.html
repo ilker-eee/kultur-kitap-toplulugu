@@ -295,6 +295,71 @@
                         </div>
                     </div>
 
+                    <!-- SÜPER ADMİN ÖZEL NOTU & YETKİLENDİRME REHBERİ (SADECE SÜPER ADMİN) -->
+                    <div class="superadmin-note-card superadmin-only" id="superAdminGuideCard">
+                        <div class="note-card-header">
+                            <div class="note-icon">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <div>
+                                <h3>👑 Başkanın Özel Notu: Ekip Üyelerine Panel Erişimi Nasıl Verilir?</h3>
+                                <p>Yönetim kurulundaki diğer arkadaşlarınızın siteyi kolayca yönetebilmesi için pratik kılavuz</p>
+                            </div>
+                        </div>
+                        <div class="note-card-body">
+                            <div class="superadmin-guide-grid">
+                                <div class="guide-item">
+                                    <span class="guide-badge">1. Linki Paylaşın</span>
+                                    <h4>Yönetici Kaydı</h4>
+                                    <p>Ekip arkadaşınıza bu sayfanın linkini verin (<code>admin.html</code>). Giriş ekranında <em>"Yeni Yönetim Üyesi Kaydı"</em> seçeneğinden adını, e-postasını ve kendi belirleyeceği şifreyi girerek kaydolsun.</p>
+                                </div>
+                                <div class="guide-item">
+                                    <span class="guide-badge">2. Rolünü Belirleyin</span>
+                                    <h4>Kullanıcılar & Roller</h4>
+                                    <p>Arkadaşınız kaydolduğunda, sol menüdeki <strong>"Kullanıcılar & Roller"</strong> sekmenize otomatik olarak düşer. Oradaki açılır listeden rolünü <strong>İçerik Editörü</strong> veya <strong>Moderatör</strong> olarak seçebilirsiniz.</p>
+                                </div>
+                                <div class="guide-item">
+                                    <span class="guide-badge">3. Güvenli Sade Arayüz</span>
+                                    <h4>Karmaşık Kısımlar Gizlenir</h4>
+                                    <p>Editör veya Moderatör giriş yaptığında sistem sizin bu gördüğünüz <strong>Kullanıcı Yönetimi</strong> ve <strong>Yedekleme</strong> sekmelerini onlara otomatik olarak tamamen gizler; sadece sade ve pratik kısımları görürler.</p>
+                                </div>
+                                <div class="guide-item">
+                                    <span class="guide-badge">4. Başvuru Takibi</span>
+                                    <h4>Gelen Başvurular</h4>
+                                    <p>Siteden yapılan başvurular ve öneriler anında sisteme kaydedilir. Ayrıca öğrenciler butona tıkladığı an oluşturulan hazır WhatsApp mesajı ile doğrudan size de ulaşır.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EKİP ÜYELERİNDEN SÜPER ADMİNE GELEN MESAJLAR (SADECE SÜPER ADMİN) -->
+                    <div class="dashboard-card superadmin-only" id="devMessagesCard" style="margin-bottom: 24px;">
+                        <div class="card-header">
+                            <div>
+                                <h3><i class="fas fa-inbox"></i> Ekip Üyelerinden Gelen Notlar & Mesajlar (<span id="devMsgCount">0</span>)</h3>
+                                <p class="card-desc">Ekip üyelerinin sağ alttaki "Geliştiriciye Yaz" kutusundan size bıraktığı notlar.</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="data-table" id="devMessagesTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Gönderen</th>
+                                            <th>Konu / Kategori</th>
+                                            <th>Mesaj</th>
+                                            <th>Tarih</th>
+                                            <th>İşlem</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="devMessagesTableBody">
+                                        <!-- Dinamik doldurulacak -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Hızlı İşlemler Kartları -->
                     <div class="quick-actions-row">
                         <div class="dashboard-card">
@@ -728,6 +793,56 @@
 
             </div>
         </main>
+    </div>
+
+    <!-- SAĞ ALT: GELİŞTİRİCİYE / SÜPER ADMİNE YAZ BUTONU -->
+    <button class="dev-msg-fab" id="devMsgFab" title="Süper Admin / Geliştiriciye Not Bırak">
+        <i class="fas fa-comment-dots"></i>
+        <span>Geliştiriciye Yaz</span>
+    </button>
+
+    <!-- GELİŞTİRİCİYE YAZ MODAL -->
+    <div class="dev-msg-modal" id="devMsgModal" style="display: none;">
+        <div class="dev-msg-modal-overlay" id="devMsgModalOverlay"></div>
+        <div class="dev-msg-modal-content">
+            <div class="dev-msg-modal-header">
+                <div class="dev-msg-title">
+                    <i class="fas fa-paper-plane"></i>
+                    <div>
+                        <h4>Geliştiriciye & Başkana Yaz</h4>
+                        <p>Süper Admin (İlker M.) hesabına soru, öneri veya hata bildirimi iletin.</p>
+                    </div>
+                </div>
+                <button class="dev-msg-close-btn" id="closeDevMsgModal" aria-label="Kapat"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="devMsgForm" class="dev-msg-form">
+                <div class="form-group">
+                    <label for="devSenderName"><i class="fas fa-user"></i> Adınız Soyadınız *</label>
+                    <input type="text" id="devSenderName" placeholder="Ad Soyad" required>
+                </div>
+                <div class="form-group">
+                    <label for="devMsgCategory"><i class="fas fa-tag"></i> Konu *</label>
+                    <select id="devMsgCategory">
+                        <option value="Soru / Yardım">❓ Soru / Yardım Talebi</option>
+                        <option value="Hata Bildirimi">⚠️ Sitede / Panelde Hata Bildirimi</option>
+                        <option value="Yeni Özellik">💡 Yeni Özellik / Sayfa Önerisi</option>
+                        <option value="Genel Not">📝 Genel Not / Bilgilendirme</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="devMsgContent"><i class="fas fa-align-left"></i> Mesajınız *</label>
+                    <textarea id="devMsgContent" rows="4" placeholder="İlker Başkana veya geliştiriciye iletmek istediğiniz not..." required></textarea>
+                </div>
+                <div class="dev-msg-actions">
+                    <button type="submit" class="btn-primary-sm">
+                        <i class="fas fa-paper-plane"></i> Mesajı Kaydet & İlet
+                    </button>
+                    <button type="button" class="btn-whatsapp-sm" id="devMsgWhatsAppBtn">
+                        <i class="fab fa-whatsapp"></i> WhatsApp'tan Yaz
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- TOAST BİLDİRİM KUTUSU -->

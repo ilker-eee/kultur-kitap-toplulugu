@@ -1274,3 +1274,244 @@ body {
         grid-column: auto;
     }
 }
+
+/* ==========================================
+   SUPER ADMIN NOT KARTI & YETKİLENDİRME REHBERİ
+   ========================================== */
+.superadmin-note-card {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(37, 99, 235, 0.05) 100%);
+    border: 1.5px solid rgba(245, 158, 11, 0.35);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.08);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.note-card-header {
+    padding: 20px 24px;
+    background: rgba(245, 158, 11, 0.06);
+    border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.note-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #f59e0b;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+    flex-shrink: 0;
+}
+
+.note-card-header h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.note-card-header p {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.note-card-body {
+    padding: 22px 24px;
+}
+
+.superadmin-guide-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.guide-item {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: var(--shadow-sm);
+}
+
+.guide-badge {
+    align-self: flex-start;
+    background: rgba(245, 158, 11, 0.15);
+    color: #b45309;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+[data-theme="dark"] .guide-badge {
+    background: rgba(245, 158, 11, 0.25);
+    color: #fbbf24;
+}
+
+.guide-item h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.guide-item p {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.guide-item code {
+    background: var(--bg-surface-alt);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    color: var(--primary);
+}
+
+/* ==========================================
+   FLOATING ACTION BUTTON: GELİŞTİRİCİYE YAZ
+   ========================================== */
+.dev-msg-fab {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 20px;
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+    cursor: pointer;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.dev-msg-fab i {
+    font-size: 1.1rem;
+}
+
+.dev-msg-fab:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45);
+}
+
+/* ==========================================
+   GELİŞTİRİCİYE YAZ MODAL
+   ========================================== */
+.dev-msg-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.dev-msg-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+}
+
+.dev-msg-modal-content {
+    position: relative;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 480px;
+    padding: 28px;
+    animation: authFadeIn 0.3s ease;
+    z-index: 1;
+}
+
+.dev-msg-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dev-msg-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dev-msg-title i {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.dev-msg-title h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.dev-msg-title p {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.dev-msg-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.dev-msg-close-btn:hover {
+    color: var(--accent-red);
+}
+
+.dev-msg-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.dev-msg-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+}
+

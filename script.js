@@ -382,9 +382,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Save applicant to local storage for Admin Panel
             try {
                 const raw = localStorage.getItem('sdu_topluluk_data');
-                const data = raw ? JSON.parse(raw) : { applications: [] };
-                if (!data.applications) data.applications = [];
-                data.applications.unshift({
+                let data = raw ? JSON.parse(raw) : {};
+                if (!data.applications || !Array.isArray(data.applications)) {
+                    data.applications = [];
+                }
+                const newApplication = {
                     id: Date.now(),
                     fullName,
                     department,
@@ -393,8 +395,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     interest,
                     date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
                     status: 'Beklemede'
-                });
+                };
+                data.applications.unshift(newApplication);
                 localStorage.setItem('sdu_topluluk_data', JSON.stringify(data));
+
+                // Ekstra Güvenlik: Bağımsız yedek havuzuna da ekle
+                const standaloneRaw = localStorage.getItem('sdu_submitted_applications');
+                const standaloneList = standaloneRaw ? JSON.parse(standaloneRaw) : [];
+                standaloneList.unshift(newApplication);
+                localStorage.setItem('sdu_submitted_applications', JSON.stringify(standaloneList));
             } catch (err) {
                 console.warn('Başvuru kaydetme hatası:', err);
             }
@@ -409,6 +418,17 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('🎉 Başvurunuz alındı! Aramıza hoş geldiniz.', 'fas fa-check-circle');
         });
     }
+
+    // === YÖNETİM KURULU İÇİN GİZLİ KISAYOL (Ctrl + Shift + A) ===
+    window.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+            e.preventDefault();
+            showToast('🔐 Yönetim Masasına yönlendiriliyorsunuz...', 'fas fa-key');
+            setTimeout(() => {
+                window.location.href = 'admin.html';
+            }, 600);
+        }
+    });
 
     // === SUGGEST AN EVENT FORM SUBMISSION ===
     const suggestEventForm = document.getElementById('suggestEventForm');

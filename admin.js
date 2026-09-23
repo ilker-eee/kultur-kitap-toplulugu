@@ -133,37 +133,76 @@
     const STORAGE_KEY = 'sdu_topluluk_data';
     const SESSION_USER_KEY = 'sdu_admin_user';
 
+    // === VERİLERİ KONTROL ET VE EKSİKLERİ TAMAMLA ===
+    function ensureCompleteData(parsed) {
+        if (!parsed || typeof parsed !== 'object') parsed = {};
+        if (!parsed.book || typeof parsed.book !== 'object') {
+            parsed.book = JSON.parse(JSON.stringify(DEFAULT_DATA.book));
+        }
+        if (!parsed.events || !Array.isArray(parsed.events)) {
+            parsed.events = JSON.parse(JSON.stringify(DEFAULT_DATA.events));
+        }
+        if (!parsed.applications || !Array.isArray(parsed.applications)) {
+            parsed.applications = JSON.parse(JSON.stringify(DEFAULT_DATA.applications));
+        }
+        if (!parsed.suggestions || !Array.isArray(parsed.suggestions)) {
+            parsed.suggestions = JSON.parse(JSON.stringify(DEFAULT_DATA.suggestions));
+        }
+        if (!parsed.users || !Array.isArray(parsed.users)) {
+            parsed.users = JSON.parse(JSON.stringify(DEFAULT_DATA.users));
+        }
+        if (!parsed.developer_messages || !Array.isArray(parsed.developer_messages)) {
+            parsed.developer_messages = [];
+        }
+
+        // Güvenlik: Master kullanıcının varlığını ve şifresini garanti altına al
+        let hasMaster = false;
+        parsed.users = parsed.users.map(u => {
+            if (u.email.toLowerCase() === 'ilkerm946@gmail.com') {
+                hasMaster = true;
+                u.role = 'superadmin';
+                u.isMaster = true;
+                if (!u.password) u.password = 'ilker123';
+            }
+            return u;
+        });
+
+        if (!hasMaster) {
+            parsed.users.unshift(DEFAULT_DATA.users[0]);
+        }
+
+        // Standalone sdu_submitted_applications anahtarından başvuruları içe aktar ve birleştir
+        try {
+            const standaloneRaw = localStorage.getItem('sdu_submitted_applications');
+            if (standaloneRaw) {
+                const sApps = JSON.parse(standaloneRaw);
+                if (Array.isArray(sApps)) {
+                    sApps.forEach(sApp => {
+                        const exists = parsed.applications.some(a => a.id === sApp.id || (a.phone === sApp.phone && a.fullName === sApp.fullName));
+                        if (!exists) parsed.applications.unshift(sApp);
+                    });
+                }
+            }
+        } catch (e) {}
+
+        return parsed;
+    }
+
     // === VERİ GETİR / KAYDET ===
     function getData() {
         try {
             const raw = localStorage.getItem(STORAGE_KEY);
             if (!raw) {
-                saveData(DEFAULT_DATA);
-                return JSON.parse(JSON.stringify(DEFAULT_DATA));
+                const initial = ensureCompleteData({});
+                saveData(initial);
+                return initial;
             }
             const parsed = JSON.parse(raw);
-            // Güvenlik: Master kullanıcının varlığını ve şifresini garanti altına al
-            let hasMaster = false;
-            if (!parsed.users || !Array.isArray(parsed.users)) parsed.users = DEFAULT_DATA.users;
-            
-            parsed.users = parsed.users.map(u => {
-                if (u.email === 'ilkerm946@gmail.com') {
-                    hasMaster = true;
-                    u.role = 'superadmin';
-                    u.isMaster = true;
-                    if (!u.password) u.password = 'ilker123';
-                }
-                return u;
-            });
-
-            if (!hasMaster) {
-                parsed.users.unshift(DEFAULT_DATA.users[0]);
-            }
-            if (!parsed.suggestions) parsed.suggestions = DEFAULT_DATA.suggestions;
-            return parsed;
+            const complete = ensureCompleteData(parsed);
+            return complete;
         } catch (e) {
             console.error('Veri yükleme hatası:', e);
-            return JSON.parse(JSON.stringify(DEFAULT_DATA));
+            return ensureCompleteData({});
         }
     }
 
@@ -498,6 +537,7 @@
         renderSuggestionsSection(data);
         renderBroadcastSection(data);
         renderUsersSection(data);
+        renderDevMessagesSection(data);
     }
 
     // 1. GENEL BAKIŞ
@@ -512,6 +552,10 @@
 
         const suggCount = data.suggestions ? data.suggestions.length : 0;
         document.getElementById('statSuggestionCount').textContent = suggCount;
+
+        const devMsgCount = data.developer_messages ? data.developer_messages.length : 0;
+        const devMsgCountEl = document.getElementById('devMsgCount');
+        if (devMsgCountEl) devMsgCountEl.textContent = devMsgCount;
 
         // Badge counters
         const badgeApps = document.getElementById('badgeApplications');
@@ -994,6 +1038,126 @@
             showToast('Sistem varsayılan verilere sıfırlandı.', 'fas fa-redo');
         });
     }
+
+    // ==========================================
+    // 9. GELİŞTİRİCİYE / SÜPER ADMİNE YAZILAN MESAJLAR
+    // ==========================================
+    function renderDevMessagesSection(data) {
+        const tbody = document.getElementById('devMessagesTableBody');
+        const countEl = document.getElementById('devMsgCount');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        const list = data.developer_messages || [];
+        if (countEl) countEl.textContent = list.length;
+
+        if (list.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">Henüz ekip üyelerinden bir not bırakılmadı.</td></tr>`;
+            return;
+        }
+
+        list.forEach(m => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${m.sender}</strong></td>
+                <td><span class="table-tag tag-kitap">${m.category}</span></td>
+                <td>${m.content}</td>
+                <td><small>${m.date}</small></td>
+                <td>
+                    <button class="btn-icon-action delete" title="Mesajı Sil" onclick="deleteDevMessage(${m.id})">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    window.deleteDevMessage = function(id) {
+        if (!confirm('Bu notu silmek istediğinize emin misiniz?')) return;
+        const data = getData();
+        data.developer_messages = (data.developer_messages || []).filter(m => m.id !== id);
+        saveData(data);
+        renderDevMessagesSection(data);
+        renderOverview(data);
+        showToast('Not silindi.', 'fas fa-trash-alt');
+    };
+
+    // FAB & Modal Dinleyicileri
+    const devMsgFab = document.getElementById('devMsgFab');
+    const devMsgModal = document.getElementById('devMsgModal');
+    const closeDevMsgModal = document.getElementById('closeDevMsgModal');
+    const devMsgModalOverlay = document.getElementById('devMsgModalOverlay');
+    const devMsgForm = document.getElementById('devMsgForm');
+    const devSenderName = document.getElementById('devSenderName');
+    const devMsgWhatsAppBtn = document.getElementById('devMsgWhatsAppBtn');
+
+    if (devMsgFab && devMsgModal) {
+        devMsgFab.addEventListener('click', () => {
+            devMsgModal.style.display = 'flex';
+            const user = getLoggedInUser();
+            if (user && devSenderName && !devSenderName.value) {
+                devSenderName.value = `${user.name} (${user.title || user.role})`;
+            }
+        });
+    }
+
+    if (closeDevMsgModal && devMsgModal) {
+        closeDevMsgModal.addEventListener('click', () => {
+            devMsgModal.style.display = 'none';
+        });
+    }
+
+    if (devMsgModalOverlay && devMsgModal) {
+        devMsgModalOverlay.addEventListener('click', () => {
+            devMsgModal.style.display = 'none';
+        });
+    }
+
+    if (devMsgForm) {
+        devMsgForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const sender = document.getElementById('devSenderName').value.trim();
+            const category = document.getElementById('devMsgCategory').value;
+            const content = document.getElementById('devMsgContent').value.trim();
+
+            const data = getData();
+            if (!data.developer_messages) data.developer_messages = [];
+            data.developer_messages.unshift({
+                id: Date.now(),
+                sender,
+                category,
+                content,
+                date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+            });
+            saveData(data);
+            renderDevMessagesSection(data);
+            renderOverview(data);
+
+            devMsgModal.style.display = 'none';
+            devMsgForm.reset();
+            showToast('✉️ Notunuz Süper Admin masasına iletildi!', 'fas fa-check-circle');
+        });
+    }
+
+    if (devMsgWhatsAppBtn) {
+        devMsgWhatsAppBtn.addEventListener('click', () => {
+            const sender = document.getElementById('devSenderName')?.value.trim() || 'Yönetim Üyesi';
+            const category = document.getElementById('devMsgCategory')?.value || 'Not';
+            const content = document.getElementById('devMsgContent')?.value.trim() || '';
+
+            const waText = `Merhaba İlker Başkanım! 👋%0A%0A*Gönderen:* ${encodeURIComponent(sender)}%0A*Konu:* ${encodeURIComponent(category)}%0A*Mesaj:* ${encodeURIComponent(content || 'Panel üzerinden bir not iletmek istiyorum.')}`;
+            const url = `https://wa.me/905XXXXXXXXX?text=${waText}`;
+            window.open(url, '_blank');
+        });
+    }
+
+    // Gerçek Zamanlı Sekmeler Arası Senkronizasyon Dinleyicisi
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'sdu_topluluk_data' || e.key === 'sdu_submitted_applications') {
+            renderAllSections();
+            showToast('🔔 Yeni başvuru veya veri senkronize edildi!', 'fas fa-bell');
+        }
+    });
 
     // ==========================================
     // İLK YÜKLEME KONTROLÜ
