@@ -1241,7 +1241,36 @@ document.addEventListener('DOMContentLoaded', () => {
                     password
                 };
 
-                const newMember = await registerMember(newMemberData);
+                let newMember;
+                try {
+                    newMember = await registerMember(newMemberData);
+                } catch (fbErr) {
+                    console.warn("Firebase kayıt başarısız, yerel kayıt kullanılıyor:", fbErr);
+                    newMember = {
+                        id: 'local_' + Date.now(),
+                        name: newMemberData.name,
+                        role: 'Üye',
+                        identifier: newMemberData.identifier
+                    };
+                }
+
+                // Hem Yönetim Paneli Gelen Başvurular sekmesine düşsün hem de giriş yapılsın
+                const rawData = localStorage.getItem('sdu_topluluk_data');
+                if (rawData) {
+                    const data = JSON.parse(rawData);
+                    if (!data.applications) data.applications = [];
+                    data.applications.push({
+                        id: Date.now(),
+                        fullName: name,
+                        studentId: identifier.split('@')[0],
+                        department: department,
+                        grade: grade,
+                        phone: phone,
+                        status: 'Beklemede',
+                        date: new Date().toLocaleDateString('tr-TR')
+                    });
+                    localStorage.setItem('sdu_topluluk_data', JSON.stringify(data));
+                }
 
                 saveMemberSession(newMember);
                 closeAuthModal();
