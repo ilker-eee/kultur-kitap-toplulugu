@@ -625,18 +625,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function getAllEventsList() {
         const defaultEvents = [
-            { id: 1, title: "Kitap Okuma Kulübü", category: "kitap", date: "15 Ekim 2026", time: "14:00", place: "Merkez Kütüphane", desc: "Bu ayki kitabımızı birlikte tartışacağımız okuma grubu buluşması." },
-            { id: 2, title: "Yazar Söyleşisi", category: "soylesi", date: "22 Ekim 2026", time: "15:30", place: "Konferans Salonu", desc: "Ünlü yazarımız ile edebiyat ve yaratıcı yazarlık üzerine keyifli bir söyleşi." },
-            { id: 3, title: "Şiir Dinletisi", category: "soylesi", date: "5 Kasım 2026", time: "18:00", place: "Amfi Tiyatro", desc: "Öğrencilerimizin kendi şiirlerini seslendireceği özel bir akşam etkinliği." },
-            { id: 4, title: "Kültür Gezisi", category: "gezi", date: "12 Kasım 2026", time: "09:00", place: "Şehir Merkezi", desc: "Tarihi ve kültürel mekanları keşfedeceğimiz bir günlük gezi programı." },
-            { id: 5, title: "Yazma Etkinliği", category: "kitap", date: "5 Mart 2026", time: "14:00", place: "Etkinlik Salonu", badge: "Tamamlandı", desc: "Geçmiş Etkinlik - Workshop formatında gerçekleştirilen yazma etkinliğimiz." },
-            { id: 6, title: "Adem'den Önce Kitap Kritiği", category: "kitap", date: "10 Aralık 2025", time: "15:00", place: "Okuma Salonu", badge: "Tamamlandı", desc: "Geçmiş Etkinlik - Adem'den Önce kitabı üzerine gerçekleştirdiğimiz söyleşi." },
-            { id: 7, title: "Matrix Film İzleme Etkinliği", category: "soylesi", date: "24 Ekim 2025", time: "19:00", place: "Sinema Salonu", badge: "Tamamlandı", desc: "Geçmiş Etkinlik - Üyelerimizle birlikte gerçekleştirdiğimiz film izleme ve tahlil etkinliği." },
-            { id: 8, title: "Tanışma Toplantısı", category: "soylesi", date: "15 Ekim 2025", time: "17:00", place: "Merkez Kütüphane", badge: "Tamamlandı", desc: "Geçmiş Etkinlik - SDÜ Kültür ve Kitap Topluluğu tanışma toplantısı." },
-            { id: 9, title: "Bir Zamanlar Anadolu'da Film İzleme", category: "soylesi", date: "20 Haziran 2025", time: "18:00", place: "Sinema Salonu", badge: "Tamamlandı", desc: "Geçmiş Etkinlik - Anma programı kapsamında film gösterimi." },
-            { id: 10, title: "Sagalassos Antik Kenti Gezisi", category: "gezi", date: "30 Mayıs 2025", time: "09:00", place: "Sagalassos", badge: "Tamamlandı", desc: "Geçmiş Etkinlik - Sosyal ve kültürel gezi." },
-            { id: 11, title: "Üç Anadolu Efsanesi Kitap İncelemesi", category: "kitap", date: "13 Mayıs 2025", time: "16:00", place: "Okuma Salonu", badge: "Tamamlandı", desc: "Geçmiş Etkinlik - Kitap inceleme etkinliği." },
-            { id: 12, title: "Film Gösterimi: 12 Kızgın Adam", category: "soylesi", date: "02 Mayıs 2025", time: "19:00", place: "Sinema Salonu", badge: "Tamamlandı", desc: "Geçmiş Etkinlik - Film gösterimi." }
+            { id: 5, title: "Yazma Etkinliği", category: "kitap", date: "5 Mart 2026", time: "14:00", place: "Etkinlik Salonu", badge: "Tamamlandı", desc: "Workshop formatında gerçekleştirilen yazma etkinliğimiz." },
+            { id: 6, title: "Adem'den Önce Kitap Kritiği", category: "kitap", date: "10 Aralık 2025", time: "15:00", place: "Okuma Salonu", badge: "Tamamlandı", desc: "Adem'den Önce kitabı üzerine gerçekleştirdiğimiz söyleşi." },
+            { id: 7, title: "Matrix Film İzleme Etkinliği", category: "soylesi", date: "24 Ekim 2025", time: "19:00", place: "Sinema Salonu", badge: "Tamamlandı", desc: "Üyelerimizle birlikte gerçekleştirdiğimiz film izleme ve tahlil etkinliği." },
+            { id: 8, title: "Tanışma Toplantısı", category: "soylesi", date: "15 Ekim 2025", time: "17:00", place: "Merkez Kütüphane", badge: "Tamamlandı", desc: "SDÜ Kültür ve Kitap Topluluğu tanışma toplantısı." },
+            { id: 9, title: "Bir Zamanlar Anadolu'da Film İzleme", category: "soylesi", date: "20 Haziran 2025", time: "18:00", place: "Sinema Salonu", badge: "Tamamlandı", desc: "Anma programı kapsamında film gösterimi." },
+            { id: 10, title: "Sagalassos Antik Kenti Gezisi", category: "gezi", date: "30 Mayıs 2025", time: "09:00", place: "Sagalassos", badge: "Tamamlandı", desc: "Sosyal ve kültürel gezi." },
+            { id: 11, title: "Üç Anadolu Efsanesi Kitap İncelemesi", category: "kitap", date: "13 Mayıs 2025", time: "16:00", place: "Okuma Salonu", badge: "Tamamlandı", desc: "Kitap inceleme etkinliği." },
+            { id: 12, title: "Film Gösterimi: 12 Kızgın Adam", category: "soylesi", date: "02 Mayıs 2025", time: "19:00", place: "Sinema Salonu", badge: "Tamamlandı", desc: "Film gösterimi." }
         ];
 
         try {
@@ -805,7 +801,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (pastGrid) pastGrid.innerHTML = '';
                 
                 data.events.forEach(ev => {
-                    const pCount = (ev.participants && Array.isArray(ev.participants)) ? ev.participants.length : 24;
+                    const pCount = (ev.participants && Array.isArray(ev.participants)) ? ev.participants.length : 0;
                     const card = document.createElement('div');
                     card.className = 'event-card';
                     card.dataset.category = ev.category;
@@ -1424,7 +1420,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!stats) {
                 // SDU Resmi Topluluk Sayfası Kaydıyla Uyumlu Başlangıç Sayacı
-                stats = { total: 1845, today: 1, date: todayDate };
+                stats = { total: 0, today: 1, date: todayDate };
             }
 
             // Gün değiştiğinde bugünkü gerçek sayacı sıfırla

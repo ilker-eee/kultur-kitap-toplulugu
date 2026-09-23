@@ -17,58 +17,14 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
             author: "Sabahattin Ali",
             genre: "Türk Klasikleri",
             pages: "160",
-            readers: "85 Okur",
+            readers: "0 Okur",
             synopsis: "Topluluğumuzla bu ay Türk edebiyatının derin aşk ve yabancılaşma başyapıtını tahlil ediyoruz. Yalnızlık, sanat ve ruh bağları üzerine konuşacağımız bu özel oturuma tüm üniversitemiz davetlidir.",
             quote: "İnsanlara inanmak, onlara güvenmek lazım geldiğini biliyorum... Fakat bir kere aldanan bir adamın bir daha inanmasına imkân var mıdır?",
-            progress: 75,
-            meetingDate: "28 Ekim 2026, Çarşamba 17:00",
-            meetingPlace: "Merkez Kütüphane Kitap Kafe"
+            progress: 0,
+            meetingDate: "Henüz belirlenmedi",
+            meetingPlace: "Henüz belirlenmedi"
         },
         events: [
-            {
-                id: 1,
-                title: "Kitap Okuma Kulübü",
-                category: "kitap",
-                date: "15 Ekim 2026",
-                time: "14:00",
-                place: "Merkez Kütüphane",
-                badge: "Yaklaşan",
-                icon: "fas fa-book",
-                desc: "Bu ayki kitabımızı birlikte tartışacağımız okuma grubu buluşması."
-            },
-            {
-                id: 2,
-                title: "Yazar Söyleşisi",
-                category: "soylesi",
-                date: "22 Ekim 2026",
-                time: "15:30",
-                place: "Konferans Salonu",
-                badge: "Önümüzdeki Ay",
-                icon: "fas fa-microphone",
-                desc: "Ünlü yazarımız ile edebiyat ve yaratıcı yazarlık üzerine keyifli bir söyleşi."
-            },
-            {
-                id: 3,
-                title: "Şiir Dinletisi",
-                category: "soylesi",
-                date: "05 Kasım 2026",
-                time: "18:00",
-                place: "Amfi Tiyatro",
-                badge: "Önümüzdeki Ay",
-                icon: "fas fa-feather-alt",
-                desc: "Öğrencilerimizin kendi şiirlerini seslendireceği özel bir akşam etkinliği."
-            },
-            {
-                id: 4,
-                title: "Kültür Gezisi",
-                category: "gezi",
-                date: "12 Kasım 2026",
-                time: "09:00",
-                place: "Sagalassos Antik Kenti",
-                badge: "Kayıt Açık",
-                icon: "fas fa-bus",
-                desc: "Tarihi ve kültürel mekanları keşfedeceğimiz bir günlük gezi programı."
-            },
             {
                 id: 5,
                 title: "Yazma Etkinliği",
@@ -78,7 +34,7 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
                 place: "Etkinlik Salonu",
                 badge: "Tamamlandı",
                 icon: "fas fa-pencil-alt",
-                desc: "Geçmiş Etkinlik - Workshop formatında gerçekleştirilen yazma etkinliğimiz."
+                desc: "Workshop formatında gerçekleştirilen yazma etkinliğimiz."
             },
             {
                 id: 6,
@@ -89,7 +45,7 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
                 place: "Okuma Salonu",
                 badge: "Tamamlandı",
                 icon: "fas fa-book-open",
-                desc: "Geçmiş Etkinlik - Adem'den Önce kitabı üzerine gerçekleştirdiğimiz söyleşi."
+                desc: "Adem'den Önce kitabı üzerine gerçekleştirdiğimiz söyleşi."
             },
             {
                 id: 7,
@@ -100,7 +56,7 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
                 place: "Sinema Salonu",
                 badge: "Tamamlandı",
                 icon: "fas fa-film",
-                desc: "Geçmiş Etkinlik - Üyelerimizle birlikte gerçekleştirdiğimiz film izleme ve tahlil etkinliği."
+                desc: "Üyelerimizle birlikte gerçekleştirdiğimiz film izleme ve tahlil etkinliği."
             },
             {
                 id: 8,
@@ -111,42 +67,11 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
                 place: "Merkez Kütüphane",
                 badge: "Tamamlandı",
                 icon: "fas fa-users",
-                desc: "Geçmiş Etkinlik - SDÜ Kültür ve Kitap Topluluğu tanışma toplantısı."
+                desc: "SDÜ Kültür ve Kitap Topluluğu tanışma toplantısı."
             }
         ],
-        applications: [
-            {
-                id: 1,
-                fullName: "Zeynep Kaya",
-                department: "Türk Dili ve Edebiyatı",
-                grade: "2. Sınıf",
-                phone: "05551234567",
-                interest: "Kitap Okuma Kulübü & Tahliller",
-                date: "2026-09-22 14:30",
-                status: "Onaylandı"
-            },
-            {
-                id: 2,
-                fullName: "Emre Yılmaz",
-                department: "Bilgisayar Mühendisliği",
-                grade: "1. Sınıf",
-                phone: "05429876543",
-                interest: "Yazar Söyleşileri & Paneller",
-                date: "2026-09-23 09:15",
-                status: "Beklemede"
-            }
-        ],
-        suggestions: [
-            {
-                id: 1,
-                name: "Büşra Çelik",
-                department: "Sosyoloji",
-                title: "Açık Havada Gece Sineması ve Kitap Karşılaştırması",
-                desc: "Kampüs çimlerinde akşam 'Guguk Kuşu' veya '1984' filmini izleyip romanıyla karşılaştıralım.",
-                date: "2026-09-23 10:00",
-                status: "Değerlendiriliyor"
-            }
-        ],
+        applications: [],
+        suggestions: [],
         users: [
             {
                 id: 1,
@@ -156,22 +81,6 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
                 role: "superadmin",
                 title: "Topluluk Başkanı (Süper Admin)",
                 isMaster: true
-            },
-            {
-                id: 2,
-                name: "Ahmet Y.",
-                email: "ahmet@sdu.edu.tr",
-                password: "sdu123",
-                role: "editor",
-                title: "İçerik Editörü"
-            },
-            {
-                id: 3,
-                name: "Selin D.",
-                email: "selin@sdu.edu.tr",
-                password: "sdu123",
-                role: "moderator",
-                title: "Başvuru Moderatörü"
             }
         ]
     };
