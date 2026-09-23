@@ -3917,3 +3917,31 @@ img {
 
 
 
+/* Yeni Footer Düzeni */
+.new-footer-layout {
+    grid-template-columns: 1fr 1.5fr;
+}
+
+.footer-links-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.footer-links-grid li a {
+    transition: all 0.3s ease;
+}
+
+.footer-links-grid li a:hover {
+    color: white;
+    transform: translateX(5px);
+}
+
+@media (max-width: 768px) {
+    .new-footer-layout {
+        grid-template-columns: 1fr !important;
+    }
+    .footer-links-grid {
+        grid-template-columns: 1fr;
+    }
+}
