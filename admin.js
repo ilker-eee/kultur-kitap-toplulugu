@@ -992,6 +992,7 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
         const tbody = document.getElementById('usersTableBody');
         const pendingTbody = document.getElementById('pendingUsersTableBody');
         const pendingCountEl = document.getElementById('pendingUsersCount');
+        const badgeUsers = document.getElementById('badgeUsers');
         
         if (tbody) tbody.innerHTML = '';
         if (pendingTbody) pendingTbody.innerHTML = '';
@@ -1000,6 +1001,10 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
         const activeUsers = data.users.filter(u => u.status !== 'pending_approval');
 
         if (pendingCountEl) pendingCountEl.textContent = pendingUsers.length;
+        if (badgeUsers) {
+            badgeUsers.textContent = pendingUsers.length;
+            badgeUsers.style.display = pendingUsers.length > 0 ? 'inline-block' : 'none';
+        }
 
         // Onay Bekleyen Tablosu
         if (pendingTbody) {
