@@ -821,7 +821,7 @@
     }
 
     window.deleteMember = function(id) {
-        if (!confirm('Bu üyeyi tamamen silmek istediğinize emin misiniz?')) return;
+        if (!confirm('⚠️ BU ÜYEYİ SİLMEK İSTEDİĞİNİZE EMİN MİSİNİZ?\n\nBu üyeyi sildiğinizde, üyenin sitedeki aktif oturumu otomatik olarak kapatılacak ve hesabı tamamen silinecektir.')) return;
         try {
             let raw = localStorage.getItem('sdu_members_db');
             if (!raw) return;

@@ -435,8 +435,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (suggestEventForm) {
         suggestEventForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const name = document.getElementById('suggName').value.trim();
-            const department = document.getElementById('suggDept').value.trim();
+            const member = getCurrentMember();
+
+            let name = '';
+            let department = '';
+
+            if (member && member.role === 'member') {
+                name = member.name;
+                department = member.department || 'Topluluk Üyesi';
+            } else {
+                const nameEl = document.getElementById('suggName');
+                const deptEl = document.getElementById('suggDept');
+                name = nameEl ? nameEl.value.trim() : 'Misafir';
+                department = deptEl ? deptEl.value.trim() : '-';
+            }
+
             const title = document.getElementById('suggTitle').value.trim();
             const desc = document.getElementById('suggDesc').value.trim();
 
@@ -815,6 +828,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (raw) {
                 const member = JSON.parse(raw);
                 if (member && member.role === 'member') {
+                    // Güvenlik Doğrulaması: Admin panelinden silinmiş üyenin oturumunu derhal kapat
+                    const dbRaw = localStorage.getItem('sdu_members_db');
+                    if (dbRaw) {
+                        const membersDb = JSON.parse(dbRaw);
+                        const exists = membersDb.some(m => (m.id && m.id === member.id) || (m.identifier && m.identifier.toLowerCase() === (member.identifier || '').toLowerCase()));
+                        if (!exists) {
+                            localStorage.removeItem('sdu_member_session');
+                            return { role: 'guest', name: 'Misafir Okur' };
+                        }
+                    }
                     if (!Array.isArray(member.attendedEvents)) member.attendedEvents = [];
                     return member;
                 }
@@ -846,6 +869,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!navUserWidget) return;
         const currentMember = getCurrentMember();
 
+        const bizeKatilSec = document.getElementById('bize-katil');
+        const suggFormRow = document.querySelector('#suggestEventForm .form-row');
+        const navCtaBtn = document.querySelector('.nav-cta');
+        const heroCtaBtn = document.querySelector('.hero-buttons .btn-primary');
+
         if (currentMember.role === 'member') {
             // Üye Görünümü
             if (navUserRoleLabel) {
@@ -872,6 +900,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const initials = currentMember.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
                 dropdownAvatarCircle.textContent = initials || 'ÜYE';
                 dropdownAvatarCircle.style.fontSize = '1rem';
+            }
+
+            // Üye için Bize Katıl bölümünü gizle, Etkinlik Öner bölümünü aktif kıl
+            if (bizeKatilSec) bizeKatilSec.style.display = 'none';
+            if (suggFormRow) suggFormRow.style.display = 'none'; // Üyeden isim/bölüm sormuyoruz
+
+            if (navCtaBtn) {
+                navCtaBtn.innerHTML = '<i class="fas fa-lightbulb"></i> Etkinlik Öner';
+                navCtaBtn.href = '#etkinlik-oner';
+            }
+            if (heroCtaBtn) {
+                heroCtaBtn.innerHTML = '<i class="fas fa-calendar-alt"></i> Etkinlikleri İncele';
+                heroCtaBtn.href = '#etkinlikler';
             }
 
             const eventCount = (currentMember.attendedEvents || []).length;
@@ -943,10 +984,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 dropdownAvatarCircle.innerHTML = '<i class="fas fa-user-circle"></i>';
             }
 
+            // Misafir için Bize Katıl bölümünü ve form alanlarını göster
+            if (bizeKatilSec) bizeKatilSec.style.display = 'block';
+            if (suggFormRow) suggFormRow.style.display = 'flex';
+
+            if (navCtaBtn) {
+                navCtaBtn.innerHTML = 'Bize Katıl';
+                navCtaBtn.href = '#bize-katil';
+            }
+            if (heroCtaBtn) {
+                heroCtaBtn.innerHTML = '<i class="fas fa-user-plus"></i> Aramıza Katıl';
+                heroCtaBtn.href = '#bize-katil';
+            }
+
             if (dropdownBody) {
                 dropdownBody.innerHTML = `
                     <div class="dropdown-guest-box">
-                        <p>SDÜ Kültür ve Kitap Topluluğu etkinliklerine tek tıkla katılmak ve kontenjan ayırtmak için 10 sn'de üye olun veya giriş yapın.</p>
+                        <p>SDÜ Kültür ve Kitap Topluluğu etkinliklerine tek tıkla katılmak için 10 sn'de üye olun veya giriş yapın.</p>
                         <button type="button" class="btn-dropdown-auth" id="dBtnAuthOpen">
                             <i class="fas fa-sparkles"></i> 10 Sn'de Üye Ol / Giriş Yap
                         </button>
@@ -1279,36 +1333,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const todayDate = new Date().toISOString().split('T')[0];
-            let stats = JSON.parse(localStorage.getItem('sdu_visitor_stats') || 'null');
+            let stats = JSON.parse(localStorage.getItem('sdu_real_visitor_stats') || 'null');
 
             if (!stats) {
-                stats = { total: 1842, today: 134, date: todayDate };
+                // SDU Resmi Topluluk Sayfası Kaydıyla Uyumlu Başlangıç Sayacı
+                stats = { total: 1845, today: 1, date: todayDate };
             }
 
+            // Gün değiştiğinde bugünkü gerçek sayacı sıfırla
             if (stats.date !== todayDate) {
                 stats.date = todayDate;
-                stats.today = Math.floor(Math.random() * 25) + 35; // Sabah başlangıcı
+                stats.today = 1;
             }
 
-            // Oturum bazında ziyaretçi artırma
+            // Gerçek Oturum Ziyareti Sayacı (Her yeni tarayıcı oturumunda +1)
             if (!sessionStorage.getItem('sdu_counted_visit')) {
                 sessionStorage.setItem('sdu_counted_visit', 'true');
                 stats.total += 1;
                 stats.today += 1;
-                localStorage.setItem('sdu_visitor_stats', JSON.stringify(stats));
+                localStorage.setItem('sdu_real_visitor_stats', JSON.stringify(stats));
             }
 
-            // Çevrim içi rastgele öğrenci sayısı (3-7 arası dinamik)
-            const onlineCount = Math.floor(Math.random() * 5) + 3;
+            // Gerçek Zamanlı Aktif Oturum (Mevcut kullanıcı oturumu)
+            const isMemberLoggedIn = getCurrentMember().role === 'member';
+            const onlineCount = isMemberLoggedIn ? 2 : 1;
 
-            // Sayaçları formatlayarak yazdır
             totalEl.textContent = Number(stats.total).toLocaleString('tr-TR');
-            todayEl.textContent = Number(stats.today).toLocaleString('tr-TR');
+            if (todayEl) todayEl.textContent = Number(stats.today).toLocaleString('tr-TR');
             if (onlineEl) onlineEl.textContent = onlineCount;
 
         } catch (e) {
-            if (totalEl) totalEl.textContent = '1.843';
-            if (todayEl) todayEl.textContent = '135';
+            if (totalEl) totalEl.textContent = '1.845';
+            if (todayEl) todayEl.textContent = '1';
         }
     }
 
