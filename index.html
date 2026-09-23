@@ -7,11 +7,14 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+
+    <!-- Scroll Progress Indicator -->
+    <div class="scroll-progress-bar" id="scrollProgressBar"></div>
 
     <!-- ========== NAVIGATION ========== -->
     <nav class="navbar" id="navbar">
@@ -46,25 +49,30 @@
     <!-- ========== HERO SECTION ========== -->
     <section class="hero" id="anasayfa">
         <div class="hero-bg-shapes">
+            <div class="glow-orb orb-1"></div>
+            <div class="glow-orb orb-2"></div>
+            <div class="glow-orb orb-3"></div>
             <div class="shape shape-1"></div>
             <div class="shape shape-2"></div>
             <div class="shape shape-3"></div>
         </div>
         <div class="hero-container">
             <div class="hero-badge">
-                <i class="fas fa-star"></i>
-                Süleyman Demirel Üniversitesi
+                <span class="live-dot"></span>
+                <span>Süleyman Demirel Üniversitesi</span>
+                <span class="badge-separator">•</span>
+                <span class="badge-tag">Güz Kayıtları Açık</span>
             </div>
             <h1 class="hero-title">
                 Birlikte Okuyor,<br>
                 <span class="gradient-text">Birlikte Büyüyoruz.</span>
             </h1>
             <p class="hero-subtitle">
-                Süleyman Demirel Üniversitesi'nde kültür ve edebiyat tutkunlarını bir araya getiren
-                topluluğumuza katıl, birlikte keşfedelim.
+                Süleyman Demirel Üniversitesi'nde kültür, sanat ve edebiyat tutkunlarını bir araya getiren
+                topluluğumuza katıl; birlikte okuyalım, birlikte üretelim.
             </p>
             <div class="hero-buttons">
-                <a href="#hakkimizda" class="btn btn-primary">
+                <a href="#hakkimizda" class="btn btn-primary btn-shine">
                     <i class="fas fa-compass"></i>
                     Topluluğu Keşfet
                 </a>
@@ -88,6 +96,12 @@
                 </div>
             </div>
         </div>
+
+        <!-- Scroll Down Indicator -->
+        <a href="#hakkimizda" class="hero-scroll-indicator" aria-label="Aşağı Kaydır">
+            <span class="mouse-icon"><span class="mouse-wheel"></span></span>
+            <span class="scroll-text">Keşfet</span>
+        </a>
     </section>
 
     <!-- ========== GÜNÜN ALINTISI ========== -->
@@ -219,10 +233,10 @@
                     <div class="reading-progress-box">
                         <div class="progress-info">
                             <span>Topluluk Okuma İlerlemesi</span>
-                            <span class="progress-percent">%75</span>
+                            <span class="progress-percent" id="readingProgressPercent">0%</span>
                         </div>
                         <div class="progress-bar-bg">
-                            <div class="progress-bar-fill" style="width: 75%;"></div>
+                            <div class="progress-bar-fill" id="readingProgressBar" data-target="75" style="width: 0%;"></div>
                         </div>
                     </div>
 
@@ -320,6 +334,7 @@
                         <div class="event-footer">
                             <span><i class="fas fa-map-marker-alt"></i> Merkez Kütüphane</span>
                             <span><i class="fas fa-clock"></i> 14:00</span>
+                            <button class="event-cal-btn" data-title="Kitap Okuma Kulübü" data-date="15 Ekim 2026" aria-label="Takvime Ekle" title="Takvime Ekle / Hatırlatıcı"><i class="far fa-calendar-plus"></i></button>
                         </div>
                     </div>
                 </div>
@@ -341,6 +356,7 @@
                         <div class="event-footer">
                             <span><i class="fas fa-map-marker-alt"></i> Konferans Salonu</span>
                             <span><i class="fas fa-clock"></i> 15:30</span>
+                            <button class="event-cal-btn" data-title="Yazar Söyleşisi" data-date="22 Ekim 2026" aria-label="Takvime Ekle" title="Takvime Ekle / Hatırlatıcı"><i class="far fa-calendar-plus"></i></button>
                         </div>
                     </div>
                 </div>
@@ -362,6 +378,7 @@
                         <div class="event-footer">
                             <span><i class="fas fa-map-marker-alt"></i> Amfi Tiyatro</span>
                             <span><i class="fas fa-clock"></i> 18:00</span>
+                            <button class="event-cal-btn" data-title="Şiir Dinletisi" data-date="5 Kasım 2026" aria-label="Takvime Ekle" title="Takvime Ekle / Hatırlatıcı"><i class="far fa-calendar-plus"></i></button>
                         </div>
                     </div>
                 </div>
@@ -383,6 +400,7 @@
                         <div class="event-footer">
                             <span><i class="fas fa-map-marker-alt"></i> Şehir Merkezi</span>
                             <span><i class="fas fa-clock"></i> 09:00</span>
+                            <button class="event-cal-btn" data-title="Kültür Gezisi" data-date="12 Kasım 2026" aria-label="Takvime Ekle" title="Takvime Ekle / Hatırlatıcı"><i class="far fa-calendar-plus"></i></button>
                         </div>
                     </div>
                 </div>
@@ -741,6 +759,9 @@
     <button class="back-to-top" id="backToTop" aria-label="Yukarı çık">
         <i class="fas fa-chevron-up"></i>
     </button>
+
+    <!-- Interactive Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
 
     <script src="script.js"></script>
 </body>

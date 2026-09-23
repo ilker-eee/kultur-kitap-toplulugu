@@ -22,6 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('theme', newTheme);
         updateThemeIcon(newTheme);
 
+        showToast(newTheme === 'dark' ? '🌙 Karanlık tema etkinleştirildi' : '☀️ Aydınlık tema etkinleştirildi', newTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun');
+
         // Animate the button
         themeToggle.style.transform = 'rotate(360deg) scale(1.1)';
         setTimeout(() => {
@@ -56,6 +58,14 @@ document.addEventListener('DOMContentLoaded', () => {
             backToTop.classList.add('visible');
         } else {
             backToTop.classList.remove('visible');
+        }
+
+        // Scroll Progress Bar
+        const progressBar = document.getElementById('scrollProgressBar');
+        if (progressBar) {
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = totalHeight > 0 ? (scrollY / totalHeight) * 100 : 0;
+            progressBar.style.width = `${progress}%`;
         }
     }
 
@@ -273,6 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
         nextQuoteBtn.addEventListener('click', () => {
             currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
             showQuote(currentQuoteIndex);
+            showToast('✨ Yeni bir edebiyat sözü yüklendi', 'fas fa-feather-alt');
         });
     }
 
@@ -374,8 +385,96 @@ document.addEventListener('DOMContentLoaded', () => {
                 formSuccessMessage.style.display = 'block';
                 formSuccessMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
+
+            showToast('🎉 Başvurunuz alındı! Aramıza hoş geldiniz.', 'fas fa-check-circle');
         });
     }
+
+    // === TOAST NOTIFICATION HELPER ===
+    const toastContainer = document.getElementById('toastContainer');
+    function showToast(message, icon = 'fas fa-info-circle') {
+        if (!toastContainer) return;
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `<i class="${icon}"></i> <span>${message}</span>`;
+        toastContainer.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('fade-out');
+            setTimeout(() => toast.remove(), 320);
+        }, 3200);
+    }
+
+    // === 3D BOOK INTERACTIVE MOUSE TILT ===
+    const bookShowcase = document.querySelector('.book-showcase');
+    const book3d = document.querySelector('.book-3d');
+
+    if (bookShowcase && book3d) {
+        bookShowcase.addEventListener('mousemove', (e) => {
+            const rect = bookShowcase.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            // Calculate tilt angle (-14deg to +14deg)
+            const rotateY = ((x - centerX) / centerX) * 15;
+            const rotateX = -((y - centerY) / centerY) * 12;
+
+            book3d.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(1.04)`;
+        });
+
+        bookShowcase.addEventListener('mouseleave', () => {
+            book3d.style.transform = 'rotateY(-18deg) rotateX(6deg) scale(1)';
+        });
+    }
+
+    // === ANIMATED READING PROGRESS BAR ===
+    const readingBar = document.getElementById('readingProgressBar');
+    const readingPercent = document.getElementById('readingProgressPercent');
+
+    if (readingBar) {
+        const progressObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const target = parseInt(readingBar.dataset.target || 75);
+                    readingBar.style.width = `${target}%`;
+
+                    // Counter animation for percentage
+                    let current = 0;
+                    const duration = 1200;
+                    const stepTime = Math.max(Math.floor(duration / target), 10);
+
+                    const interval = setInterval(() => {
+                        current++;
+                        if (readingPercent) readingPercent.textContent = `%${current}`;
+                        if (current >= target) clearInterval(interval);
+                    }, stepTime);
+
+                    progressObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.25 });
+
+        progressObserver.observe(readingBar);
+    }
+
+    // === EVENT CALENDAR BUTTONS ===
+    const calBtns = document.querySelectorAll('.event-cal-btn');
+    calBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const title = btn.dataset.title || 'Etkinlik';
+            const date = btn.dataset.date || '';
+            showToast(`📅 "${title}" (${date}) hatırlatıcınız kaydedildi!`, 'fas fa-calendar-check');
+
+            btn.style.transform = 'scale(1.25) rotate(15deg)';
+            setTimeout(() => {
+                btn.style.transform = '';
+            }, 300);
+        });
+    });
 
     // Initial call
     handleScroll();
