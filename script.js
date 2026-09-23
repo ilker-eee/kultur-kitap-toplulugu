@@ -874,7 +874,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const raw = localStorage.getItem('sdu_member_session');
             if (raw) {
                 const member = JSON.parse(raw);
-                if (member && member.role === 'member') {
+                if (member && (member.role === 'member' || member.role === 'Üye')) {
                     // Güvenlik Doğrulaması: Admin panelinden silinmiş üyenin oturumunu derhal kapat
                     const dbRaw = localStorage.getItem('sdu_members_db');
                     if (dbRaw) {
@@ -1166,6 +1166,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Firebase Login
                 const user = await loginMember(identifier, password);
                 
+                user.role = 'member';
+                if (!Array.isArray(user.attendedEvents)) user.attendedEvents = [];
                 saveMemberSession(user);
                 closeAuthModal();
                 renderUserWidget();
@@ -1247,12 +1249,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         department: department,
                         grade: grade,
                         phone: phone,
-                        status: 'Beklemede',
+                        status: 'Onaylandı',
                         date: new Date().toLocaleDateString('tr-TR')
                     });
                     localStorage.setItem('sdu_topluluk_data', JSON.stringify(data));
                 }
 
+                // Rolü normalize et ve oturumu kaydet
+                newMember.role = 'member';
+                if (!Array.isArray(newMember.attendedEvents)) newMember.attendedEvents = [];
                 saveMemberSession(newMember);
                 closeAuthModal();
                 renderUserWidget();
