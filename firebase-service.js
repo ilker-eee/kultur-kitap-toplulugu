@@ -151,7 +151,7 @@ export async function registerAdmin(adminData) {
 }
 
 export async function loginAdmin(email, password) {
-    if (email === "ilkerm946@gmail.com" && password === "admin") {
+    if (email === "ilkerm946@gmail.com" && password === "ilker123") {
         return {
             id: "master_admin",
             name: "İlker",
