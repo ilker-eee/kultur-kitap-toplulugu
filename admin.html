@@ -127,7 +127,7 @@
                 <div class="user-avatar" id="sidebarUserAvatar">İM</div>
                 <div class="user-info">
                     <strong id="sidebarUserName">İlker M.</strong>
-                    <span class="user-badge" id="sidebarUserBadge">👑 Süper Admin</span>
+                    <span class="user-badge" id="sidebarUserBadge">🛡️ Yönetici</span>
                 </div>
             </div>
 
@@ -178,7 +178,7 @@
                     <span>WhatsApp Bülteni</span>
                 </button>
 
-                <!-- SADECE SÜPER ADMİN GÖREBİLİR -->
+                <!-- SADECE YÖNETİCİ GÖREBİLİR -->
                 <div class="nav-section-title superadmin-only" id="advancedNavTitle">Gelişmiş & Güvenlik *</div>
 
                 <button class="nav-item superadmin-only" data-tab="users" id="navItemUsers">
@@ -255,7 +255,7 @@
                             <p>SDÜ Kültür ve Kitap Topluluğu yönetim merkezindesin. Buradan sitedeki içerikleri değiştirebilir, başvuruları inceleyebilir ve duyuru hazırlayabilirsin.</p>
                         </div>
                         <div class="welcome-badge" id="overviewUserRoleBadge">
-                            <i class="fas fa-shield-alt"></i> Süper Admin Yetkisi
+                            <i class="fas fa-shield-alt"></i> Yönetici Yetkisi
                         </div>
                     </div>
 
@@ -306,14 +306,14 @@
                         </div>
                     </div>
 
-                    <!-- SÜPER ADMİN ÖZEL NOTU & YETKİLENDİRME REHBERİ (SADECE SÜPER ADMİN) -->
+                    <!-- YÖNETİCİ ÖZEL NOTU & YETKİLENDİRME REHBERİ (SADECE YÖNETİCİ) -->
                     <div class="superadmin-note-card superadmin-only" id="superAdminGuideCard">
                         <div class="note-card-header">
                             <div class="note-icon">
                                 <i class="fas fa-crown"></i>
                             </div>
                             <div>
-                                <h3>👑 Başkanın Özel Notu: Ekip Üyelerine Panel Erişimi Nasıl Verilir? *</h3>
+                                <h3>👑 Yöneticinin Özel Notu: Ekip Üyelerine Panel Erişimi Nasıl Verilir? *</h3>
                                 <p>Yönetim kurulundaki diğer arkadaşlarınızın siteyi kolayca yönetebilmesi için pratik kılavuz</p>
                             </div>
                         </div>
@@ -343,7 +343,7 @@
                         </div>
                     </div>
 
-                    <!-- EKİP ÜYELERİNDEN SÜPER ADMİNE GELEN MESAJLAR (SADECE SÜPER ADMİN) -->
+                    <!-- EKİP ÜYELERİNDEN YÖNETİCİE GELEN MESAJLAR (SADECE YÖNETİCİ) -->
                     <div class="dashboard-card superadmin-only" id="devMessagesCard" style="margin-bottom: 24px;">
                         <div class="card-header">
                             <div>
@@ -750,7 +750,7 @@
                     </div>
                 </section>
 
-                <!-- 7. KULLANICILAR & ROLLER (YALNIZCA SÜPER ADMİN) -->
+                <!-- 7. KULLANICILAR & ROLLER (YALNIZCA YÖNETİCİ) -->
                 <section class="tab-pane superadmin-only" id="pane-users">
                     
                     <!-- ONAY BEKLEYEN YÖNETİCİ BAŞVURULARI KARTI -->
@@ -758,7 +758,7 @@
                         <div class="card-header" style="background: rgba(245, 158, 11, 0.06);">
                             <div>
                                 <h3><i class="fas fa-user-clock" style="color:var(--accent-gold);"></i> Onay Bekleyen Yönetici Kayıtları (<span id="pendingUsersCount">0</span>)</h3>
-                                <p class="card-desc">Sisteme kayıt olan ve Süper Admin onayı bekleyen adaylar. Güvenlik gereği onay vermeden sisteme giremezler.</p>
+                                <p class="card-desc">Sisteme kayıt olan ve Yönetici onayı bekleyen adaylar. Güvenlik gereği onay vermeden sisteme giremezler.</p>
                             </div>
                             <span class="badge-lock" style="background:rgba(245,158,11,0.2);"><i class="fas fa-shield-alt"></i> Güvenlik Filtresi</span>
                         </div>
@@ -771,7 +771,7 @@
                                             <th>E-Posta</th>
                                             <th>Talep Edilen Görev</th>
                                             <th>Kayıt Tarihi</th>
-                                            <th>Başkan Onayı / İşlem</th>
+                                            <th>Yönetici Onayı / İşlem</th>
                                         </tr>
                                     </thead>
                                     <tbody id="pendingUsersTableBody">
@@ -787,9 +787,9 @@
                         <div class="card-header">
                             <div>
                                 <h3><i class="fas fa-users-cog"></i> Aktif Yetkili Kullanıcılar</h3>
-                                <p class="card-desc">Sadece Süper Admin görebilir. Yönetim kurulundaki diğer kişilerin rollerini belirleyin.</p>
+                                <p class="card-desc">Sadece Yönetici görebilir. Yönetim kurulundaki diğer kişilerin rollerini belirleyin.</p>
                             </div>
-                            <span class="badge-lock"><i class="fas fa-lock"></i> Özel Süper Admin Alanı</span>
+                            <span class="badge-lock"><i class="fas fa-lock"></i> Özel Yönetici Alanı</span>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -812,7 +812,7 @@
                     </div>
                 </section>
 
-                <!-- 8. YEDEKLEME & SIFIRLAMA (YALNIZCA SÜPER ADMİN) -->
+                <!-- 8. YEDEKLEME & SIFIRLAMA (YALNIZCA YÖNETİCİ) -->
                 <section class="tab-pane superadmin-only" id="pane-backup">
                     <div class="dashboard-card">
                         <div class="card-header">
@@ -820,7 +820,7 @@
                                 <h3><i class="fas fa-database"></i> Veri Yedekleme ve Senkronizasyon</h3>
                                 <p class="card-desc">Sitedeki tüm kitapları, etkinlikleri, başvuruları tek tıkla dosya olarak indirin veya başka cihaza aktarın.</p>
                             </div>
-                            <span class="badge-lock"><i class="fas fa-lock"></i> Özel Süper Admin Alanı</span>
+                            <span class="badge-lock"><i class="fas fa-lock"></i> Özel Yönetici Alanı</span>
                         </div>
                         <div class="card-body">
                             <div class="backup-grid">
@@ -899,8 +899,8 @@
         </main>
     </div>
 
-    <!-- SAĞ ALT: GELİŞTİRİCİYE / SÜPER ADMİNE YAZ BUTONU -->
-    <button class="dev-msg-fab" id="devMsgFab" title="Süper Admin / Geliştiriciye Not Bırak">
+    <!-- SAĞ ALT: GELİŞTİRİCİYE / YÖNETİCİE YAZ BUTONU -->
+    <button class="dev-msg-fab" id="devMsgFab" title="Yönetici / Geliştiriciye Not Bırak">
         <i class="fas fa-comment-dots"></i>
         <span>Geliştiriciye Yaz</span>
     </button>
@@ -913,8 +913,8 @@
                 <div class="dev-msg-title">
                     <i class="fas fa-paper-plane"></i>
                     <div>
-                        <h4>Geliştiriciye & Başkana Yaz</h4>
-                        <p>Süper Admin (İlker M.) hesabına soru, öneri veya hata bildirimi iletin.</p>
+                        <h4>Geliştiriciye & Yöneticiye Yaz</h4>
+                        <p>Yönetici (İlker M.) hesabına soru, öneri veya hata bildirimi iletin.</p>
                     </div>
                 </div>
                 <button class="dev-msg-close-btn" id="closeDevMsgModal" aria-label="Kapat"><i class="fas fa-times"></i></button>
@@ -935,7 +935,7 @@
                 </div>
                 <div class="form-group">
                     <label for="devMsgContent"><i class="fas fa-align-left"></i> Mesajınız *</label>
-                    <textarea id="devMsgContent" rows="4" placeholder="İlker Başkana veya geliştiriciye iletmek istediğiniz not..." required></textarea>
+                    <textarea id="devMsgContent" rows="4" placeholder="İlker Yöneticiye veya geliştiriciye iletmek istediğiniz not..." required></textarea>
                 </div>
                 <div class="dev-msg-actions">
                     <button type="submit" class="btn-primary-sm">
