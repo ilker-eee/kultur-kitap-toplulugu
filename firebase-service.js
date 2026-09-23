@@ -30,6 +30,8 @@ export async function registerMember(memberData) {
         name: memberData.name,
         identifier: memberData.identifier,
         department: memberData.department,
+        grade: memberData.grade || '',
+        phone: memberData.phone || '',
         passwordHash: hashedPassword,
         role: 'üye',
         registeredAt: new Date().toISOString()

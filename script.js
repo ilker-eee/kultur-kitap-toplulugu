@@ -800,6 +800,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (grid) grid.innerHTML = '';
                 if (pastGrid) pastGrid.innerHTML = '';
                 
+                let hasUpcoming = false;
                 data.events.forEach(ev => {
                     const pCount = (ev.participants && Array.isArray(ev.participants)) ? ev.participants.length : 0;
                     const card = document.createElement('div');
@@ -855,8 +856,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         pastGrid.appendChild(card);
                     } else if (!isCompleted && grid) {
                         grid.appendChild(card);
+                        hasUpcoming = true;
                     }
                 });
+                
+                if (typeof hasUpcoming !== 'undefined' && !hasUpcoming && grid) {
+                    grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: rgba(255,255,255,0.8); border-radius: 12px; border: 1px dashed var(--border-color);"><i class="fas fa-calendar-times" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px; display: block;"></i><h3 style="color: var(--text-dark); margin-bottom: 8px;">Yaklaşan Etkinlik Bulunmuyor</h3><p style="color: var(--text-muted);">Şu an için planlanmış yeni bir etkinlik bulunmamaktadır. Yeni etkinlikler duyurulduğunda burada listelenecektir.</p></div>';
+                }
                 
                 bindEventCalButtons();
                 bindEventJoinButtons();
