@@ -341,6 +341,15 @@
             const user = data.users.find(u => u.email.toLowerCase() === email && u.password === password);
 
             if (user) {
+                // KRİTİK GÜVENLİK KONTROLÜ: Onay Bekleyen Hesaplar Giriş Yapamaz!
+                if (user.status === 'pending_approval') {
+                    if (loginError) {
+                        loginError.innerHTML = '<i class="fas fa-user-lock"></i> <strong>Hesabınız henüz onaylanmadı!</strong><br>Yönetici kaydınız alınmıştır. Güvenlik gereği Topluluk Başkanı (Süper Admin) onay verdikten sonra panele giriş yapabilirsiniz.';
+                        loginError.style.display = 'block';
+                    }
+                    return;
+                }
+
                 setLoggedInUser(user);
                 initAdminDashboard(user);
                 showToast(`Hoş geldiniz, ${user.name}!`, 'fas fa-smile');
@@ -375,18 +384,22 @@
             }
 
             const roleTitles = {
-                editor: 'İçerik Editörü',
-                moderator: 'Başvuru Moderatörü',
+                editor: 'İçerik Editörü (Adayı)',
+                moderator: 'Başvuru Moderatörü (Adayı)',
                 member: 'Topluluk Üyesi'
             };
 
+            // KRİTİK GÜVENLİK DÜZELTMESİ: Yeni kayıt doğrudan onaylanmaz!
             const newUser = {
                 id: Date.now(),
                 name,
                 email,
                 password,
-                role,
-                title: roleTitles[role] || 'Yönetim Üyesi'
+                role: 'pending',
+                requestedRole: role,
+                status: 'pending_approval',
+                title: roleTitles[role] || 'Yönetici Adayı (Onay Bekliyor)',
+                registeredAt: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
             };
 
             data.users.push(newUser);
@@ -394,13 +407,13 @@
 
             if (regError) regError.style.display = 'none';
             if (regSuccess) {
-                regSuccess.textContent = 'Kaydınız başarıyla oluşturuldu! Şimdi giriş yapabilirsiniz.';
+                regSuccess.innerHTML = '<i class="fas fa-shield-alt"></i> <strong>Kaydınız başarıyla alındı!</strong><br>Güvenlik gereği Topluluk Başkanı (Süper Admin) onayladıktan sonra hesabınız aktifleşecektir.';
                 regSuccess.style.display = 'block';
             }
             registerForm.reset();
             setTimeout(() => {
                 switchToLoginBtn.click();
-            }, 1200);
+            }, 3000);
         });
     }
 
@@ -620,17 +633,19 @@
         if (countEl) countEl.textContent = data.events.length;
 
         if (data.events.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:24px;">Henüz kayıtlı etkinlik bulunmuyor.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:24px;">Henüz kayıtlı etkinlik bulunmuyor.</td></tr>`;
             return;
         }
 
         data.events.forEach(ev => {
+            const count = (ev.participants && Array.isArray(ev.participants)) ? ev.participants.length : 0;
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><strong>${ev.title}</strong></td>
                 <td><span class="table-tag tag-${ev.category}">${ev.category.toUpperCase()}</span></td>
                 <td><i class="far fa-clock"></i> ${ev.date} (${ev.time || '14:00'})</td>
                 <td><i class="fas fa-map-marker-alt"></i> ${ev.place}</td>
+                <td><span class="table-tag tag-kitap"><i class="fas fa-users"></i> ${count} Katılımcı</span></td>
                 <td><span class="table-tag tag-status-approved">${ev.badge || 'Aktif'}</span></td>
                 <td>
                     <button class="btn-icon-action delete" title="Etkinliği Sil" onclick="deleteEvent(${ev.id})">
@@ -928,40 +943,101 @@
     // 7. KULLANICILAR & ROLLER (SADECE SÜPER ADMİN)
     function renderUsersSection(data) {
         const tbody = document.getElementById('usersTableBody');
-        if (!tbody) return;
-        tbody.innerHTML = '';
+        const pendingTbody = document.getElementById('pendingUsersTableBody');
+        const pendingCountEl = document.getElementById('pendingUsersCount');
+        
+        if (tbody) tbody.innerHTML = '';
+        if (pendingTbody) pendingTbody.innerHTML = '';
 
-        data.users.forEach(u => {
-            const tr = document.createElement('tr');
-            const isMaster = u.email === 'ilkerm946@gmail.com' || u.isMaster;
+        const pendingUsers = data.users.filter(u => u.status === 'pending_approval');
+        const activeUsers = data.users.filter(u => u.status !== 'pending_approval');
 
-            tr.innerHTML = `
-                <td>
-                    <strong>${u.name}</strong>
-                    ${isMaster ? ' <span class="badge-lock" style="font-size:0.7rem; padding:2px 6px;">Başkan</span>' : ''}
-                </td>
-                <td><code>${u.email}</code></td>
-                <td><span class="table-tag ${isMaster ? 'tag-kitap' : 'tag-soylesi'}">${u.title || u.role}</span></td>
-                <td>
-                    ${isMaster ? '<em>(Değiştirilemez)</em>' : `
-                        <select onchange="changeUserRole(${u.id}, this.value)" style="padding:4px 8px; border-radius:6px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-primary);">
-                            <option value="editor" ${u.role === 'editor' ? 'selected' : ''}>İçerik Editörü</option>
-                            <option value="moderator" ${u.role === 'moderator' ? 'selected' : ''}>Başvuru Moderatörü</option>
-                            <option value="member" ${u.role === 'member' ? 'selected' : ''}>Topluluk Üyesi</option>
-                        </select>
-                    `}
-                </td>
-                <td>
-                    ${isMaster ? '-' : `
-                        <button class="btn-icon-action delete" title="Kullanıcıyı Sil" onclick="deleteUser(${u.id})">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    `}
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
+        if (pendingCountEl) pendingCountEl.textContent = pendingUsers.length;
+
+        // Onay Bekleyen Tablosu
+        if (pendingTbody) {
+            if (pendingUsers.length === 0) {
+                pendingTbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:16px;">Şu an onay bekleyen bir yönetici başvurusu bulunmuyor.</td></tr>`;
+            } else {
+                pendingUsers.forEach(u => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${u.name}</strong></td>
+                        <td><code>${u.email}</code></td>
+                        <td><span class="table-tag tag-soylesi">${u.requestedRole === 'editor' ? 'İçerik Editörü' : (u.requestedRole === 'moderator' ? 'Başvuru Moderatörü' : 'Üye')}</span></td>
+                        <td><small>${u.registeredAt || '-'}</small></td>
+                        <td>
+                            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                                <button type="button" class="btn-primary-sm" style="padding:4px 8px; font-size:0.75rem;" onclick="approveUser(${u.id}, 'editor')">
+                                    <i class="fas fa-check"></i> Editör Yap
+                                </button>
+                                <button type="button" class="btn-outline-sm" style="padding:4px 8px; font-size:0.75rem;" onclick="approveUser(${u.id}, 'moderator')">
+                                    <i class="fas fa-shield-alt"></i> Moderatör Yap
+                                </button>
+                                <button type="button" class="btn-danger-sm" style="padding:4px 8px; font-size:0.75rem;" onclick="deleteUser(${u.id})">
+                                    <i class="fas fa-times"></i> Reddet
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    pendingTbody.appendChild(tr);
+                });
+            }
+        }
+
+        // Aktif Kullanıcılar Tablosu
+        if (tbody) {
+            activeUsers.forEach(u => {
+                const tr = document.createElement('tr');
+                const isMaster = u.email === 'ilkerm946@gmail.com' || u.isMaster;
+
+                tr.innerHTML = `
+                    <td>
+                        <strong>${u.name}</strong>
+                        ${isMaster ? ' <span class="badge-lock" style="font-size:0.7rem; padding:2px 6px;">Başkan</span>' : ''}
+                    </td>
+                    <td><code>${u.email}</code></td>
+                    <td><span class="table-tag ${isMaster ? 'tag-kitap' : 'tag-soylesi'}">${u.title || u.role}</span></td>
+                    <td>
+                        ${isMaster ? '<em>(Değiştirilemez)</em>' : `
+                            <select onchange="changeUserRole(${u.id}, this.value)" style="padding:4px 8px; border-radius:6px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-primary);">
+                                <option value="editor" ${u.role === 'editor' ? 'selected' : ''}>İçerik Editörü</option>
+                                <option value="moderator" ${u.role === 'moderator' ? 'selected' : ''}>Başvuru Moderatörü</option>
+                                <option value="member" ${u.role === 'member' ? 'selected' : ''}>Topluluk Üyesi</option>
+                            </select>
+                        `}
+                    </td>
+                    <td>
+                        ${isMaster ? '-' : `
+                            <button class="btn-icon-action delete" title="Kullanıcıyı Sil" onclick="deleteUser(${u.id})">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        `}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
     }
+
+    window.approveUser = function (id, assignedRole) {
+        const data = getData();
+        const u = data.users.find(user => user.id === id);
+        if (u) {
+            const titles = {
+                editor: 'İçerik Editörü',
+                moderator: 'Başvuru Moderatörü',
+                member: 'Topluluk Üyesi'
+            };
+            u.status = 'approved';
+            u.role = assignedRole;
+            u.title = titles[assignedRole] || 'Yönetici';
+            saveData(data);
+            renderUsersSection(data);
+            renderOverview(data);
+            showToast(`✅ ${u.name} kullanıcısı ${u.title} olarak onaylandı! Artık giriş yapabilir.`, 'fas fa-user-check');
+        }
+    };
 
     window.changeUserRole = function (id, newRole) {
         const data = getData();

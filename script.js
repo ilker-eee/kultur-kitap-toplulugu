@@ -763,9 +763,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (grid) {
                     grid.innerHTML = '';
                     data.events.forEach(ev => {
+                        const pCount = (ev.participants && Array.isArray(ev.participants)) ? ev.participants.length : 24;
                         const card = document.createElement('div');
                         card.className = 'event-card';
                         card.dataset.category = ev.category;
+                        card.dataset.id = ev.id;
                         card.innerHTML = `
                             <div class="event-image">
                                 <div class="event-placeholder">
@@ -785,11 +787,18 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <span><i class="fas fa-clock"></i> ${ev.time || '14:00'}</span>
                                     <button class="event-cal-btn" data-title="${ev.title}" data-date="${ev.date}" aria-label="Takvime Ekle" title="Takvime Ekle / Hatırlatıcı"><i class="far fa-calendar-plus"></i></button>
                                 </div>
+                                <div class="event-action-row">
+                                    <span class="event-attendees-badge"><i class="fas fa-users"></i> <strong class="participant-count">${pCount}</strong> Katılımcı</span>
+                                    <button type="button" class="btn-event-join" data-event-id="${ev.id}" data-event-title="${ev.title}">
+                                        <i class="fas fa-plus-circle"></i> <span>Katılmak İstiyorum</span>
+                                    </button>
+                                </div>
                             </div>
                         `;
                         grid.appendChild(card);
                     });
                     bindEventCalButtons();
+                    bindEventJoinButtons();
                 }
             }
         } catch (e) {
@@ -797,24 +806,516 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Oturum Açmış Yönetici Varsa Nav'da Göster
-    try {
-        const loggedUserRaw = sessionStorage.getItem('sdu_admin_user');
-        if (loggedUserRaw) {
-            const user = JSON.parse(loggedUserRaw);
-            const navAdminBtn = document.querySelector('.nav-admin-btn');
-            if (navAdminBtn) {
-                navAdminBtn.innerHTML = `<i class="fas fa-shield-alt"></i> <span>${user.name.split(' ')[0]} (Panel)</span>`;
-                navAdminBtn.style.background = 'var(--primary-light)';
-                navAdminBtn.style.color = 'var(--primary)';
+    // ==========================================
+    // TOPLULUK ÜYELİĞİ & OTURUM YÖNETİMİ (MİSAFİR / ÜYE)
+    // ==========================================
+    function getCurrentMember() {
+        try {
+            const raw = localStorage.getItem('sdu_member_session');
+            if (raw) {
+                const member = JSON.parse(raw);
+                if (member && member.role === 'member') {
+                    if (!Array.isArray(member.attendedEvents)) member.attendedEvents = [];
+                    return member;
+                }
+            }
+        } catch (e) {}
+        return { role: 'guest', name: 'Misafir Okur' };
+    }
+
+    function saveMemberSession(member) {
+        localStorage.setItem('sdu_member_session', JSON.stringify(member));
+    }
+
+    function clearMemberSession() {
+        localStorage.removeItem('sdu_member_session');
+    }
+
+    const navUserWidget = document.getElementById('navUserWidget');
+    const navUserBtn = document.getElementById('navUserBtn');
+    const navUserRoleLabel = document.getElementById('navUserRoleLabel');
+    const navUserNameLabel = document.getElementById('navUserNameLabel');
+    const navUserStatusDot = document.getElementById('navUserStatusDot');
+    const navUserAvatarIcon = document.getElementById('navUserAvatarIcon');
+    const dropdownUserName = document.getElementById('dropdownUserName');
+    const dropdownUserRole = document.getElementById('dropdownUserRole');
+    const dropdownAvatarCircle = document.getElementById('dropdownAvatarCircle');
+    const dropdownBody = document.getElementById('dropdownBody');
+
+    function renderUserWidget() {
+        if (!navUserWidget) return;
+        const currentMember = getCurrentMember();
+
+        if (currentMember.role === 'member') {
+            // Üye Görünümü
+            if (navUserRoleLabel) {
+                navUserRoleLabel.textContent = 'Topluluk Üyesi';
+                navUserRoleLabel.className = 'user-role-label member';
+            }
+            if (navUserNameLabel) {
+                navUserNameLabel.textContent = currentMember.name.split(' ')[0];
+                navUserNameLabel.title = currentMember.name;
+            }
+            if (navUserStatusDot) {
+                navUserStatusDot.className = 'user-status-dot member';
+            }
+            if (navUserAvatarIcon) {
+                navUserAvatarIcon.innerHTML = '<i class="fas fa-user-check"></i>';
+            }
+
+            if (dropdownUserName) dropdownUserName.textContent = currentMember.name;
+            if (dropdownUserRole) {
+                dropdownUserRole.textContent = 'Topluluk Üyesi';
+                dropdownUserRole.className = 'd-badge-role member';
+            }
+            if (dropdownAvatarCircle) {
+                const initials = currentMember.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+                dropdownAvatarCircle.textContent = initials || 'ÜYE';
+                dropdownAvatarCircle.style.fontSize = '1rem';
+            }
+
+            const eventCount = (currentMember.attendedEvents || []).length;
+            if (dropdownBody) {
+                dropdownBody.innerHTML = `
+                    <div class="dropdown-stats-row">
+                        <span><i class="fas fa-calendar-check"></i> Katıldığım Etkinlikler</span>
+                        <strong>${eventCount} Etkinlik</strong>
+                    </div>
+                    <button type="button" class="dropdown-action-btn" id="dBtnScrollEvents">
+                        <i class="fas fa-calendar-alt"></i> Etkinlik Programını Gör
+                    </button>
+                    <button type="button" class="dropdown-action-btn" id="dBtnScrollSuggest">
+                        <i class="fas fa-lightbulb"></i> Etkinlik Fikri Öner
+                    </button>
+                    <button type="button" class="dropdown-action-btn logout" id="dBtnLogout">
+                        <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+                    </button>
+                `;
+
+                const dBtnScrollEvents = document.getElementById('dBtnScrollEvents');
+                if (dBtnScrollEvents) {
+                    dBtnScrollEvents.addEventListener('click', () => {
+                        navUserWidget.classList.remove('active');
+                        document.getElementById('etkinlikler')?.scrollIntoView({ behavior: 'smooth' });
+                    });
+                }
+                const dBtnScrollSuggest = document.getElementById('dBtnScrollSuggest');
+                if (dBtnScrollSuggest) {
+                    dBtnScrollSuggest.addEventListener('click', () => {
+                        navUserWidget.classList.remove('active');
+                        document.getElementById('etkinlik-oner')?.scrollIntoView({ behavior: 'smooth' });
+                    });
+                }
+                const dBtnLogout = document.getElementById('dBtnLogout');
+                if (dBtnLogout) {
+                    dBtnLogout.addEventListener('click', () => {
+                        clearMemberSession();
+                        navUserWidget.classList.remove('active');
+                        renderUserWidget();
+                        bindEventJoinButtons();
+                        showToast('Çıkış yapıldı. Misafir moduna geçildi.', 'fas fa-info-circle');
+                    });
+                }
+            }
+        } else {
+            // Misafir Görünümü
+            if (navUserRoleLabel) {
+                navUserRoleLabel.textContent = 'Misafir';
+                navUserRoleLabel.className = 'user-role-label guest';
+            }
+            if (navUserNameLabel) {
+                navUserNameLabel.textContent = 'Giriş / Üye Ol';
+                navUserNameLabel.title = 'Misafir Kullanıcı';
+            }
+            if (navUserStatusDot) {
+                navUserStatusDot.className = 'user-status-dot guest';
+            }
+            if (navUserAvatarIcon) {
+                navUserAvatarIcon.innerHTML = '<i class="fas fa-user"></i>';
+            }
+
+            if (dropdownUserName) dropdownUserName.textContent = 'Misafir Okur';
+            if (dropdownUserRole) {
+                dropdownUserRole.textContent = 'Giriş Yapılmadı';
+                dropdownUserRole.className = 'd-badge-role';
+            }
+            if (dropdownAvatarCircle) {
+                dropdownAvatarCircle.innerHTML = '<i class="fas fa-user-circle"></i>';
+            }
+
+            if (dropdownBody) {
+                dropdownBody.innerHTML = `
+                    <div class="dropdown-guest-box">
+                        <p>SDÜ Kültür ve Kitap Topluluğu etkinliklerine tek tıkla katılmak ve kontenjan ayırtmak için 10 sn'de üye olun veya giriş yapın.</p>
+                        <button type="button" class="btn-dropdown-auth" id="dBtnAuthOpen">
+                            <i class="fas fa-sparkles"></i> 10 Sn'de Üye Ol / Giriş Yap
+                        </button>
+                    </div>
+                `;
+
+                const dBtnAuthOpen = document.getElementById('dBtnAuthOpen');
+                if (dBtnAuthOpen) {
+                    dBtnAuthOpen.addEventListener('click', () => {
+                        navUserWidget.classList.remove('active');
+                        openAuthModal('register');
+                    });
+                }
             }
         }
-    } catch (e) {}
+    }
 
-    // Dinamik İçerik Yükle
+    if (navUserBtn && navUserWidget) {
+        navUserBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navUserWidget.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!navUserWidget.contains(e.target)) {
+                navUserWidget.classList.remove('active');
+            }
+        });
+    }
+
+    // ==========================================
+    // SİTE AUTH MODAL (ÜYE GİRİŞİ & KAYIT)
+    // ==========================================
+    const siteAuthModal = document.getElementById('siteAuthModal');
+    const authModalBackdrop = document.getElementById('authModalBackdrop');
+    const authModalCloseBtn = document.getElementById('authModalCloseBtn');
+    const tabBtnLogin = document.getElementById('tabBtnLogin');
+    const tabBtnRegister = document.getElementById('tabBtnRegister');
+    const memberLoginForm = document.getElementById('memberLoginForm');
+    const memberRegisterForm = document.getElementById('memberRegisterForm');
+    const authErrorMsg = document.getElementById('authErrorMsg');
+    const authSuccessMsg = document.getElementById('authSuccessMsg');
+    const authModalNotice = document.getElementById('authModalNotice');
+
+    let pendingPostAuthAction = null;
+
+    function openAuthModal(defaultTab = 'login', noticeText = null, callback = null) {
+        if (!siteAuthModal) return;
+        pendingPostAuthAction = callback;
+
+        if (noticeText && authModalNotice) {
+            authModalNotice.textContent = noticeText;
+        } else if (authModalNotice) {
+            authModalNotice.textContent = 'Etkinliklere tek tıkla katılmak ve topluluk duyurularından faydalanmak için oturum açın veya üye olun.';
+        }
+
+        if (authErrorMsg) authErrorMsg.style.display = 'none';
+        if (authSuccessMsg) authSuccessMsg.style.display = 'none';
+
+        if (defaultTab === 'register') {
+            tabBtnRegister?.click();
+        } else {
+            tabBtnLogin?.click();
+        }
+
+        siteAuthModal.classList.add('open');
+        siteAuthModal.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeAuthModal() {
+        if (!siteAuthModal) return;
+        siteAuthModal.classList.remove('open');
+        siteAuthModal.setAttribute('aria-hidden', 'true');
+        if (memberLoginForm) memberLoginForm.reset();
+        if (memberRegisterForm) memberRegisterForm.reset();
+        if (authErrorMsg) authErrorMsg.style.display = 'none';
+        if (authSuccessMsg) authSuccessMsg.style.display = 'none';
+    }
+
+    if (authModalCloseBtn) authModalCloseBtn.addEventListener('click', closeAuthModal);
+    if (authModalBackdrop) authModalBackdrop.addEventListener('click', closeAuthModal);
+
+    if (tabBtnLogin && tabBtnRegister) {
+        tabBtnLogin.addEventListener('click', () => {
+            tabBtnLogin.classList.add('active');
+            tabBtnRegister.classList.remove('active');
+            if (memberLoginForm) memberLoginForm.style.display = 'flex';
+            if (memberRegisterForm) memberRegisterForm.style.display = 'none';
+            if (authErrorMsg) authErrorMsg.style.display = 'none';
+            if (authSuccessMsg) authSuccessMsg.style.display = 'none';
+        });
+
+        tabBtnRegister.addEventListener('click', () => {
+            tabBtnRegister.classList.add('active');
+            tabBtnLogin.classList.remove('active');
+            if (memberRegisterForm) memberRegisterForm.style.display = 'flex';
+            if (memberLoginForm) memberLoginForm.style.display = 'none';
+            if (authErrorMsg) authErrorMsg.style.display = 'none';
+            if (authSuccessMsg) authSuccessMsg.style.display = 'none';
+        });
+    }
+
+    // Giriş İşlemi
+    if (memberLoginForm) {
+        memberLoginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const identifier = document.getElementById('memberLoginIdentifier').value.trim();
+            const password = document.getElementById('memberLoginPassword').value;
+
+            try {
+                const raw = localStorage.getItem('sdu_members_db');
+                const members = raw ? JSON.parse(raw) : [];
+                const user = members.find(m => m.identifier.toLowerCase() === identifier.toLowerCase());
+
+                if (user && user.password === password) {
+                    saveMemberSession(user);
+                    closeAuthModal();
+                    renderUserWidget();
+                    bindEventJoinButtons();
+                    showToast(`🎉 Hoş geldiniz, ${user.name}! Topluluk üyesi olarak giriş yapıldı.`, 'fas fa-user-check');
+                    if (typeof pendingPostAuthAction === 'function') {
+                        pendingPostAuthAction(user);
+                        pendingPostAuthAction = null;
+                    }
+                } else if (!user) {
+                    // Kullanıcı veritabanında yoksa hızlı otomatik üyelik uyarısı
+                    if (authErrorMsg) {
+                        authErrorMsg.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Bu öğrenci no/e-posta ile kayıt bulunamadı. Lütfen <strong>Hızlı Üye Ol</strong> sekmesinden 10 saniyede kaydolun.';
+                        authErrorMsg.style.display = 'block';
+                    }
+                } else {
+                    if (authErrorMsg) {
+                        authErrorMsg.innerHTML = '<i class="fas fa-lock"></i> Şifre hatalı. Lütfen tekrar deneyin.';
+                        authErrorMsg.style.display = 'block';
+                    }
+                }
+            } catch (err) {
+                console.warn(err);
+            }
+        });
+    }
+
+    // Kayıt İşlemi
+    if (memberRegisterForm) {
+        memberRegisterForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('memberRegName').value.trim();
+            const identifier = document.getElementById('memberRegIdentifier').value.trim();
+            const department = document.getElementById('memberRegDept').value.trim();
+            const password = document.getElementById('memberRegPassword').value;
+
+            try {
+                const raw = localStorage.getItem('sdu_members_db');
+                const members = raw ? JSON.parse(raw) : [];
+
+                const existing = members.find(m => m.identifier.toLowerCase() === identifier.toLowerCase());
+                if (existing) {
+                    if (authErrorMsg) {
+                        authErrorMsg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Bu öğrenci no/e-posta zaten kayıtlı. Lütfen giriş yapın.';
+                        authErrorMsg.style.display = 'block';
+                    }
+                    return;
+                }
+
+                const newMember = {
+                    id: 'mbr_' + Date.now(),
+                    name,
+                    identifier,
+                    department,
+                    password,
+                    role: 'member',
+                    joinedAt: new Date().toLocaleDateString('tr-TR'),
+                    attendedEvents: []
+                };
+
+                members.push(newMember);
+                localStorage.setItem('sdu_members_db', JSON.stringify(members));
+                saveMemberSession(newMember);
+
+                closeAuthModal();
+                renderUserWidget();
+                bindEventJoinButtons();
+                showToast(`🌟 Tebrikler ${name}! Topluluk üyeliğiniz başlatıldı.`, 'fas fa-sparkles');
+
+                if (typeof pendingPostAuthAction === 'function') {
+                    pendingPostAuthAction(newMember);
+                    pendingPostAuthAction = null;
+                }
+            } catch (err) {
+                console.warn(err);
+            }
+        });
+    }
+
+    // ==========================================
+    // ETKİNLİĞE TEK TIKLA KATILMA SİSTEMİ
+    // ==========================================
+    function bindEventJoinButtons() {
+        const joinButtons = document.querySelectorAll('.btn-event-join');
+        const currentMember = getCurrentMember();
+
+        joinButtons.forEach(btn => {
+            const evId = parseInt(btn.dataset.eventId || btn.dataset.id);
+            const title = btn.dataset.eventTitle || btn.dataset.title || 'Etkinlik';
+
+            const isJoined = currentMember.role === 'member' && (currentMember.attendedEvents || []).includes(evId);
+
+            if (isJoined) {
+                btn.classList.add('joined');
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> <span>Katıldınız</span>';
+                btn.title = 'Etkinliğe katılımınız kaydedildi. Tekrar tıklayarak iptal edebilirsiniz.';
+            } else {
+                btn.classList.remove('joined');
+                btn.innerHTML = '<i class="fas fa-plus-circle"></i> <span>Katılmak İstiyorum</span>';
+                btn.title = 'Etkinliğe katılmak için tıklayın';
+            }
+
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                handleEventJoinClick(evId, title, btn);
+            };
+        });
+    }
+
+    function handleEventJoinClick(evId, title, btn) {
+        const member = getCurrentMember();
+
+        if (member.role !== 'member') {
+            showToast(`💡 "${title}" etkinliğine tek tıkla katılmak için lütfen üye olun veya giriş yapın!`, 'fas fa-info-circle');
+            openAuthModal('register', `⚡ "${title}" etkinliğine kaydolmak için lütfen üye olun veya giriş yapın.`, (loggedInMember) => {
+                executeEventJoin(evId, title, btn, loggedInMember);
+            });
+            return;
+        }
+
+        executeEventJoin(evId, title, btn, member);
+    }
+
+    function executeEventJoin(evId, title, btn, member) {
+        if (!member || member.role !== 'member') return;
+
+        if (!Array.isArray(member.attendedEvents)) member.attendedEvents = [];
+        const isAlreadyJoined = member.attendedEvents.includes(evId);
+
+        try {
+            const raw = localStorage.getItem('sdu_topluluk_data');
+            let data = raw ? JSON.parse(raw) : { events: [] };
+            if (!data.events) data.events = [];
+
+            let ev = data.events.find(e => e.id === evId);
+
+            if (isAlreadyJoined) {
+                // İptal et
+                member.attendedEvents = member.attendedEvents.filter(id => id !== evId);
+                saveMemberSession(member);
+
+                if (ev && Array.isArray(ev.participants)) {
+                    ev.participants = ev.participants.filter(p => p.memberId !== member.id);
+                    localStorage.setItem('sdu_topluluk_data', JSON.stringify(data));
+                }
+
+                // Sayacı güncelle
+                const card = btn.closest('.event-card');
+                if (card) {
+                    const countEl = card.querySelector('.participant-count');
+                    if (countEl) {
+                        const cur = parseInt(countEl.textContent) || 1;
+                        countEl.textContent = Math.max(0, cur - 1);
+                    }
+                }
+
+                btn.classList.remove('joined');
+                btn.innerHTML = '<i class="fas fa-plus-circle"></i> <span>Katılmak İstiyorum</span>';
+                showToast(`"${title}" etkinliği katılım kaydınız iptal edildi.`, 'fas fa-info-circle');
+            } else {
+                // Katıl
+                member.attendedEvents.push(evId);
+                saveMemberSession(member);
+
+                if (!ev) {
+                    // Varsayılan etkinlik verilerinde yerel arama
+                    ev = { id: evId, title: title, participants: [] };
+                    data.events.push(ev);
+                }
+                if (!Array.isArray(ev.participants)) ev.participants = [];
+
+                ev.participants.push({
+                    memberId: member.id,
+                    name: member.name,
+                    identifier: member.identifier,
+                    joinedAt: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+                });
+
+                localStorage.setItem('sdu_topluluk_data', JSON.stringify(data));
+
+                // Sayacı güncelle
+                const card = btn.closest('.event-card');
+                if (card) {
+                    const countEl = card.querySelector('.participant-count');
+                    if (countEl) {
+                        const cur = parseInt(countEl.textContent) || 0;
+                        countEl.textContent = cur + 1;
+                    }
+                }
+
+                btn.classList.add('joined');
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> <span>Katıldınız</span>';
+                showToast(`🎉 Tebrikler ${member.name.split(' ')[0]}! "${title}" etkinliğine katıldınız. Kontenjanınız ayrıldı.`, 'fas fa-check-circle');
+            }
+
+            renderUserWidget();
+        } catch (err) {
+            console.warn('Katılım işlemi hatası:', err);
+        }
+    }
+
+    // ==========================================
+    // TATLI ZİYARETÇİ SAYACI (FOOTER)
+    // ==========================================
+    function initVisitorCounter() {
+        const totalEl = document.getElementById('totalVisitorsCount');
+        const todayEl = document.getElementById('todayVisitorsCount');
+        const onlineEl = document.getElementById('onlineVisitorsCount');
+
+        if (!totalEl) return;
+
+        try {
+            const todayDate = new Date().toISOString().split('T')[0];
+            let stats = JSON.parse(localStorage.getItem('sdu_visitor_stats') || 'null');
+
+            if (!stats) {
+                stats = { total: 1842, today: 134, date: todayDate };
+            }
+
+            if (stats.date !== todayDate) {
+                stats.date = todayDate;
+                stats.today = Math.floor(Math.random() * 25) + 35; // Sabah başlangıcı
+            }
+
+            // Oturum bazında ziyaretçi artırma
+            if (!sessionStorage.getItem('sdu_counted_visit')) {
+                sessionStorage.setItem('sdu_counted_visit', 'true');
+                stats.total += 1;
+                stats.today += 1;
+                localStorage.setItem('sdu_visitor_stats', JSON.stringify(stats));
+            }
+
+            // Çevrim içi rastgele öğrenci sayısı (3-7 arası dinamik)
+            const onlineCount = Math.floor(Math.random() * 5) + 3;
+
+            // Sayaçları formatlayarak yazdır
+            totalEl.textContent = Number(stats.total).toLocaleString('tr-TR');
+            todayEl.textContent = Number(stats.today).toLocaleString('tr-TR');
+            if (onlineEl) onlineEl.textContent = onlineCount;
+
+        } catch (e) {
+            if (totalEl) totalEl.textContent = '1.843';
+            if (todayEl) todayEl.textContent = '135';
+        }
+    }
+
+    // Başlangıç Yüklemeleri
+    renderUserWidget();
+    bindEventJoinButtons();
+    initVisitorCounter();
     syncDynamicSiteContent();
 
     // Initial scroll call
     handleScroll();
 });
+
 
