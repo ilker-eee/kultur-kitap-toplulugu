@@ -799,46 +799,69 @@ document.addEventListener('DOMContentLoaded', () => {
             // Etkinlikler Senkronizasyonu
             if (data.events && Array.isArray(data.events) && data.events.length > 0) {
                 const grid = document.getElementById('eventsGrid');
-                if (grid) {
-                    grid.innerHTML = '';
-                    data.events.forEach(ev => {
-                        const pCount = (ev.participants && Array.isArray(ev.participants)) ? ev.participants.length : 24;
-                        const card = document.createElement('div');
-                        card.className = 'event-card';
-                        card.dataset.category = ev.category;
-                        card.dataset.id = ev.id;
-                        card.innerHTML = `
-                            <div class="event-image">
-                                <div class="event-placeholder">
-                                    <i class="${ev.icon || 'fas fa-calendar-day'}"></i>
-                                </div>
-                                <span class="event-badge ${ev.badge === 'Önümüzdeki Ay' ? 'upcoming' : ''} ${ev.badge === 'Tamamlandı' ? 'completed' : ''}">${ev.badge || 'Yaklaşan'}</span>
-                            </div>
-                            <div class="event-content">
-                                <div class="event-date">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    ${ev.date}
-                                </div>
-                                <h3>${ev.title}</h3>
-                                <p>${ev.desc || ''}</p>
-                                <div class="event-footer">
-                                    <span><i class="fas fa-map-marker-alt"></i> ${ev.place}</span>
-                                    <span><i class="fas fa-clock"></i> ${ev.time || '14:00'}</span>
-                                    <button class="event-cal-btn" data-title="${ev.title}" data-date="${ev.date}" aria-label="Takvime Ekle" title="Takvime Ekle / Hatırlatıcı"><i class="far fa-calendar-plus"></i></button>
-                                </div>
-                                <div class="event-action-row">
-                                    <span class="event-attendees-badge"><i class="fas fa-users"></i> <strong class="participant-count">${pCount}</strong> Katılımcı</span>
-                                    <button type="button" class="btn-event-join" data-event-id="${ev.id}" data-event-title="${ev.title}">
-                                        <i class="fas fa-plus-circle"></i> <span>Katılmak İstiyorum</span>
-                                    </button>
-                                </div>
+                const pastGrid = document.getElementById('pastEventsGrid');
+                
+                if (grid) grid.innerHTML = '';
+                if (pastGrid) pastGrid.innerHTML = '';
+                
+                data.events.forEach(ev => {
+                    const pCount = (ev.participants && Array.isArray(ev.participants)) ? ev.participants.length : 24;
+                    const card = document.createElement('div');
+                    card.className = 'event-card';
+                    card.dataset.category = ev.category;
+                    card.dataset.id = ev.id;
+                    
+                    const isCompleted = ev.badge === 'Tamamlandı';
+                    
+                    let actionRowHtml = `
+                        <div class="event-action-row">
+                            <span class="event-attendees-badge"><i class="fas fa-users"></i> <strong class="participant-count">${pCount}</strong> Katılımcı</span>
+                            <button type="button" class="btn-event-join" data-event-id="${ev.id}" data-event-title="${ev.title}">
+                                <i class="fas fa-plus-circle"></i> <span>Katılmak İstiyorum</span>
+                            </button>
+                        </div>
+                    `;
+                    
+                    if (isCompleted) {
+                        actionRowHtml = `
+                            <div class="event-action-row">
+                                <span class="event-attendees-badge" style="width: 100%; justify-content: center;"><i class="fas fa-users"></i> <strong class="participant-count">${pCount}</strong> Katılımcı ile Gerçekleşti</span>
                             </div>
                         `;
+                    }
+                    
+                    card.innerHTML = `
+                        <div class="event-image">
+                            <div class="event-placeholder">
+                                <i class="${ev.icon || 'fas fa-calendar-day'}"></i>
+                            </div>
+                            <span class="event-badge ${ev.badge === 'Önümüzdeki Ay' ? 'upcoming' : ''} ${isCompleted ? 'completed' : ''}">${ev.badge || 'Yaklaşan'}</span>
+                        </div>
+                        <div class="event-content">
+                            <div class="event-date">
+                                <i class="fas fa-calendar-alt"></i>
+                                ${ev.date}
+                            </div>
+                            <h3>${ev.title}</h3>
+                            <p>${ev.desc || ''}</p>
+                            <div class="event-footer">
+                                <span><i class="fas fa-map-marker-alt"></i> ${ev.place}</span>
+                                <span><i class="fas fa-clock"></i> ${ev.time || '14:00'}</span>
+                                ${!isCompleted ? `<button class="event-cal-btn" data-title="${ev.title}" data-date="${ev.date}" aria-label="Takvime Ekle" title="Takvime Ekle / Hatırlatıcı"><i class="far fa-calendar-plus"></i></button>` : ''}
+                            </div>
+                            ${actionRowHtml}
+                        </div>
+                    `;
+                    
+                    if (isCompleted && pastGrid) {
+                        pastGrid.appendChild(card);
+                    } else if (!isCompleted && grid) {
                         grid.appendChild(card);
-                    });
-                    bindEventCalButtons();
-                    bindEventJoinButtons();
-                }
+                    }
+                });
+                
+                bindEventCalButtons();
+                bindEventJoinButtons();
             }
         } catch (e) {
             console.warn('Dinamik senkronizasyon hatası:', e);
