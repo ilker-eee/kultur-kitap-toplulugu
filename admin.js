@@ -4,7 +4,7 @@
    Zero-cost static sync with LocalStorage & SessionStorage
    ========================================== */
 
-import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.js';
+import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, getAdmins, approveAdmin, deleteAdmin as fbDeleteAdmin, getApplications, updateApplicationStatus, deleteApplication as fbDeleteApplication, getSuggestions, updateSuggestionStatus, deleteSuggestion as fbDeleteSuggestion } from './firebase-service.js';
 
 (function () {
     'use strict';
@@ -287,55 +287,56 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
     }
 
     if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value.trim().toLowerCase();
             const password = document.getElementById('loginPassword').value.trim();
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
 
-            const data = getData();
-            const user = data.users.find(u => u.email.toLowerCase() === email && u.password === password);
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Giriş Yapılıyor...';
+            }
 
-            if (user) {
-                // KRİTİK GÜVENLİK KONTROLÜ: Onay Bekleyen Hesaplar Giriş Yapamaz!
-                if (user.status === 'pending_approval') {
-                    if (loginError) {
-                        loginError.innerHTML = '<i class="fas fa-user-lock"></i> <strong>Hesabınız henüz onaylanmadı!</strong><br>Yönetici kaydınız alınmıştır. Güvenlik gereği Topluluk Başkanı (Süper Admin) onay verdikten sonra panele giriş yapabilirsiniz.';
-                        loginError.style.display = 'block';
-                    }
-                    return;
-                }
-
+            try {
+                const user = await loginAdmin(email, password);
+                
                 setLoggedInUser(user);
                 initAdminDashboard(user);
                 showToast(`Hoş geldiniz, ${user.name}!`, 'fas fa-smile');
                 if (loginError) loginError.style.display = 'none';
                 loginForm.reset();
-            } else {
+            } catch (err) {
+                console.warn(err);
                 if (loginError) {
-                    loginError.textContent = 'Hatalı e-posta veya şifre! Lütfen bilgilerinizi kontrol edin.';
+                    if (err.message === "NOT_APPROVED") {
+                        loginError.innerHTML = '<i class="fas fa-user-lock"></i> <strong>Hesabınız henüz onaylanmadı!</strong><br>Yönetici kaydınız alınmıştır. Güvenlik gereği Yönetici onay verdikten sonra panele giriş yapabilirsiniz.';
+                    } else {
+                        loginError.textContent = 'Hatalı e-posta veya şifre! Lütfen bilgilerinizi kontrol edin.';
+                    }
                     loginError.style.display = 'block';
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Giriş Yap <i class="fas fa-arrow-right"></i>';
                 }
             }
         });
     }
 
     if (registerForm) {
-        registerForm.addEventListener('submit', (e) => {
+        registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim().toLowerCase();
             const role = document.getElementById('regRole').value;
             const password = document.getElementById('regPassword').value.trim();
+            const submitBtn = registerForm.querySelector('button[type="submit"]');
 
-            const data = getData();
-            const exists = data.users.some(u => u.email.toLowerCase() === email);
-
-            if (exists) {
-                if (regError) {
-                    regError.textContent = 'Bu e-posta adresi ile kayıtlı bir hesap zaten mevcut!';
-                    regError.style.display = 'block';
-                }
-                return;
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kayıt Yapılıyor...';
             }
 
             const roleTitles = {
@@ -344,31 +345,37 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
                 member: 'Topluluk Üyesi'
             };
 
-            // KRİTİK GÜVENLİK DÜZELTMESİ: Yeni kayıt doğrudan onaylanmaz!
-            const newUser = {
-                id: Date.now(),
-                name,
-                email,
-                password,
-                role: 'pending',
-                requestedRole: role,
-                status: 'pending_approval',
-                title: roleTitles[role] || 'Yönetici Adayı (Onay Bekliyor)',
-                registeredAt: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-            };
+            try {
+                await registerAdmin({
+                    name,
+                    email,
+                    password,
+                    requestedRole: role,
+                    title: roleTitles[role] || 'Yönetici Adayı (Onay Bekliyor)'
+                });
 
-            data.users.push(newUser);
-            saveData(data);
-
-            if (regError) regError.style.display = 'none';
-            if (regSuccess) {
-                regSuccess.innerHTML = '<i class="fas fa-shield-alt"></i> <strong>Kaydınız başarıyla alındı!</strong><br>Güvenlik gereği Topluluk Başkanı (Süper Admin) onayladıktan sonra hesabınız aktifleşecektir.';
-                regSuccess.style.display = 'block';
+                if (regError) regError.style.display = 'none';
+                if (regSuccess) {
+                    regSuccess.innerHTML = '<i class="fas fa-shield-alt"></i> <strong>Kaydınız başarıyla alındı!</strong><br>Güvenlik gereği Yönetici onayladıktan sonra hesabınız aktifleşecektir.';
+                    regSuccess.style.display = 'block';
+                }
+                registerForm.reset();
+                setTimeout(() => {
+                    switchToLoginBtn.click();
+                    if (regSuccess) regSuccess.style.display = 'none';
+                }, 3000);
+            } catch (err) {
+                console.warn(err);
+                if (regError) {
+                    regError.textContent = err.message || 'Kayıt sırasında bir hata oluştu.';
+                    regError.style.display = 'block';
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Kayıt Ol';
+                }
             }
-            registerForm.reset();
-            setTimeout(() => {
-                switchToLoginBtn.click();
-            }, 3000);
         });
     }
 
@@ -528,16 +535,25 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
     }
 
     // 1. GENEL BAKIŞ
-    function renderOverview(data) {
+    async function renderOverview(data) {
         document.getElementById('statBookTitle').textContent = data.book.title || 'Belirtilmedi';
         document.getElementById('statBookProgress').textContent = `%${data.book.progress || 0} Tamamlandı`;
         document.getElementById('statEventCount').textContent = data.events.length;
         
-        const pendingCount = data.applications.filter(a => a.status === 'Beklemede').length;
-        document.getElementById('statApplicationCount').textContent = data.applications.length;
+        let apps = [];
+        let suggs = [];
+        try {
+            apps = await getApplications();
+            suggs = await getSuggestions();
+        } catch(e) {
+            console.error('Error fetching stats for overview:', e);
+        }
+
+        const pendingCount = apps.filter(a => a.status === 'Beklemede').length;
+        document.getElementById('statApplicationCount').textContent = apps.length;
         document.getElementById('statPendingApps').textContent = `${pendingCount} beklemede`;
 
-        const suggCount = data.suggestions ? data.suggestions.length : 0;
+        const suggCount = suggs.length;
         document.getElementById('statSuggestionCount').textContent = suggCount;
 
         const devMsgCount = data.developer_messages ? data.developer_messages.length : 0;
@@ -671,20 +687,29 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
     };
 
     // 4. GELEN BAŞVURULAR
-    function renderApplicationsSection(data) {
+    async function renderApplicationsSection() {
         const tbody = document.getElementById('applicationsTableBody');
         const countEl = document.getElementById('appTotalCount');
         if (!tbody) return;
-        tbody.innerHTML = '';
-        if (countEl) countEl.textContent = data.applications.length;
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Yükleniyor...</td></tr>';
+
+        let apps = [];
+        try {
+            apps = await getApplications();
+        } catch (e) {
+            console.error('Error fetching applications:', e);
+        }
+
+        if (countEl) countEl.textContent = apps.length;
 
         const searchVal = (document.getElementById('searchAppInput')?.value || '').toLowerCase();
-        const filtered = data.applications.filter(a => 
-            a.fullName.toLowerCase().includes(searchVal) ||
-            a.department.toLowerCase().includes(searchVal) ||
-            a.phone.includes(searchVal)
+        const filtered = apps.filter(a => 
+            (a.fullName || '').toLowerCase().includes(searchVal) ||
+            (a.department || '').toLowerCase().includes(searchVal) ||
+            (a.phone || '').includes(searchVal)
         );
 
+        tbody.innerHTML = '';
         if (filtered.length === 0) {
             tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:24px;">Başvuru bulunamadı.</td></tr>`;
             return;
@@ -692,29 +717,29 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
 
         filtered.forEach(app => {
             const tr = document.createElement('tr');
-            const cleanPhone = app.phone.replace(/\D/g, '');
+            const cleanPhone = (app.phone || '').replace(/\D/g, '');
             const waPhone = cleanPhone.startsWith('90') ? cleanPhone : (cleanPhone.startsWith('0') ? '9' + cleanPhone : '90' + cleanPhone);
             const waMsg = encodeURIComponent(`Merhaba ${app.fullName}! SDÜ Kültür ve Kitap Topluluğu yönetiminden yazıyorum. Aramıza katılım başvurunuz onaylandı, hoş geldiniz! 🎉`);
 
             tr.innerHTML = `
-                <td><strong>${app.fullName}</strong></td>
-                <td>${app.department} <span style="color:var(--text-muted);">(${app.grade})</span></td>
+                <td><strong>${app.fullName || '-'}</strong></td>
+                <td>${app.department || '-'} <span style="color:var(--text-muted);">(${app.grade || '-'})</span></td>
                 <td>
-                    ${app.phone}
-                    <a href="https://wa.me/${waPhone}?text=${waMsg}" target="_blank" class="btn-icon-action whatsapp" title="WhatsApp'tan Mesaj At">
+                    ${app.phone || '-'}
+                    ${app.phone ? `<a href="https://wa.me/${waPhone}?text=${waMsg}" target="_blank" class="btn-icon-action whatsapp" title="WhatsApp'tan Mesaj At">
                         <i class="fab fa-whatsapp"></i>
-                    </a>
+                    </a>` : ''}
                 </td>
                 <td><small>${app.interest || 'Genel'}</small></td>
                 <td><small>${app.date || '-'}</small></td>
                 <td>
                     <span class="table-tag ${app.status === 'Onaylandı' ? 'tag-status-approved' : 'tag-status-pending'}" 
-                          style="cursor:pointer;" title="Durumu Değiştirmek İçin Tıkla" onclick="toggleAppStatus(${app.id})">
-                        ${app.status}
+                          style="cursor:pointer;" title="Durumu Değiştirmek İçin Tıkla" onclick="toggleAppStatus('${app.id}', '${app.status}')">
+                        ${app.status || 'Beklemede'}
                     </span>
                 </td>
                 <td>
-                    <button class="btn-icon-action delete" title="Sil" onclick="deleteApp(${app.id})">
+                    <button class="btn-icon-action delete" title="Sil" onclick="deleteApp('${app.id}')">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </td>
@@ -726,30 +751,32 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
     const searchAppInput = document.getElementById('searchAppInput');
     if (searchAppInput) {
         searchAppInput.addEventListener('input', () => {
-            renderApplicationsSection(getData());
+            renderApplicationsSection();
         });
     }
 
-    window.toggleAppStatus = function (id) {
-        const data = getData();
-        const app = data.applications.find(a => a.id === id);
-        if (app) {
-            app.status = app.status === 'Onaylandı' ? 'Beklemede' : 'Onaylandı';
-            saveData(data);
-            renderApplicationsSection(data);
-            renderOverview(data);
-            showToast(`Başvuru durumu: ${app.status}`, 'fas fa-info-circle');
+    window.toggleAppStatus = async function (id, currentStatus) {
+        const newStatus = currentStatus === 'Onaylandı' ? 'Beklemede' : 'Onaylandı';
+        try {
+            await updateApplicationStatus(id, newStatus);
+            renderApplicationsSection();
+            showToast(`Başvuru durumu: ${newStatus}`, 'fas fa-info-circle');
+        } catch (e) {
+            console.error(e);
+            showToast('Durum güncellenirken bir hata oluştu.', 'fas fa-exclamation-triangle');
         }
     };
 
-    window.deleteApp = function (id) {
+    window.deleteApp = async function (id) {
         if (!confirm('Bu başvuruyu silmek istediğinize emin misiniz?')) return;
-        const data = getData();
-        data.applications = data.applications.filter(a => a.id !== id);
-        saveData(data);
-        renderApplicationsSection(data);
-        renderOverview(data);
-        showToast('Başvuru silindi.', 'fas fa-trash-alt');
+        try {
+            await fbDeleteApplication(id);
+            renderApplicationsSection();
+            showToast('Başvuru silindi.', 'fas fa-trash-alt');
+        } catch (e) {
+            console.error(e);
+            showToast('Silinirken hata oluştu.', 'fas fa-exclamation-triangle');
+        }
     };
 
     // 4.5 ÜYELER (HIZLI KAYIT)
@@ -826,13 +853,21 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
 
 
     // 5. ETKİNLİK ÖNERİLERİ
-    function renderSuggestionsSection(data) {
+    async function renderSuggestionsSection() {
         const tbody = document.getElementById('suggestionsTableBody');
         const countEl = document.getElementById('suggTotalCount');
         if (!tbody) return;
-        tbody.innerHTML = '';
-        const list = data.suggestions || [];
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Yükleniyor...</td></tr>';
+
+        let list = [];
+        try {
+            list = await getSuggestions();
+        } catch (e) {
+            console.error(e);
+        }
+
         if (countEl) countEl.textContent = list.length;
+        tbody.innerHTML = '';
 
         if (list.length === 0) {
             tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:24px;">Henüz etkinlik önerisi gelmedi.</td></tr>`;
@@ -842,19 +877,19 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
         list.forEach(s => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong>${s.name}</strong></td>
+                <td><strong>${s.name || '-'}</strong></td>
                 <td>${s.department || '-'}</td>
-                <td><strong>${s.title}</strong></td>
-                <td><small>${s.desc}</small></td>
+                <td><strong>${s.title || '-'}</strong></td>
+                <td><small>${s.desc || '-'}</small></td>
                 <td><small>${s.date || '-'}</small></td>
                 <td>
                     <span class="table-tag ${s.status === 'Kabul Edildi' ? 'tag-status-approved' : 'tag-status-pending'}" 
-                          style="cursor:pointer;" title="Durumu Değiştirmek İçin Tıkla" onclick="toggleSuggestionStatus(${s.id})">
-                        ${s.status}
+                          style="cursor:pointer;" title="Durumu Değiştirmek İçin Tıkla" onclick="toggleSuggestionStatus('${s.id}', '${s.status}')">
+                        ${s.status || 'Değerlendiriliyor'}
                     </span>
                 </td>
                 <td>
-                    <button class="btn-icon-action delete" title="Sil" onclick="deleteSuggestion(${s.id})">
+                    <button class="btn-icon-action delete" title="Sil" onclick="deleteSuggestion('${s.id}')">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </td>
@@ -863,25 +898,28 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
         });
     }
 
-    window.toggleSuggestionStatus = function (id) {
-        const data = getData();
-        const sugg = data.suggestions.find(s => s.id === id);
-        if (sugg) {
-            sugg.status = sugg.status === 'Kabul Edildi' ? 'Değerlendiriliyor' : 'Kabul Edildi';
-            saveData(data);
-            renderSuggestionsSection(data);
-            showToast(`Öneri durumu: ${sugg.status}`, 'fas fa-check');
+    window.toggleSuggestionStatus = async function (id, currentStatus) {
+        const newStatus = currentStatus === 'Kabul Edildi' ? 'Değerlendiriliyor' : 'Kabul Edildi';
+        try {
+            await updateSuggestionStatus(id, newStatus);
+            renderSuggestionsSection();
+            showToast(`Öneri durumu: ${newStatus}`, 'fas fa-check');
+        } catch (e) {
+            console.error(e);
+            showToast('Durum güncellenemedi.', 'fas fa-exclamation-triangle');
         }
     };
 
-    window.deleteSuggestion = function (id) {
+    window.deleteSuggestion = async function (id) {
         if (!confirm('Bu öneriyi silmek istediğinize emin misiniz?')) return;
-        const data = getData();
-        data.suggestions = data.suggestions.filter(s => s.id !== id);
-        saveData(data);
-        renderSuggestionsSection(data);
-        renderOverview(data);
-        showToast('Öneri silindi.', 'fas fa-trash-alt');
+        try {
+            await fbDeleteSuggestion(id);
+            renderSuggestionsSection();
+            showToast('Öneri silindi.', 'fas fa-trash-alt');
+        } catch (e) {
+            console.error(e);
+            showToast('Öneri silinemedi.', 'fas fa-exclamation-triangle');
+        }
     };
 
     // 6. WHATSAPP BÜLTENİ
@@ -988,17 +1026,27 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
     }
 
     // 7. KULLANICILAR & ROLLER (SADECE SÜPER ADMİN)
-    function renderUsersSection(data) {
+    async function renderUsersSection() {
         const tbody = document.getElementById('usersTableBody');
         const pendingTbody = document.getElementById('pendingUsersTableBody');
         const pendingCountEl = document.getElementById('pendingUsersCount');
         const badgeUsers = document.getElementById('badgeUsers');
         
+        if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Yükleniyor...</td></tr>';
+        if (pendingTbody) pendingTbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Yükleniyor...</td></tr>';
+
+        let adminUsers = [];
+        try {
+            adminUsers = await getAdmins();
+        } catch (e) {
+            console.error('Error fetching admins:', e);
+        }
+
         if (tbody) tbody.innerHTML = '';
         if (pendingTbody) pendingTbody.innerHTML = '';
 
-        const pendingUsers = data.users.filter(u => u.status === 'pending_approval');
-        const activeUsers = data.users.filter(u => u.status !== 'pending_approval');
+        const pendingUsers = adminUsers.filter(u => u.status === 'pending_approval');
+        const activeUsers = adminUsers.filter(u => u.status !== 'pending_approval');
 
         if (pendingCountEl) pendingCountEl.textContent = pendingUsers.length;
         if (badgeUsers) {
@@ -1017,16 +1065,16 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
                         <td><strong>${u.name}</strong></td>
                         <td><code>${u.email}</code></td>
                         <td><span class="table-tag tag-soylesi">${u.requestedRole === 'editor' ? 'İçerik Editörü' : (u.requestedRole === 'moderator' ? 'Başvuru Moderatörü' : 'Üye')}</span></td>
-                        <td><small>${u.registeredAt || '-'}</small></td>
+                        <td><small>${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString('tr-TR') : '-'}</small></td>
                         <td>
                             <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                                <button type="button" class="btn-primary-sm" style="padding:4px 8px; font-size:0.75rem;" onclick="approveUser(${u.id}, 'editor')">
+                                <button type="button" class="btn-primary-sm" style="padding:4px 8px; font-size:0.75rem;" onclick="approveUser('${u.id}', 'editor')">
                                     <i class="fas fa-check"></i> Editör Yap
                                 </button>
-                                <button type="button" class="btn-outline-sm" style="padding:4px 8px; font-size:0.75rem;" onclick="approveUser(${u.id}, 'moderator')">
+                                <button type="button" class="btn-outline-sm" style="padding:4px 8px; font-size:0.75rem;" onclick="approveUser('${u.id}', 'moderator')">
                                     <i class="fas fa-shield-alt"></i> Moderatör Yap
                                 </button>
-                                <button type="button" class="btn-danger-sm" style="padding:4px 8px; font-size:0.75rem;" onclick="deleteUser(${u.id})">
+                                <button type="button" class="btn-danger-sm" style="padding:4px 8px; font-size:0.75rem;" onclick="deleteUser('${u.id}')">
                                     <i class="fas fa-times"></i> Reddet
                                 </button>
                             </div>
@@ -1039,82 +1087,88 @@ import { getMembers, deleteMember as fbDeleteMember } from './firebase-service.j
 
         // Aktif Kullanıcılar Tablosu
         if (tbody) {
-            activeUsers.forEach(u => {
-                const tr = document.createElement('tr');
-                const isMaster = u.email === 'ilkerm946@gmail.com' || u.isMaster;
+            if (activeUsers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:16px;">Sistemde şu an aktif yönetici bulunmuyor.</td></tr>`;
+            } else {
+                activeUsers.forEach(u => {
+                    const tr = document.createElement('tr');
+                    const isMaster = u.email === 'ilkerm946@gmail.com' || u.isMaster;
 
-                tr.innerHTML = `
-                    <td>
-                        <strong>${u.name}</strong>
-                        ${isMaster ? ' <span class="badge-lock" style="font-size:0.7rem; padding:2px 6px;">Başkan</span>' : ''}
-                    </td>
-                    <td><code>${u.email}</code></td>
-                    <td><span class="table-tag ${isMaster ? 'tag-kitap' : 'tag-soylesi'}">${u.title || u.role}</span></td>
-                    <td>
-                        ${isMaster ? '<em>(Değiştirilemez)</em>' : `
-                            <select onchange="changeUserRole(${u.id}, this.value)" style="padding:4px 8px; border-radius:6px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-primary);">
-                                <option value="editor" ${u.role === 'editor' ? 'selected' : ''}>İçerik Editörü</option>
-                                <option value="moderator" ${u.role === 'moderator' ? 'selected' : ''}>Başvuru Moderatörü</option>
-                                <option value="member" ${u.role === 'member' ? 'selected' : ''}>Topluluk Üyesi</option>
-                            </select>
-                        `}
-                    </td>
-                    <td>
-                        ${isMaster ? '-' : `
-                            <button class="btn-icon-action delete" title="Kullanıcıyı Sil" onclick="deleteUser(${u.id})">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        `}
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+                    tr.innerHTML = `
+                        <td>
+                            <strong>${u.name}</strong>
+                            ${isMaster ? ' <span class="badge-lock" style="font-size:0.7rem; padding:2px 6px;">Yönetici</span>' : ''}
+                        </td>
+                        <td><code>${u.email}</code></td>
+                        <td><span class="table-tag ${isMaster ? 'tag-kitap' : 'tag-soylesi'}">${u.title || u.role}</span></td>
+                        <td>
+                            ${isMaster ? '<em>(Değiştirilemez)</em>' : `
+                                <select onchange="changeUserRole('${u.id}', this.value)" style="padding:4px 8px; border-radius:6px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-primary);">
+                                    <option value="editor" ${u.role === 'editor' ? 'selected' : ''}>İçerik Editörü</option>
+                                    <option value="moderator" ${u.role === 'moderator' ? 'selected' : ''}>Başvuru Moderatörü</option>
+                                    <option value="member" ${u.role === 'member' ? 'selected' : ''}>Topluluk Üyesi</option>
+                                </select>
+                            `}
+                        </td>
+                        <td>
+                            ${isMaster ? '-' : `
+                                <button class="btn-icon-action delete" title="Kullanıcıyı Sil" onclick="deleteUser('${u.id}')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            `}
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
         }
     }
 
-    window.approveUser = function (id, assignedRole) {
-        const data = getData();
-        const u = data.users.find(user => user.id === id);
-        if (u) {
-            const titles = {
-                editor: 'İçerik Editörü',
-                moderator: 'Başvuru Moderatörü',
-                member: 'Topluluk Üyesi'
-            };
-            u.status = 'approved';
-            u.role = assignedRole;
-            u.title = titles[assignedRole] || 'Yönetici';
-            saveData(data);
-            renderUsersSection(data);
-            renderOverview(data);
-            showToast(`✅ ${u.name} kullanıcısı ${u.title} olarak onaylandı! Artık giriş yapabilir.`, 'fas fa-user-check');
+    window.approveUser = async function (id, assignedRole) {
+        const titles = {
+            editor: 'İçerik Editörü',
+            moderator: 'Başvuru Moderatörü',
+            member: 'Topluluk Üyesi'
+        };
+        const title = titles[assignedRole] || 'Yönetici';
+        
+        try {
+            await approveAdmin(id, assignedRole, title);
+            renderUsersSection();
+            showToast(`✅ Kullanıcı ${title} olarak onaylandı! Artık giriş yapabilir.`, 'fas fa-user-check');
+        } catch (e) {
+            console.error(e);
+            showToast('Onaylama başarısız oldu.', 'fas fa-exclamation-circle');
         }
     };
 
-    window.changeUserRole = function (id, newRole) {
-        const data = getData();
-        const u = data.users.find(user => user.id === id);
-        if (u) {
-            const titles = {
-                editor: 'İçerik Editörü',
-                moderator: 'Başvuru Moderatörü',
-                member: 'Topluluk Üyesi'
-            };
-            u.role = newRole;
-            u.title = titles[newRole] || 'Üye';
-            saveData(data);
-            renderUsersSection(data);
-            showToast(`${u.name} kullanıcısının rolü güncellendi.`, 'fas fa-user-shield');
+    window.changeUserRole = async function (id, newRole) {
+        const titles = {
+            editor: 'İçerik Editörü',
+            moderator: 'Başvuru Moderatörü',
+            member: 'Topluluk Üyesi'
+        };
+        const title = titles[newRole] || 'Yönetici';
+        try {
+            await approveAdmin(id, newRole, title); // Re-using approveAdmin to update role/title
+            renderUsersSection();
+            showToast('Rol başarıyla güncellendi.', 'fas fa-check-circle');
+        } catch (e) {
+            console.error(e);
+            showToast('Güncelleme başarısız oldu.', 'fas fa-exclamation-circle');
         }
     };
 
-    window.deleteUser = function (id) {
-        if (!confirm('Bu kullanıcıyı sistemden silmek istediğinize emin misiniz?')) return;
-        const data = getData();
-        data.users = data.users.filter(u => u.id !== id);
-        saveData(data);
-        renderUsersSection(data);
-        showToast('Kullanıcı silindi.', 'fas fa-trash-alt');
+    window.deleteUser = async function (id) {
+        if (!confirm('Bu yöneticiyi sistemden silmek istediğinize emin misiniz?')) return;
+        try {
+            await fbDeleteAdmin(id);
+            renderUsersSection();
+            showToast('Yönetici başarıyla silindi.', 'fas fa-trash-alt');
+        } catch (e) {
+            console.error(e);
+            showToast('Silme başarısız oldu.', 'fas fa-exclamation-circle');
+        }
     };
 
     // 8. YEDEKLEME & SIFIRLAMA (SADECE SÜPER ADMİN)

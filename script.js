@@ -3,7 +3,7 @@
    JavaScript: Navigation, Animations, Counters
    ========================================== */
 
-import { registerMember, loginMember } from './firebase-service.js';
+import { registerMember, loginMember, submitApplication, submitSuggestion } from './firebase-service.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -364,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const waRedirectBtn = document.getElementById('waRedirectBtn');
 
     if (joinForm) {
-        joinForm.addEventListener('submit', (e) => {
+        joinForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const fullName = document.getElementById('fullName').value.trim();
@@ -372,6 +372,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const grade = document.getElementById('studentGrade').value;
             const phone = document.getElementById('phoneNum').value.trim();
             const interest = document.getElementById('interest').value;
+            const submitBtn = joinForm.querySelector('button[type="submit"]');
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gönderiliyor...';
+            }
 
             // Generate WhatsApp message
             const message = `Merhaba! Ben ${fullName}. SDÜ ${department} (${grade}) öğrencisiyim. Kültür ve Kitap Topluluğu'na katılmak istiyorum.%0A%0Aİlgi Alanım: ${interest}%0ATelefon: ${phone}`;
@@ -381,43 +387,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 waRedirectBtn.href = waUrl;
             }
 
-            // Save applicant to local storage for Admin Panel
             try {
-                const raw = localStorage.getItem('sdu_topluluk_data');
-                let data = raw ? JSON.parse(raw) : {};
-                if (!data.applications || !Array.isArray(data.applications)) {
-                    data.applications = [];
-                }
-                const newApplication = {
-                    id: Date.now(),
+                // Save applicant to Firebase
+                await submitApplication({
                     fullName,
                     department,
                     grade,
                     phone,
                     interest,
-                    date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-                    status: 'Beklemede'
-                };
-                data.applications.unshift(newApplication);
-                localStorage.setItem('sdu_topluluk_data', JSON.stringify(data));
+                    date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                });
 
-                // Ekstra Güvenlik: Bağımsız yedek havuzuna da ekle
-                const standaloneRaw = localStorage.getItem('sdu_submitted_applications');
-                const standaloneList = standaloneRaw ? JSON.parse(standaloneRaw) : [];
-                standaloneList.unshift(newApplication);
-                localStorage.setItem('sdu_submitted_applications', JSON.stringify(standaloneList));
+                // Hide form and show success message
+                joinForm.style.display = 'none';
+                if (formSuccessMessage) {
+                    formSuccessMessage.style.display = 'block';
+                    formSuccessMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+
+                showToast('🎉 Başvurunuz alındı! Aramıza hoş geldiniz.', 'fas fa-check-circle');
             } catch (err) {
-                console.warn('Başvuru kaydetme hatası:', err);
+                console.error('Başvuru kaydetme hatası:', err);
+                showToast('Başvuru gönderilirken bir hata oluştu.', 'fas fa-exclamation-triangle');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Başvuruyu Gönder <i class="fas fa-paper-plane"></i>';
+                }
             }
-
-            // Hide form and show success message
-            joinForm.style.display = 'none';
-            if (formSuccessMessage) {
-                formSuccessMessage.style.display = 'block';
-                formSuccessMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-
-            showToast('🎉 Başvurunuz alındı! Aramıza hoş geldiniz.', 'fas fa-check-circle');
         });
     }
 
@@ -435,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // === SUGGEST AN EVENT FORM SUBMISSION ===
     const suggestEventForm = document.getElementById('suggestEventForm');
     if (suggestEventForm) {
-        suggestEventForm.addEventListener('submit', (e) => {
+        suggestEventForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const member = getCurrentMember();
 
@@ -454,27 +450,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const title = document.getElementById('suggTitle').value.trim();
             const desc = document.getElementById('suggDesc').value.trim();
+            const submitBtn = suggestEventForm.querySelector('button[type="submit"]');
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gönderiliyor...';
+            }
 
             try {
-                const raw = localStorage.getItem('sdu_topluluk_data');
-                const data = raw ? JSON.parse(raw) : { suggestions: [] };
-                if (!data.suggestions) data.suggestions = [];
-                data.suggestions.unshift({
-                    id: Date.now(),
+                await submitSuggestion({
                     name,
                     department,
                     title,
                     desc,
-                    date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }),
-                    status: 'Değerlendiriliyor'
+                    date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' })
                 });
-                localStorage.setItem('sdu_topluluk_data', JSON.stringify(data));
-            } catch (err) {
-                console.warn('Öneri kaydetme hatası:', err);
-            }
 
-            suggestEventForm.reset();
-            showToast('💡 Harika fikriniz için teşekkürler! Öneriniz yönetim kurulumuza iletildi.', 'fas fa-lightbulb');
+                suggestEventForm.reset();
+                showToast('💡 Harika fikriniz için teşekkürler! Öneriniz yönetim kurulumuza iletildi.', 'fas fa-lightbulb');
+            } catch (err) {
+                console.error('Öneri kaydetme hatası:', err);
+                showToast('Öneriniz gönderilirken bir hata oluştu.', 'fas fa-exclamation-triangle');
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Fikrimi Gönder <i class="fas fa-paper-plane"></i>';
+                }
+            }
         });
     }
 
