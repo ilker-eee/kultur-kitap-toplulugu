@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yönetim Paneli | SDÜ Kültür ve Kitap Topluluğu</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+    <!-- GİRİŞ & KAYIT OVERLAY / EKRANI -->
+    <div id="authScreen" class="auth-overlay">
+        <div class="auth-modal">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h2>SDÜ Kültür ve Kitap Topluluğu</h2>
+                <p id="authSubtitle">Yönetim Paneli Giriş Ekranı</p>
+            </div>
+
+            <!-- Giriş Formu -->
+            <form id="loginForm" class="auth-form">
+                <div class="auth-field">
+                    <label for="loginEmail"><i class="fas fa-envelope"></i> E-Posta Adresi</label>
+                    <input type="email" id="loginEmail" placeholder="ornek@sdu.edu.tr" required autocomplete="username">
+                </div>
+                <div class="auth-field">
+                    <label for="loginPassword"><i class="fas fa-lock"></i> Şifre</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+                        <button type="button" class="toggle-password" data-target="loginPassword" aria-label="Şifreyi Göster/Gizle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="loginError" class="auth-error" style="display: none;"></div>
+
+                <button type="submit" class="btn-auth-primary">
+                    <i class="fas fa-sign-in-alt"></i> Güvenli Giriş Yap
+                </button>
+
+                <div class="auth-switch">
+                    <span>Hesabınız yok mu?</span>
+                    <button type="button" id="switchToRegisterBtn" class="link-btn">Yeni Yönetim Üyesi Kaydı</button>
+                </div>
+                
+                <div class="auth-back">
+                    <a href="index.html"><i class="fas fa-arrow-left"></i> Ana Siteye Geri Dön</a>
+                </div>
+            </form>
+
+            <!-- Kayıt Formu -->
+            <form id="registerForm" class="auth-form" style="display: none;">
+                <div class="auth-field">
+                    <label for="regName"><i class="fas fa-user"></i> Ad Soyad *</label>
+                    <input type="text" id="regName" placeholder="Adınız Soyadınız" required>
+                </div>
+                <div class="auth-field">
+                    <label for="regEmail"><i class="fas fa-envelope"></i> E-Posta Adresi *</label>
+                    <input type="email" id="regEmail" placeholder="ornek@sdu.edu.tr" required>
+                </div>
+                <div class="auth-field">
+                    <label for="regRole"><i class="fas fa-id-badge"></i> Talep Edilen Görev</label>
+                    <select id="regRole">
+                        <option value="editor">İçerik Editörü (Kitap & Etkinlik)</option>
+                        <option value="moderator">Moderatör (Başvurular & Öneriler)</option>
+                        <option value="member">Topluluk Üyesi</option>
+                    </select>
+                </div>
+                <div class="auth-field">
+                    <label for="regPassword"><i class="fas fa-lock"></i> Şifre *</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="regPassword" placeholder="En az 6 karakter" required minlength="6">
+                        <button type="button" class="toggle-password" data-target="regPassword" aria-label="Şifreyi Göster/Gizle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="regError" class="auth-error" style="display: none;"></div>
+                <div id="regSuccess" class="auth-success" style="display: none;"></div>
+
+                <button type="submit" class="btn-auth-primary">
+                    <i class="fas fa-user-plus"></i> Kaydı Tamamla
+                </button>
+
+                <div class="auth-switch">
+                    <span>Zaten hesabınız var mı?</span>
+                    <button type="button" id="switchToLoginBtn" class="link-btn">Giriş Ekranına Dön</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- YÖNETİM PANELİ ANA ARAYÜZÜ -->
+    <div id="adminApp" class="admin-layout" style="display: none;">
+        
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <div class="brand-icon"><i class="fas fa-book-reader"></i></div>
+                    <div class="brand-text">
+                        <h3>SDÜ Kitap</h3>
+                        <span>Yönetim Masası</span>
+                    </div>
+                </div>
+                <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Menüyü Kapat">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Profil Rozeti -->
+            <div class="sidebar-user-card">
+                <div class="user-avatar" id="sidebarUserAvatar">İM</div>
+                <div class="user-info">
+                    <strong id="sidebarUserName">İlker M.</strong>
+                    <span class="user-badge" id="sidebarUserBadge">👑 Süper Admin</span>
+                </div>
+            </div>
+
+            <!-- Menü Sekmeleri -->
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Temel Yönetim</div>
+                
+                <button class="nav-item active" data-tab="overview">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Genel Bakış</span>
+                </button>
+
+                <button class="nav-item" data-tab="book" data-role="editor">
+                    <i class="fas fa-book-open"></i>
+                    <span>Ayın Kitabı</span>
+                </button>
+
+                <button class="nav-item" data-tab="events" data-role="editor">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Etkinlikler</span>
+                </button>
+
+                <button class="nav-item" data-tab="applications" data-role="moderator">
+                    <i class="fas fa-user-check"></i>
+                    <span>Gelen Başvurular</span>
+                    <span class="nav-counter" id="badgeApplications">0</span>
+                </button>
+
+                <button class="nav-item" data-tab="suggestions" data-role="moderator">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>Etkinlik Önerileri</span>
+                    <span class="nav-counter" id="badgeSuggestions">0</span>
+                </button>
+
+                <button class="nav-item" data-tab="broadcast" data-role="editor">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>WhatsApp Bülteni</span>
+                </button>
+
+                <!-- SADECE SÜPER ADMİN GÖREBİLİR -->
+                <div class="nav-section-title superadmin-only" id="advancedNavTitle">Gelişmiş & Güvenlik</div>
+
+                <button class="nav-item superadmin-only" data-tab="users" id="navItemUsers">
+                    <i class="fas fa-users-cog"></i>
+                    <span>Kullanıcılar & Roller</span>
+                </button>
+
+                <button class="nav-item superadmin-only" data-tab="backup" id="navItemBackup">
+                    <i class="fas fa-database"></i>
+                    <span>Yedekleme & Sıfırlama</span>
+                </button>
+
+                <div class="nav-section-title">Destek & Kılavuz</div>
+
+                <button class="nav-item" data-tab="guide">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Kullanım Rehberi</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="index.html" class="sidebar-footer-link" target="_blank">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>Siteyi Aç</span>
+                </a>
+                <button id="logoutBtn" class="sidebar-footer-link logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Çıkış Yap</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="admin-main">
+            <!-- Topbar -->
+            <header class="admin-topbar">
+                <div class="topbar-left">
+                    <button class="sidebar-toggle-btn" id="sidebarToggleBtn" aria-label="Menüyü Aç">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="page-title-box">
+                        <h1 id="topbarTitle">Genel Bakış</h1>
+                        <p id="topbarSubtitle">Topluluk güncel istatistikleri ve durum özeti</p>
+                    </div>
+                </div>
+
+                <div class="topbar-actions">
+                    <!-- Tema Değiştirici -->
+                    <button class="topbar-btn" id="adminThemeToggle" aria-label="Tema Değiştir" title="Aydınlık / Karanlık Tema">
+                        <i class="fas fa-moon" id="adminThemeIcon"></i>
+                    </button>
+
+                    <!-- Ana Siteye Git -->
+                    <a href="index.html" class="topbar-btn site-link" title="Ana Sayfaya Git">
+                        <i class="fas fa-globe"></i>
+                        <span>Siteyi İncele</span>
+                    </a>
+
+                    <!-- Çıkış Butonu -->
+                    <button class="topbar-btn logout-btn" id="topbarLogoutBtn" title="Oturumu Kapat">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- SEKME İÇERİKLERİ -->
+            <div class="admin-content-body">
+
+                <!-- 1. GENEL BAKIŞ SEKME -->
+                <section class="tab-pane active" id="pane-overview">
+                    <div class="welcome-banner">
+                        <div class="welcome-text">
+                            <h2>Hoş Geldin, <span id="overviewUserName">İlker</span> 👋</h2>
+                            <p>SDÜ Kültür ve Kitap Topluluğu yönetim merkezindesin. Buradan sitedeki içerikleri değiştirebilir, başvuruları inceleyebilir ve duyuru hazırlayabilirsin.</p>
+                        </div>
+                        <div class="welcome-badge" id="overviewUserRoleBadge">
+                            <i class="fas fa-shield-alt"></i> Süper Admin Yetkisi
+                        </div>
+                    </div>
+
+                    <!-- İstatistik Kartları -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon icon-blue">
+                                <i class="fas fa-book-reader"></i>
+                            </div>
+                            <div class="stat-details">
+                                <span class="stat-label">Ayın Kitabı</span>
+                                <h3 class="stat-value" id="statBookTitle">Kürk Mantolu Madonna</h3>
+                                <span class="stat-sub" id="statBookProgress">%75 Tamamlandı</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon icon-green">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="stat-details">
+                                <span class="stat-label">Aktif Etkinlikler</span>
+                                <h3 class="stat-value" id="statEventCount">4</h3>
+                                <span class="stat-sub">Sitede yayında</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon icon-purple">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="stat-details">
+                                <span class="stat-label">Toplam Başvuru</span>
+                                <h3 class="stat-value" id="statApplicationCount">0</h3>
+                                <span class="stat-sub" id="statPendingApps">0 beklemede</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon icon-amber">
+                                <i class="fas fa-lightbulb"></i>
+                            </div>
+                            <div class="stat-details">
+                                <span class="stat-label">Etkinlik Önerileri</span>
+                                <h3 class="stat-value" id="statSuggestionCount">0</h3>
+                                <span class="stat-sub">Öğrencilerden gelen</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hızlı İşlemler Kartları -->
+                    <div class="quick-actions-row">
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-bolt"></i> Hızlı İşlemler</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="action-buttons-grid">
+                                    <button class="action-box" onclick="switchAdminTab('book')">
+                                        <i class="fas fa-book"></i>
+                                        <span>Kitabı Güncelle</span>
+                                    </button>
+                                    <button class="action-box" onclick="switchAdminTab('events')">
+                                        <i class="fas fa-calendar-plus"></i>
+                                        <span>Yeni Etkinlik</span>
+                                    </button>
+                                    <button class="action-box" onclick="switchAdminTab('applications')">
+                                        <i class="fas fa-user-check"></i>
+                                        <span>Başvuruları Gör</span>
+                                    </button>
+                                    <button class="action-box" onclick="switchAdminTab('broadcast')">
+                                        <i class="fab fa-whatsapp"></i>
+                                        <span>Duyuru Hazırla</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-bullhorn"></i> WhatsApp Duyuru Önizlemesi</h3>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted" style="margin-bottom: 12px; font-size: 0.9rem;">
+                                    Etkinlikler veya ayın kitabı tahlili yaklaştığında tek tıkla topluluk grubuna şık duyuru gönderebilirsiniz.
+                                </p>
+                                <button class="btn-primary-sm" onclick="switchAdminTab('broadcast')">
+                                    <i class="fab fa-whatsapp"></i> WhatsApp Bülteni Sekmesine Git
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. AYIN KİTABI DÜZENLEYİCİ -->
+                <section class="tab-pane" id="pane-book">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div>
+                                <h3><i class="fas fa-book-open"></i> Ayın Kitabı Bilgilerini Güncelle</h3>
+                                <p class="card-desc">Buradan yapacağınız değişiklikler ana sayfada canlı olarak güncellenir.</p>
+                            </div>
+                            <button type="button" class="btn-primary-sm" id="saveBookBtn">
+                                <i class="fas fa-save"></i> Değişiklikleri Kaydet
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <form id="bookForm" class="admin-form-grid">
+                                <div class="form-group">
+                                    <label for="bookMonthTag">Seçki Dönemi / Etiketi</label>
+                                    <input type="text" id="bookMonthTag" placeholder="Örn: Ekim 2026 Seçkisi" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="bookTitle">Kitap Adı *</label>
+                                    <input type="text" id="bookTitle" placeholder="Örn: Kürk Mantolu Madonna" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="bookAuthor">Yazar *</label>
+                                    <input type="text" id="bookAuthor" placeholder="Örn: Sabahattin Ali" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="bookGenre">Tür / Kategori</label>
+                                    <input type="text" id="bookGenre" placeholder="Örn: Türk Klasikleri">
+                                </div>
+                                <div class="form-group">
+                                    <label for="bookPages">Sayfa Sayısı</label>
+                                    <input type="text" id="bookPages" placeholder="Örn: 160">
+                                </div>
+                                <div class="form-group">
+                                    <label for="bookReaders">Okur Sayısı Rozeti</label>
+                                    <input type="text" id="bookReaders" placeholder="Örn: 85 Okur">
+                                </div>
+                                <div class="form-group">
+                                    <label for="bookMeetingDate">Tahlil Tarihi & Saati</label>
+                                    <input type="text" id="bookMeetingDate" placeholder="Örn: 28 Ekim 2026, Çarşamba 17:00">
+                                </div>
+                                <div class="form-group">
+                                    <label for="bookMeetingPlace">Buluşma Yeri</label>
+                                    <input type="text" id="bookMeetingPlace" placeholder="Örn: Merkez Kütüphane Kitap Kafe">
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="bookProgress">Topluluk Okuma İlerlemesi (% <span id="progressValueDisplay">75</span>)</label>
+                                    <input type="range" id="bookProgress" min="0" max="100" value="75" class="slider-input">
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="bookQuote">Kitaptan Öne Çıkan Alıntı</label>
+                                    <textarea id="bookQuote" rows="2" placeholder="Kitaptan etkileyici bir cümle..."></textarea>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="bookSynopsis">Tahlil Açıklaması & Tanıtım</label>
+                                    <textarea id="bookSynopsis" rows="3" placeholder="Kitabın konusu ve tahlil oturumunda ne konuşulacağı..."></textarea>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. ETKİNLİK YÖNETİMİ SEKME -->
+                <section class="tab-pane" id="pane-events">
+                    <!-- Yeni Etkinlik Ekleme Kartı -->
+                    <div class="dashboard-card" style="margin-bottom: 24px;">
+                        <div class="card-header">
+                            <div>
+                                <h3><i class="fas fa-plus-circle"></i> Yeni Etkinlik Ekle</h3>
+                                <p class="card-desc">Sitede yayınlanacak yeni bir söyleşi, kulüp buluşması veya gezi ekleyin.</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <form id="addEventForm" class="admin-form-grid">
+                                <div class="form-group">
+                                    <label for="eventTitle">Etkinlik Başlığı *</label>
+                                    <input type="text" id="eventTitle" placeholder="Örn: Şiir ve Edebiyat Akşamı" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventCategory">Kategori *</label>
+                                    <select id="eventCategory" required>
+                                        <option value="kitap">Kitap Kulübü</option>
+                                        <option value="soylesi">Söyleşi & Dinleti</option>
+                                        <option value="gezi">Kültür Gezisi</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventDate">Tarih *</label>
+                                    <input type="text" id="eventDate" placeholder="Örn: 18 Kasım 2026" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventTime">Saat</label>
+                                    <input type="text" id="eventTime" placeholder="Örn: 15:30" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventPlace">Mekan / Yer *</label>
+                                    <input type="text" id="eventPlace" placeholder="Örn: Prof. Dr. M. Lütfü Çakmakçı Kültür Merkezi" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventBadge">Durum Rozeti</label>
+                                    <select id="eventBadge">
+                                        <option value="Yaklaşan">Yaklaşan</option>
+                                        <option value="Önümüzdeki Ay">Önümüzdeki Ay</option>
+                                        <option value="Kayıt Açık">Kayıt Açık</option>
+                                        <option value="Kontenjan Doldu">Kontenjan Doldu</option>
+                                    </select>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="eventDesc">Kısa Açıklama *</label>
+                                    <textarea id="eventDesc" rows="2" placeholder="Etkinliğin içeriği hakkında 1-2 cümlelik bilgi..." required></textarea>
+                                </div>
+                                <div class="form-group full-width form-actions-right">
+                                    <button type="submit" class="btn-primary-sm">
+                                        <i class="fas fa-check"></i> Etkinliği Yayınla
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Mevcut Etkinlikler Listesi -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div>
+                                <h3><i class="fas fa-list-ul"></i> Yayındaki Etkinlikler (<span id="eventListCount">0</span>)</h3>
+                                <p class="card-desc">Sitede aktif olarak görünen etkinliklerin listesi.</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="data-table" id="eventsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Etkinlik Başlığı</th>
+                                            <th>Kategori</th>
+                                            <th>Tarih & Saat</th>
+                                            <th>Yer</th>
+                                            <th>Durum</th>
+                                            <th>İşlem</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="eventsTableBody">
+                                        <!-- Dinamik doldurulacak -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. GELEN BAŞVURULAR SEKME -->
+                <section class="tab-pane" id="pane-applications">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div>
+                                <h3><i class="fas fa-user-check"></i> Topluluk Katılım Başvuruları (<span id="appTotalCount">0</span>)</h3>
+                                <p class="card-desc">Ana sitedeki "Bize Katıl" formunu dolduran öğrencilerin kayıtları.</p>
+                            </div>
+                            <div class="table-filters">
+                                <input type="text" id="searchAppInput" placeholder="İsim, bölüm veya telefon ara..." class="search-input">
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="data-table" id="applicationsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Ad Soyad</th>
+                                            <th>Bölüm & Sınıf</th>
+                                            <th>Telefon / WhatsApp</th>
+                                            <th>İlgi Alanı</th>
+                                            <th>Tarih</th>
+                                            <th>Durum</th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="applicationsTableBody">
+                                        <!-- Dinamik doldurulacak -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. ETKİNLİK ÖNERİLERİ SEKME -->
+                <section class="tab-pane" id="pane-suggestions">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div>
+                                <h3><i class="fas fa-lightbulb"></i> Öğrencilerden Gelen Etkinlik Önerileri (<span id="suggTotalCount">0</span>)</h3>
+                                <p class="card-desc">Sitedeki "Etkinlik Öner" bölümünden iletilen fikirler.</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="data-table" id="suggestionsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Öneren Kişi</th>
+                                            <th>Bölüm</th>
+                                            <th>Öneri Başlığı</th>
+                                            <th>Öneri Detayı</th>
+                                            <th>Tarih</th>
+                                            <th>Durum</th>
+                                            <th>İşlem</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="suggestionsTableBody">
+                                        <!-- Dinamik doldurulacak -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. WHATSAPP DUYURU BÜLTENİ SEKME -->
+                <section class="tab-pane" id="pane-broadcast">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div>
+                                <h3><i class="fab fa-whatsapp"></i> WhatsApp Duyuru Bülteni Hazırlayıcı</h3>
+                                <p class="card-desc">Topluluk WhatsApp grubuna atılacak hazır şablonlu, emojili duyuru oluşturun.</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="broadcast-builder-grid">
+                                <div class="broadcast-controls">
+                                    <div class="form-group">
+                                        <label for="broadcastType">Duyuru Türü</label>
+                                        <select id="broadcastType">
+                                            <option value="book">📖 Ayın Kitabı Tahlil Duyurusu</option>
+                                            <option value="event">📅 Yaklaşan Etkinlik Duyurusu</option>
+                                            <option value="welcome">🎉 Yeni Üyelere Karşılama Duyurusu</option>
+                                            <option value="custom">✍️ Özel Serbest Duyuru</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group" id="broadcastEventSelectorGroup" style="display: none;">
+                                        <label for="broadcastEventSelect">Hangi Etkinlik İçin?</label>
+                                        <select id="broadcastEventSelect"></select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="broadcastExtraNote">Ekstra Not veya Çağrı (İsteğe Bağlı)</label>
+                                        <input type="text" id="broadcastExtraNote" placeholder="Örn: Çay ve kahveler bizden! Arkadaşlarınızı da davet edebilirsiniz.">
+                                    </div>
+
+                                    <button type="button" class="btn-primary-sm" id="generateBroadcastBtn">
+                                        <i class="fas fa-magic"></i> Duyuru Metnini Oluştur
+                                    </button>
+                                </div>
+
+                                <div class="broadcast-preview-box">
+                                    <label>Oluşturulan WhatsApp Mesajı</label>
+                                    <textarea id="broadcastOutput" rows="8" readonly placeholder="Duyuru metni burada görüntülenecektir..."></textarea>
+                                    
+                                    <div class="broadcast-actions">
+                                        <button type="button" class="btn-outline-sm" id="copyBroadcastBtn">
+                                            <i class="far fa-copy"></i> Metni Kopyala
+                                        </button>
+                                        <button type="button" class="btn-whatsapp-sm" id="openWhatsAppBtn">
+                                            <i class="fab fa-whatsapp"></i> WhatsApp'ta Aç
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. KULLANICILAR & ROLLER (YALNIZCA SÜPER ADMİN) -->
+                <section class="tab-pane superadmin-only" id="pane-users">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div>
+                                <h3><i class="fas fa-users-cog"></i> Kullanıcı & Rol Yetkilendirme Masası</h3>
+                                <p class="card-desc">Sadece Süper Admin görebilir. Yönetim kurulundaki diğer kişilerin rollerini belirleyin.</p>
+                            </div>
+                            <span class="badge-lock"><i class="fas fa-lock"></i> Özel Süper Admin Alanı</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="data-table" id="usersTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Ad Soyad</th>
+                                            <th>E-Posta</th>
+                                            <th>Mevcut Rol</th>
+                                            <th>Rolü Değiştir</th>
+                                            <th>İşlem</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="usersTableBody">
+                                        <!-- Dinamik doldurulacak -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 8. YEDEKLEME & SIFIRLAMA (YALNIZCA SÜPER ADMİN) -->
+                <section class="tab-pane superadmin-only" id="pane-backup">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div>
+                                <h3><i class="fas fa-database"></i> Veri Yedekleme ve Senkronizasyon</h3>
+                                <p class="card-desc">Sitedeki tüm kitapları, etkinlikleri, başvuruları tek tıkla dosya olarak indirin veya başka cihaza aktarın.</p>
+                            </div>
+                            <span class="badge-lock"><i class="fas fa-lock"></i> Özel Süper Admin Alanı</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="backup-grid">
+                                <div class="backup-box">
+                                    <div class="backup-box-icon"><i class="fas fa-file-download"></i></div>
+                                    <h4>Yedeği İndir (JSON)</h4>
+                                    <p>Tüm site verilerini bilgisayarınıza güvenli bir `.json` dosyası olarak kaydedin.</p>
+                                    <button type="button" class="btn-primary-sm" id="exportBackupBtn">
+                                        <i class="fas fa-download"></i> Verileri İndir
+                                    </button>
+                                </div>
+
+                                <div class="backup-box">
+                                    <div class="backup-box-icon"><i class="fas fa-file-upload"></i></div>
+                                    <h4>Yedek Dosyası Yükle</h4>
+                                    <p>Daha önce indirdiğiniz JSON yedeğini yükleyerek tüm verileri geri yükleyin.</p>
+                                    <input type="file" id="importBackupInput" accept=".json" style="display: none;">
+                                    <button type="button" class="btn-outline-sm" onclick="document.getElementById('importBackupInput').click()">
+                                        <i class="fas fa-upload"></i> Dosya Seç ve Yükle
+                                    </button>
+                                </div>
+
+                                <div class="backup-box danger-box">
+                                    <div class="backup-box-icon danger-icon"><i class="fas fa-trash-restore"></i></div>
+                                    <h4>Fabrika Ayarlarına Dön</h4>
+                                    <p>Tüm yerel verileri silip varsayılan başlangıç haline döndürür.</p>
+                                    <button type="button" class="btn-danger-sm" id="resetDataBtn">
+                                        <i class="fas fa-exclamation-triangle"></i> Varsayılana Sıfırla
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 9. KULLANIM REHBERİ SEKME -->
+                <section class="tab-pane" id="pane-guide">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div>
+                                <h3><i class="fas fa-info-circle"></i> Yönetim Kurulu Kullanım Kılavuzu</h3>
+                                <p class="card-desc">Sistemi en verimli ve kolay şekilde kullanmanız için hazırlanan pratik rehber.</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="guide-steps-grid">
+                                <div class="guide-step-card">
+                                    <div class="step-num">1</div>
+                                    <h4>📖 Ayın Kitabını Değiştirme</h4>
+                                    <p>Her ayın başında "Ayın Kitabı" sekmesine girin. Yeni kitabın adını, yazarını, sayfasını ve tahlil tarihini girip <strong>"Değişiklikleri Kaydet"</strong> butonuna basın. Ana sitedeki 3D kitap kapağı ve açıklamalar hemen yenilenir.</p>
+                                </div>
+
+                                <div class="guide-step-card">
+                                    <div class="step-num">2</div>
+                                    <h4>📅 Yeni Etkinlik Duyurma</h4>
+                                    <p>"Etkinlikler" sekmesine girin. Başlık, tarih, saat ve yeri yazıp kaydedin. Etkinlik ana sayfada hem takvimde hem de etkinlik kartlarında otomatik listelenir.</p>
+                                </div>
+
+                                <div class="guide-step-card">
+                                    <div class="step-num">3</div>
+                                    <h4>📥 Başvuruları Takip Etme</h4>
+                                    <p>Öğrenciler sitedeki formu doldurduğunda "Gelen Başvurular" sekmesine düşer. Buradan tek tıkla doğrudan öğrencinin WhatsApp'ına yazabilir ve durumu "Onaylandı" yapabilirsiniz.</p>
+                                </div>
+
+                                <div class="guide-step-card">
+                                    <div class="step-num">4</div>
+                                    <h4>📢 Tek Tıkla WhatsApp Duyurusu</h4>
+                                    <p>"WhatsApp Bülteni" sekmesinden yaklaşan etkinliği seçin. Sistem sizin yerinize emojili ve düzenli bir mesaj hazırlar. "WhatsApp'ta Aç" diyerek doğrudan topluluk grubuna atabilirsiniz.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- TOAST BİLDİRİM KUTUSU -->
+    <div id="adminToastContainer" class="toast-container"></div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

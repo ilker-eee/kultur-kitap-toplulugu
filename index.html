@@ -34,6 +34,10 @@
                 <li><a href="#bize-katil" class="nav-link nav-cta">Bize Katıl</a></li>
             </ul>
             <div class="nav-actions">
+                <a href="admin.html" class="nav-admin-btn" title="Yönetim Paneli">
+                    <i class="fas fa-lock"></i>
+                    <span>Yönetim</span>
+                </a>
                 <button class="theme-toggle" id="themeToggle" aria-label="Tema değiştir" title="Karanlık / Aydınlık Tema">
                     <i class="fas fa-moon" id="themeIcon"></i>
                 </button>
@@ -308,15 +312,26 @@
                 <p class="section-desc">Her ay düzenlediğimiz etkinliklerle kampüs hayatını renklendiriyoruz.</p>
             </div>
 
-            <!-- Etkinlik Filtreleri -->
-            <div class="event-filters">
-                <button class="filter-btn active" data-filter="all">Tüm Etkinlikler</button>
-                <button class="filter-btn" data-filter="kitap">Kitap Kulübü</button>
-                <button class="filter-btn" data-filter="soylesi">Söyleşi & Dinleti</button>
-                <button class="filter-btn" data-filter="gezi">Kültür Gezisi</button>
+            <!-- Etkinlik Kontrolleri & Görünüm Seçici -->
+            <div class="events-controls-row">
+                <div class="event-filters" id="eventFilters">
+                    <button class="filter-btn active" data-filter="all">Tüm Etkinlikler</button>
+                    <button class="filter-btn" data-filter="kitap">Kitap Kulübü</button>
+                    <button class="filter-btn" data-filter="soylesi">Söyleşi & Dinleti</button>
+                    <button class="filter-btn" data-filter="gezi">Kültür Gezisi</button>
+                </div>
+                <div class="events-view-switcher">
+                    <button class="view-switch-btn active" id="btnViewCards" aria-label="Kart Görünümü">
+                        <i class="fas fa-th-large"></i> Kart Görünümü
+                    </button>
+                    <button class="view-switch-btn" id="btnViewCalendar" aria-label="Takvim Görünümü">
+                        <i class="fas fa-calendar-alt"></i> Takvim Görünümü
+                    </button>
+                </div>
             </div>
 
-            <div class="events-grid">
+            <!-- 1. KART GÖRÜNÜMÜ -->
+            <div class="events-grid" id="eventsGrid">
                 <div class="event-card" data-category="kitap">
                     <div class="event-image">
                         <div class="event-placeholder">
@@ -402,6 +417,108 @@
                             <span><i class="fas fa-clock"></i> 09:00</span>
                             <button class="event-cal-btn" data-title="Kültür Gezisi" data-date="12 Kasım 2026" aria-label="Takvime Ekle" title="Takvime Ekle / Hatırlatıcı"><i class="far fa-calendar-plus"></i></button>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. İNTERAKTİF ETKİNLİK TAKVİMİ GÖRÜNÜMÜ -->
+            <div class="events-calendar-view" id="eventsCalendarView" style="display: none;">
+                <div class="calendar-card">
+                    <div class="calendar-header">
+                        <div class="cal-nav-group">
+                            <button class="cal-arrow-btn" id="calPrevMonthBtn" aria-label="Önceki Ay"><i class="fas fa-chevron-left"></i></button>
+                            <h3 class="cal-month-title" id="calMonthTitle">Ekim 2026</h3>
+                            <button class="cal-arrow-btn" id="calNextMonthBtn" aria-label="Sonraki Ay"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                        <div class="cal-legend">
+                            <span class="legend-item"><span class="legend-dot dot-event"></span> Etkinlik Var</span>
+                            <span class="legend-item"><span class="legend-dot dot-today"></span> Seçili Gün</span>
+                        </div>
+                    </div>
+                    <div class="calendar-weekdays">
+                        <span>Pzt</span><span>Sal</span><span>Çar</span><span>Per</span><span>Cum</span><span>Cmt</span><span>Paz</span>
+                    </div>
+                    <div class="calendar-days-grid" id="calendarDaysGrid">
+                        <!-- Günler JavaScript ile doldurulacak -->
+                    </div>
+                </div>
+
+                <!-- Seçili Günün Etkinlik Paneli -->
+                <div class="calendar-event-panel" id="calendarEventPanel">
+                    <div class="panel-header">
+                        <i class="far fa-calendar-check"></i>
+                        <h4 id="calPanelDateTitle">Seçilen Günün Programı</h4>
+                    </div>
+                    <div class="panel-body" id="calPanelBody">
+                        <p class="cal-empty-msg">Detayları görmek için takvimdeki etkinlikli günlerden birine tıklayın.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WHATSAPP DUYURU KANALI BANNERI -->
+            <div class="wa-community-banner">
+                <div class="wa-banner-left">
+                    <div class="wa-banner-icon">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <div class="wa-banner-text">
+                        <span class="wa-banner-badge">Resmi Topluluk Kanalı</span>
+                        <h3>WhatsApp Duyuru Bültenimize Katılın!</h3>
+                        <p>Yaklaşan kitap tahlilleri, yazar söyleşileri ve kontenjanlı gezilerden ilk siz haberdar olun. Grup sohbete kapalıdır, yalnızca yönetim duyuruları paylaşılır.</p>
+                    </div>
+                </div>
+                <a href="https://wa.me/905XXXXXXXXX" target="_blank" rel="noopener" class="btn btn-wa-join">
+                    <i class="fab fa-whatsapp"></i> Kanala Katıl
+                </a>
+            </div>
+
+            <!-- KULLANICILAR İÇİN: ETKİNLİK ÖNER KARTI -->
+            <div class="suggest-event-section" id="etkinlik-oner">
+                <div class="suggest-card">
+                    <div class="suggest-info">
+                        <div class="suggest-tag">
+                            <i class="fas fa-lightbulb"></i> Fikrini Bizimle Paylaş
+                        </div>
+                        <h3 class="suggest-title">Toplulukta Hangi Etkinliği Görmek İstersin?</h3>
+                        <p class="suggest-desc">
+                            Aklında kampüste gerçekleştirmek istediğin bir edebiyat söyleşisi, kitap tahlili, açık hava sineması ya da yaratıcı yazarlık atölyesi mi var? Fikrini yönetim kurulumuza ilet, birlikte planlayalım!
+                        </p>
+                        <div class="suggest-highlights">
+                            <div class="suggest-highlight-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Tüm öneriler yönetim kurulu toplantısında değerlendirilir</span>
+                            </div>
+                            <div class="suggest-highlight-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Kabul edilen fikrin organizatör ekibinde yer alabilirsin</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="suggest-form-wrapper">
+                        <form id="suggestEventForm" class="suggest-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="suggName"><i class="fas fa-user"></i> Ad Soyad *</label>
+                                    <input type="text" id="suggName" placeholder="Örn: Merve Yıldız" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="suggDept"><i class="fas fa-graduation-cap"></i> Bölüm *</label>
+                                    <input type="text" id="suggDept" placeholder="Örn: Psikoloji" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="suggTitle"><i class="fas fa-heading"></i> Öneri Başlığı *</label>
+                                <input type="text" id="suggTitle" placeholder="Örn: Çimlerde Açık Hava Şiir Gecesi" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="suggDesc"><i class="fas fa-comment-alt"></i> Fikrinin Detayları *</label>
+                                <textarea id="suggDesc" rows="3" placeholder="Bu etkinliği nasıl hayal ediyorsun? Hangi kitaplar, yazarlar ya da aktiviteler olmalı?" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-suggest-submit">
+                                <i class="fas fa-paper-plane"></i> Fikrimi Yönetime İlet
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -735,6 +852,7 @@
                         <li><a href="#sss">SSS</a></li>
                         <li><a href="#bize-katil">Bize Katıl</a></li>
                         <li><a href="#iletisim">İletişim</a></li>
+                        <li><a href="admin.html" class="footer-admin-link" style="color:var(--primary); font-weight:600;"><i class="fas fa-lock"></i> Yönetici Girişi</a></li>
                     </ul>
                 </div>
                 <div class="footer-social">

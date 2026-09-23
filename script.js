@@ -379,6 +379,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 waRedirectBtn.href = waUrl;
             }
 
+            // Save applicant to local storage for Admin Panel
+            try {
+                const raw = localStorage.getItem('sdu_topluluk_data');
+                const data = raw ? JSON.parse(raw) : { applications: [] };
+                if (!data.applications) data.applications = [];
+                data.applications.unshift({
+                    id: Date.now(),
+                    fullName,
+                    department,
+                    grade,
+                    phone,
+                    interest,
+                    date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                    status: 'Beklemede'
+                });
+                localStorage.setItem('sdu_topluluk_data', JSON.stringify(data));
+            } catch (err) {
+                console.warn('Başvuru kaydetme hatası:', err);
+            }
+
             // Hide form and show success message
             joinForm.style.display = 'none';
             if (formSuccessMessage) {
@@ -387,6 +407,39 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             showToast('🎉 Başvurunuz alındı! Aramıza hoş geldiniz.', 'fas fa-check-circle');
+        });
+    }
+
+    // === SUGGEST AN EVENT FORM SUBMISSION ===
+    const suggestEventForm = document.getElementById('suggestEventForm');
+    if (suggestEventForm) {
+        suggestEventForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('suggName').value.trim();
+            const department = document.getElementById('suggDept').value.trim();
+            const title = document.getElementById('suggTitle').value.trim();
+            const desc = document.getElementById('suggDesc').value.trim();
+
+            try {
+                const raw = localStorage.getItem('sdu_topluluk_data');
+                const data = raw ? JSON.parse(raw) : { suggestions: [] };
+                if (!data.suggestions) data.suggestions = [];
+                data.suggestions.unshift({
+                    id: Date.now(),
+                    name,
+                    department,
+                    title,
+                    desc,
+                    date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }),
+                    status: 'Değerlendiriliyor'
+                });
+                localStorage.setItem('sdu_topluluk_data', JSON.stringify(data));
+            } catch (err) {
+                console.warn('Öneri kaydetme hatası:', err);
+            }
+
+            suggestEventForm.reset();
+            showToast('💡 Harika fikriniz için teşekkürler! Öneriniz yönetim kurulumuza iletildi.', 'fas fa-lightbulb');
         });
     }
 
@@ -461,21 +514,287 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // === EVENT CALENDAR BUTTONS ===
-    const calBtns = document.querySelectorAll('.event-cal-btn');
-    calBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const title = btn.dataset.title || 'Etkinlik';
-            const date = btn.dataset.date || '';
-            showToast(`📅 "${title}" (${date}) hatırlatıcınız kaydedildi!`, 'fas fa-calendar-check');
+    function bindEventCalButtons() {
+        const calBtns = document.querySelectorAll('.event-cal-btn');
+        calBtns.forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const title = btn.dataset.title || 'Etkinlik';
+                const date = btn.dataset.date || '';
+                showToast(`📅 "${title}" (${date}) hatırlatıcınız kaydedildi!`, 'fas fa-calendar-check');
 
-            btn.style.transform = 'scale(1.25) rotate(15deg)';
-            setTimeout(() => {
-                btn.style.transform = '';
-            }, 300);
+                btn.style.transform = 'scale(1.25) rotate(15deg)';
+                setTimeout(() => {
+                    btn.style.transform = '';
+                }, 300);
+            };
         });
-    });
+    }
+    bindEventCalButtons();
 
-    // Initial call
+    // ==========================================
+    // ETKİNLİK TAKVİMİ BİLEŞENİ
+    // ==========================================
+    const btnViewCards = document.getElementById('btnViewCards');
+    const btnViewCalendar = document.getElementById('btnViewCalendar');
+    const eventsGrid = document.getElementById('eventsGrid');
+    const eventsCalendarView = document.getElementById('eventsCalendarView');
+    const eventFilters = document.getElementById('eventFilters');
+
+    let currentCalMonth = 9; // 9 = Ekim 2026 (0-indexed)
+    const currentCalYear = 2026;
+
+    if (btnViewCards && btnViewCalendar) {
+        btnViewCards.addEventListener('click', () => {
+            btnViewCards.classList.add('active');
+            btnViewCalendar.classList.remove('active');
+            eventsGrid.style.display = 'grid';
+            eventsCalendarView.style.display = 'none';
+            if (eventFilters) eventFilters.style.display = 'flex';
+        });
+
+        btnViewCalendar.addEventListener('click', () => {
+            btnViewCalendar.classList.add('active');
+            btnViewCards.classList.remove('active');
+            eventsGrid.style.display = 'none';
+            eventsCalendarView.style.display = 'grid';
+            if (eventFilters) eventFilters.style.display = 'none';
+            renderCalendar(currentCalMonth, currentCalYear);
+        });
+    }
+
+    const calMonthTitle = document.getElementById('calMonthTitle');
+    const calPrevMonthBtn = document.getElementById('calPrevMonthBtn');
+    const calNextMonthBtn = document.getElementById('calNextMonthBtn');
+    const calendarDaysGrid = document.getElementById('calendarDaysGrid');
+    const calPanelDateTitle = document.getElementById('calPanelDateTitle');
+    const calPanelBody = document.getElementById('calPanelBody');
+
+    const MONTH_NAMES_TR = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+
+    if (calPrevMonthBtn && calNextMonthBtn) {
+        calPrevMonthBtn.addEventListener('click', () => {
+            if (currentCalMonth > 0) {
+                currentCalMonth--;
+                renderCalendar(currentCalMonth, currentCalYear);
+            }
+        });
+
+        calNextMonthBtn.addEventListener('click', () => {
+            if (currentCalMonth < 11) {
+                currentCalMonth++;
+                renderCalendar(currentCalMonth, currentCalYear);
+            }
+        });
+    }
+
+    function getAllEventsList() {
+        try {
+            const raw = localStorage.getItem('sdu_topluluk_data');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (parsed.events && parsed.events.length > 0) return parsed.events;
+            }
+        } catch (e) {}
+
+        // Varsayılan etkinlik listesi
+        return [
+            { id: 1, title: "Kitap Okuma Kulübü", category: "kitap", date: "15 Ekim 2026", time: "14:00", place: "Merkez Kütüphane", desc: "Bu ayki kitabımızı birlikte tartışacağımız okuma grubu buluşması." },
+            { id: 2, title: "Yazar Söyleşisi", category: "soylesi", date: "22 Ekim 2026", time: "15:30", place: "Konferans Salonu", desc: "Ünlü yazarımız ile edebiyat ve yaratıcı yazarlık üzerine keyifli bir söyleşi." },
+            { id: 3, title: "Şiir Dinletisi", category: "soylesi", date: "5 Kasım 2026", time: "18:00", place: "Amfi Tiyatro", desc: "Öğrencilerimizin kendi şiirlerini seslendireceği özel bir akşam etkinliği." },
+            { id: 4, title: "Kültür Gezisi", category: "gezi", date: "12 Kasım 2026", time: "09:00", place: "Şehir Merkezi", desc: "Tarihi ve kültürel mekanları keşfedeceğimiz bir günlük gezi programı." }
+        ];
+    }
+
+    function renderCalendar(month, year) {
+        if (!calendarDaysGrid || !calMonthTitle) return;
+        calMonthTitle.textContent = `${MONTH_NAMES_TR[month]} ${year}`;
+
+        calendarDaysGrid.innerHTML = '';
+        const allEvents = getAllEventsList();
+
+        // Ayın ilk gününün haftanın hangi günü olduğu (Pazartesi=0, Salı=1, ... Pazar=6)
+        const firstDay = new Date(year, month, 1).getDay();
+        const startOffset = (firstDay + 6) % 7; // TR takvim pazartesi başlar
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        // Boş hücreler
+        for (let i = 0; i < startOffset; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.className = 'cal-day-cell empty';
+            calendarDaysGrid.appendChild(emptyCell);
+        }
+
+        // Gün hücreleri
+        for (let d = 1; d <= daysInMonth; d++) {
+            const cell = document.createElement('div');
+            cell.className = 'cal-day-cell';
+            cell.textContent = d;
+
+            // Bu günde etkinlik var mı?
+            const currentMonthName = MONTH_NAMES_TR[month].toLowerCase();
+            const matchingEvents = allEvents.filter(ev => {
+                const lowerDate = ev.date.toLowerCase();
+                const dayMatch = lowerDate.includes(String(d) + ' ') || lowerDate.includes('0' + String(d) + ' ');
+                const monthMatch = lowerDate.includes(currentMonthName);
+                return dayMatch && monthMatch;
+            });
+
+            if (matchingEvents.length > 0) {
+                cell.classList.add('has-event');
+                const dot = document.createElement('span');
+                dot.className = 'event-dot';
+                cell.appendChild(dot);
+            }
+
+            cell.addEventListener('click', () => {
+                document.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('selected'));
+                cell.classList.add('selected');
+                showDayEvents(d, MONTH_NAMES_TR[month], year, matchingEvents);
+            });
+
+            calendarDaysGrid.appendChild(cell);
+        }
+    }
+
+    function showDayEvents(day, monthName, year, events) {
+        if (!calPanelDateTitle || !calPanelBody) return;
+        calPanelDateTitle.textContent = `${day} ${monthName} ${year}`;
+        calPanelBody.innerHTML = '';
+
+        if (!events || events.length === 0) {
+            calPanelBody.innerHTML = `<p class="cal-empty-msg"><i class="far fa-calendar"></i> Bu tarihte planlanmış bir etkinlik bulunmuyor.</p>`;
+            return;
+        }
+
+        events.forEach(ev => {
+            const item = document.createElement('div');
+            item.className = 'cal-event-item-card';
+            item.innerHTML = `
+                <h5>${ev.title}</h5>
+                <p>${ev.desc || ''}</p>
+                <div class="cal-event-item-meta">
+                    <span><i class="far fa-clock"></i> ${ev.time || '14:00'}</span>
+                    <span><i class="fas fa-map-marker-alt"></i> ${ev.place || 'Kampüs'}</span>
+                    <span><i class="fas fa-tag"></i> ${ev.category || 'Etkinlik'}</span>
+                </div>
+            `;
+            calPanelBody.appendChild(item);
+        });
+    }
+
+    // ==========================================
+    // DİNAMİK VERİ SENKRONİZASYONU (LOCALSTORAGE)
+    // ==========================================
+    function syncDynamicSiteContent() {
+        try {
+            const raw = localStorage.getItem('sdu_topluluk_data');
+            if (!raw) return;
+            const data = JSON.parse(raw);
+
+            // Ayın Kitabı Senkronizasyonu
+            if (data.book) {
+                const b = data.book;
+                const bookTag = document.querySelector('.book-tag');
+                if (bookTag && b.monthTag) bookTag.textContent = b.monthTag;
+
+                const bookTitle = document.querySelector('.book-title');
+                if (bookTitle && b.title) bookTitle.textContent = b.title;
+
+                const bookAuthor = document.querySelector('.book-author');
+                if (bookAuthor && b.author) bookAuthor.textContent = b.author;
+
+                const bookHeading = document.querySelector('.book-heading');
+                if (bookHeading && b.title) bookHeading.textContent = b.title;
+
+                const bookWriter = document.querySelector('.book-writer');
+                if (bookWriter && b.author) bookWriter.textContent = b.author;
+
+                const bookSynopsis = document.querySelector('.book-synopsis');
+                if (bookSynopsis && (b.quote || b.synopsis)) {
+                    let html = '';
+                    if (b.quote) html += `"${b.quote}"<br><br>`;
+                    if (b.synopsis) html += b.synopsis;
+                    bookSynopsis.innerHTML = html;
+                }
+
+                const badges = document.querySelectorAll('.book-meta-badges .badge');
+                if (badges.length >= 3) {
+                    if (b.genre) badges[0].innerHTML = `<i class="fas fa-bookmark"></i> ${b.genre}`;
+                    if (b.pages) badges[1].innerHTML = `<i class="fas fa-file-alt"></i> ${b.pages} Sayfa`;
+                    if (b.readers) badges[2].innerHTML = `<i class="fas fa-users"></i> ${b.readers}`;
+                }
+
+                const meetingItems = document.querySelectorAll('.book-meeting-card .meeting-item span');
+                if (meetingItems.length >= 2) {
+                    if (b.meetingDate) meetingItems[0].textContent = b.meetingDate;
+                    if (b.meetingPlace) meetingItems[1].textContent = b.meetingPlace;
+                }
+
+                const readingBar = document.getElementById('readingProgressBar');
+                if (readingBar && b.progress !== undefined) {
+                    readingBar.dataset.target = b.progress;
+                }
+            }
+
+            // Etkinlikler Senkronizasyonu
+            if (data.events && Array.isArray(data.events) && data.events.length > 0) {
+                const grid = document.getElementById('eventsGrid');
+                if (grid) {
+                    grid.innerHTML = '';
+                    data.events.forEach(ev => {
+                        const card = document.createElement('div');
+                        card.className = 'event-card';
+                        card.dataset.category = ev.category;
+                        card.innerHTML = `
+                            <div class="event-image">
+                                <div class="event-placeholder">
+                                    <i class="${ev.icon || 'fas fa-calendar-day'}"></i>
+                                </div>
+                                <span class="event-badge ${ev.badge === 'Önümüzdeki Ay' ? 'upcoming' : ''}">${ev.badge || 'Yaklaşan'}</span>
+                            </div>
+                            <div class="event-content">
+                                <div class="event-date">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    ${ev.date}
+                                </div>
+                                <h3>${ev.title}</h3>
+                                <p>${ev.desc || ''}</p>
+                                <div class="event-footer">
+                                    <span><i class="fas fa-map-marker-alt"></i> ${ev.place}</span>
+                                    <span><i class="fas fa-clock"></i> ${ev.time || '14:00'}</span>
+                                    <button class="event-cal-btn" data-title="${ev.title}" data-date="${ev.date}" aria-label="Takvime Ekle" title="Takvime Ekle / Hatırlatıcı"><i class="far fa-calendar-plus"></i></button>
+                                </div>
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                    bindEventCalButtons();
+                }
+            }
+        } catch (e) {
+            console.warn('Dinamik senkronizasyon hatası:', e);
+        }
+    }
+
+    // Oturum Açmış Yönetici Varsa Nav'da Göster
+    try {
+        const loggedUserRaw = sessionStorage.getItem('sdu_admin_user');
+        if (loggedUserRaw) {
+            const user = JSON.parse(loggedUserRaw);
+            const navAdminBtn = document.querySelector('.nav-admin-btn');
+            if (navAdminBtn) {
+                navAdminBtn.innerHTML = `<i class="fas fa-shield-alt"></i> <span>${user.name.split(' ')[0]} (Panel)</span>`;
+                navAdminBtn.style.background = 'var(--primary-light)';
+                navAdminBtn.style.color = 'var(--primary)';
+            }
+        }
+    } catch (e) {}
+
+    // Dinamik İçerik Yükle
+    syncDynamicSiteContent();
+
+    // Initial scroll call
     handleScroll();
 });
+
