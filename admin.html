@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YÃ¶netim Paneli | SDÃœ KÃ¼ltÃ¼r ve Kitap TopluluÄŸu</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>"><text y='.9em' font-size='90'>ğŸ“š</text></svg>">
+    <title>Yönetim Paneli | SDÜ Kültür ve Kitap Topluluğu</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,28 +18,28 @@
 </head>
 <body>
 
-    <!-- GÄ°RÄ°Å & KAYIT OVERLAY / EKRANI -->
+    <!-- GİRİŞ & KAYIT OVERLAY / EKRANI -->
     <div id="authScreen" class="auth-overlay">
         <div class="auth-modal">
             <div class="auth-header">
                 <div class="auth-logo">
                     <i class="fas fa-book-open"></i>
                 </div>
-                <h2>SDÃœ KÃ¼ltÃ¼r ve Kitap TopluluÄŸu</h2>
-                <p id="authSubtitle">YÃ¶netim Paneli GiriÅŸ EkranÄ±</p>
+                <h2>SDÜ Kültür ve Kitap Topluluğu</h2>
+                <p id="authSubtitle">Yönetim Paneli Giriş Ekranı</p>
             </div>
 
-            <!-- GiriÅŸ Formu -->
+            <!-- Giriş Formu -->
             <form id="loginForm" class="auth-form">
                 <div class="auth-field">
                     <label for="loginEmail"><i class="fas fa-envelope"></i> E-Posta Adresi</label>
                     <input type="email" id="loginEmail" placeholder="ornek@sdu.edu.tr" required autocomplete="username">
                 </div>
                 <div class="auth-field">
-                    <label for="loginPassword"><i class="fas fa-lock"></i> Åifre</label>
+                    <label for="loginPassword"><i class="fas fa-lock"></i> Şifre</label>
                     <div class="password-wrapper">
-                        <input type="password" id="loginPassword" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required autocomplete="current-password">
-                        <button type="button" class="toggle-password" data-target="loginPassword" aria-label="Åifreyi GÃ¶ster/Gizle">
+                        <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+                        <button type="button" class="toggle-password" data-target="loginPassword" aria-label="Şifreyi Göster/Gizle">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
@@ -48,42 +48,42 @@
                 <div id="loginError" class="auth-error" style="display: none;"></div>
 
                 <button type="submit" class="btn-auth-primary">
-                    <i class="fas fa-sign-in-alt"></i> GÃ¼venli GiriÅŸ Yap
+                    <i class="fas fa-sign-in-alt"></i> Güvenli Giriş Yap
                 </button>
 
                 <div class="auth-switch">
-                    <span>HesabÄ±nÄ±z yok mu?</span>
-                    <button type="button" id="switchToRegisterBtn" class="link-btn">Yeni YÃ¶netim Ãœyesi KaydÄ±</button>
+                    <span>Hesabınız yok mu?</span>
+                    <button type="button" id="switchToRegisterBtn" class="link-btn">Yeni Yönetim Üyesi Kaydı</button>
                 </div>
                 
                 <div class="auth-back">
-                    <a href="index.html"><i class="fas fa-arrow-left"></i> Ana Siteye Geri DÃ¶n</a>
+                    <a href="index.html"><i class="fas fa-arrow-left"></i> Ana Siteye Geri Dön</a>
                 </div>
             </form>
 
-            <!-- KayÄ±t Formu -->
+            <!-- Kayıt Formu -->
             <form id="registerForm" class="auth-form" style="display: none;">
                 <div class="auth-field">
                     <label for="regName"><i class="fas fa-user"></i> Ad Soyad *</label>
-                    <input type="text" id="regName" placeholder="AdÄ±nÄ±z SoyadÄ±nÄ±z" required>
+                    <input type="text" id="regName" placeholder="Adınız Soyadınız" required>
                 </div>
                 <div class="auth-field">
                     <label for="regEmail"><i class="fas fa-envelope"></i> E-Posta Adresi *</label>
                     <input type="email" id="regEmail" placeholder="ornek@sdu.edu.tr" required>
                 </div>
                 <div class="auth-field">
-                    <label for="regRole"><i class="fas fa-id-badge"></i> Talep Edilen GÃ¶rev</label>
+                    <label for="regRole"><i class="fas fa-id-badge"></i> Talep Edilen Görev</label>
                     <select id="regRole">
-                        <option value="editor">Ä°Ã§erik EditÃ¶rÃ¼ (Kitap & Etkinlik)</option>
-                        <option value="moderator">ModeratÃ¶r (BaÅŸvurular & Ã–neriler)</option>
-                        <option value="member">Topluluk Ãœyesi</option>
+                        <option value="editor">İçerik Editörü (Kitap & Etkinlik)</option>
+                        <option value="moderator">Moderatör (Başvurular & Öneriler)</option>
+                        <option value="member">Topluluk Üyesi</option>
                     </select>
                 </div>
                 <div class="auth-field">
-                    <label for="regPassword"><i class="fas fa-lock"></i> Åifre *</label>
+                    <label for="regPassword"><i class="fas fa-lock"></i> Şifre *</label>
                     <div class="password-wrapper">
                         <input type="password" id="regPassword" placeholder="En az 6 karakter" required minlength="6">
-                        <button type="button" class="toggle-password" data-target="regPassword" aria-label="Åifreyi GÃ¶ster/Gizle">
+                        <button type="button" class="toggle-password" data-target="regPassword" aria-label="Şifreyi Göster/Gizle">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
@@ -93,18 +93,18 @@
                 <div id="regSuccess" class="auth-success" style="display: none;"></div>
 
                 <button type="submit" class="btn-auth-primary">
-                    <i class="fas fa-user-plus"></i> KaydÄ± Tamamla
+                    <i class="fas fa-user-plus"></i> Kaydı Tamamla
                 </button>
 
                 <div class="auth-switch">
-                    <span>Zaten hesabÄ±nÄ±z var mÄ±?</span>
-                    <button type="button" id="switchToLoginBtn" class="link-btn">GiriÅŸ EkranÄ±na DÃ¶n</button>
+                    <span>Zaten hesabınız var mı?</span>
+                    <button type="button" id="switchToLoginBtn" class="link-btn">Giriş Ekranına Dön</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- YÃ–NETÄ°M PANELÄ° ANA ARAYÃœZÃœ -->
+    <!-- YÖNETİM PANELİ ANA ARAYÜZÜ -->
     <div id="adminApp" class="admin-layout" style="display: none;">
         
         <!-- SIDEBAR -->
@@ -113,36 +113,36 @@
                 <div class="brand">
                     <div class="brand-icon"><i class="fas fa-book-reader"></i></div>
                     <div class="brand-text">
-                        <h3>SDÃœ Kitap</h3>
-                        <span>YÃ¶netim MasasÄ±</span>
+                        <h3>SDÜ Kitap</h3>
+                        <span>Yönetim Masası</span>
                     </div>
                 </div>
-                <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="MenÃ¼yÃ¼ Kapat">
+                <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Menüyü Kapat">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
 
             <!-- Profil Rozeti -->
             <div class="sidebar-user-card">
-                <div class="user-avatar" id="sidebarUserAvatar">Ä°M</div>
+                <div class="user-avatar" id="sidebarUserAvatar">İM</div>
                 <div class="user-info">
-                    <strong id="sidebarUserName">Ä°lker M.</strong>
-                    <span class="user-badge" id="sidebarUserBadge">ğŸ‘‘ SÃ¼per Admin</span>
+                    <strong id="sidebarUserName">İlker M.</strong>
+                    <span class="user-badge" id="sidebarUserBadge">👑 Süper Admin</span>
                 </div>
             </div>
 
-            <!-- MenÃ¼ Sekmeleri -->
+            <!-- Menü Sekmeleri -->
             <nav class="sidebar-nav">
-                <div class="nav-section-title">Temel YÃ¶netim</div>
+                <div class="nav-section-title">Temel Yönetim</div>
                 
                 <button class="nav-item active" data-tab="overview">
                     <i class="fas fa-chart-pie"></i>
-                    <span>Genel BakÄ±ÅŸ</span>
+                    <span>Genel Bakış</span>
                 </button>
 
                 <button class="nav-item" data-tab="book" data-role="editor">
                     <i class="fas fa-book-open"></i>
-                    <span>AyÄ±n KitabÄ±</span>
+                    <span>Ayın Kitabı</span>
                 </button>
 
                 <button class="nav-item" data-tab="events" data-role="editor">
@@ -152,61 +152,61 @@
 
                 <button class="nav-item" data-tab="applications" data-role="moderator">
                     <i class="fas fa-user-check"></i>
-                    <span>Gelen BaÅŸvurular</span>
+                    <span>Gelen Başvurular</span>
                     <span class="nav-counter" id="badgeApplications">0</span>
                 </button>
 
                 <button class="nav-item" data-tab="members" data-role="moderator">
                     <i class="fas fa-users"></i>
-                    <span>Ãœyeler (HÄ±zlÄ± KayÄ±t)</span>
+                    <span>Üyeler (Hızlı Kayıt)</span>
                     <span class="nav-counter" id="badgeMembers">0</span>
                 </button>
 
                 <button class="nav-item" data-tab="gallery" data-role="editor">
                     <i class="fas fa-images"></i>
-                    <span>Galeri YÃ¶netimi</span>
+                    <span>Galeri Yönetimi</span>
                 </button>
 
                 <button class="nav-item" data-tab="suggestions" data-role="moderator">
                     <i class="fas fa-lightbulb"></i>
-                    <span>Etkinlik Ã–nerileri</span>
+                    <span>Etkinlik Önerileri</span>
                     <span class="nav-counter" id="badgeSuggestions">0</span>
                 </button>
 
                 <button class="nav-item" data-tab="broadcast" data-role="editor">
                     <i class="fab fa-whatsapp"></i>
-                    <span>WhatsApp BÃ¼lteni</span>
+                    <span>WhatsApp Bülteni</span>
                 </button>
 
-                <!-- SADECE SÃœPER ADMÄ°N GÃ–REBÄ°LÄ°R -->
-                <div class="nav-section-title superadmin-only" id="advancedNavTitle">GeliÅŸmiÅŸ & GÃ¼venlik *</div>
+                <!-- SADECE SÜPER ADMİN GÖREBİLİR -->
+                <div class="nav-section-title superadmin-only" id="advancedNavTitle">Gelişmiş & Güvenlik *</div>
 
                 <button class="nav-item superadmin-only" data-tab="users" id="navItemUsers">
                     <i class="fas fa-users-cog"></i>
-                    <span>KullanÄ±cÄ±lar & Roller *</span>
+                    <span>Kullanıcılar & Roller *</span>
                 </button>
 
                 <button class="nav-item superadmin-only" data-tab="backup" id="navItemBackup">
                     <i class="fas fa-database"></i>
-                    <span>Yedekleme & SÄ±fÄ±rlama *</span>
+                    <span>Yedekleme & Sıfırlama *</span>
                 </button>
 
-                <div class="nav-section-title">Destek & KÄ±lavuz</div>
+                <div class="nav-section-title">Destek & Kılavuz</div>
 
                 <button class="nav-item" data-tab="guide">
                     <i class="fas fa-info-circle"></i>
-                    <span>KullanÄ±m Rehberi</span>
+                    <span>Kullanım Rehberi</span>
                 </button>
             </nav>
 
             <div class="sidebar-footer">
                 <a href="index.html" class="sidebar-footer-link" target="_blank">
                     <i class="fas fa-external-link-alt"></i>
-                    <span>Siteyi AÃ§</span>
+                    <span>Siteyi Aç</span>
                 </a>
                 <button id="logoutBtn" class="sidebar-footer-link logout">
                     <i class="fas fa-sign-out-alt"></i>
-                    <span>Ã‡Ä±kÄ±ÅŸ Yap</span>
+                    <span>Çıkış Yap</span>
                 </button>
             </div>
         </aside>
@@ -216,59 +216,59 @@
             <!-- Topbar -->
             <header class="admin-topbar">
                 <div class="topbar-left">
-                    <button class="sidebar-toggle-btn" id="sidebarToggleBtn" aria-label="MenÃ¼yÃ¼ AÃ§">
+                    <button class="sidebar-toggle-btn" id="sidebarToggleBtn" aria-label="Menüyü Aç">
                         <i class="fas fa-bars"></i>
                     </button>
                     <div class="page-title-box">
-                        <h1 id="topbarTitle">Genel BakÄ±ÅŸ</h1>
-                        <p id="topbarSubtitle">Topluluk gÃ¼ncel istatistikleri ve durum Ã¶zeti</p>
+                        <h1 id="topbarTitle">Genel Bakış</h1>
+                        <p id="topbarSubtitle">Topluluk güncel istatistikleri ve durum özeti</p>
                     </div>
                 </div>
 
                 <div class="topbar-actions">
-                    <!-- Tema DeÄŸiÅŸtirici -->
-                    <button class="topbar-btn" id="adminThemeToggle" aria-label="Tema DeÄŸiÅŸtir" title="AydÄ±nlÄ±k / KaranlÄ±k Tema">
+                    <!-- Tema Değiştirici -->
+                    <button class="topbar-btn" id="adminThemeToggle" aria-label="Tema Değiştir" title="Aydınlık / Karanlık Tema">
                         <i class="fas fa-moon" id="adminThemeIcon"></i>
                     </button>
 
                     <!-- Ana Siteye Git -->
                     <a href="index.html" class="topbar-btn site-link" title="Ana Sayfaya Git">
                         <i class="fas fa-globe"></i>
-                        <span>Siteyi Ä°ncele</span>
+                        <span>Siteyi İncele</span>
                     </a>
 
-                    <!-- Ã‡Ä±kÄ±ÅŸ Butonu -->
+                    <!-- Çıkış Butonu -->
                     <button class="topbar-btn logout-btn" id="topbarLogoutBtn" title="Oturumu Kapat">
                         <i class="fas fa-sign-out-alt"></i>
                     </button>
                 </div>
             </header>
 
-            <!-- SEKME Ä°Ã‡ERÄ°KLERÄ° -->
+            <!-- SEKME İÇERİKLERİ -->
             <div class="admin-content-body">
 
-                <!-- 1. GENEL BAKIÅ SEKME -->
+                <!-- 1. GENEL BAKIŞ SEKME -->
                 <section class="tab-pane active" id="pane-overview">
                     <div class="welcome-banner">
                         <div class="welcome-text">
-                            <h2>HoÅŸ Geldin, <span id="overviewUserName">Ä°lker</span> ğŸ‘‹</h2>
-                            <p>SDÃœ KÃ¼ltÃ¼r ve Kitap TopluluÄŸu yÃ¶netim merkezindesin. Buradan sitedeki iÃ§erikleri deÄŸiÅŸtirebilir, baÅŸvurularÄ± inceleyebilir ve duyuru hazÄ±rlayabilirsin.</p>
+                            <h2>Hoş Geldin, <span id="overviewUserName">İlker</span> 👋</h2>
+                            <p>SDÜ Kültür ve Kitap Topluluğu yönetim merkezindesin. Buradan sitedeki içerikleri değiştirebilir, başvuruları inceleyebilir ve duyuru hazırlayabilirsin.</p>
                         </div>
                         <div class="welcome-badge" id="overviewUserRoleBadge">
-                            <i class="fas fa-shield-alt"></i> SÃ¼per Admin Yetkisi
+                            <i class="fas fa-shield-alt"></i> Süper Admin Yetkisi
                         </div>
                     </div>
 
-                    <!-- Ä°statistik KartlarÄ± -->
+                    <!-- İstatistik Kartları -->
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-icon icon-blue">
                                 <i class="fas fa-book-reader"></i>
                             </div>
                             <div class="stat-details">
-                                <span class="stat-label">AyÄ±n KitabÄ±</span>
-                                <h3 class="stat-value" id="statBookTitle">KÃ¼rk Mantolu Madonna</h3>
-                                <span class="stat-sub" id="statBookProgress">%75 TamamlandÄ±</span>
+                                <span class="stat-label">Ayın Kitabı</span>
+                                <h3 class="stat-value" id="statBookTitle">Kürk Mantolu Madonna</h3>
+                                <span class="stat-sub" id="statBookProgress">%75 Tamamlandı</span>
                             </div>
                         </div>
 
@@ -279,7 +279,7 @@
                             <div class="stat-details">
                                 <span class="stat-label">Aktif Etkinlikler</span>
                                 <h3 class="stat-value" id="statEventCount">4</h3>
-                                <span class="stat-sub">Sitede yayÄ±nda</span>
+                                <span class="stat-sub">Sitede yayında</span>
                             </div>
                         </div>
 
@@ -288,7 +288,7 @@
                                 <i class="fas fa-user-plus"></i>
                             </div>
                             <div class="stat-details">
-                                <span class="stat-label">Toplam BaÅŸvuru</span>
+                                <span class="stat-label">Toplam Başvuru</span>
                                 <h3 class="stat-value" id="statApplicationCount">0</h3>
                                 <span class="stat-sub" id="statPendingApps">0 beklemede</span>
                             </div>
@@ -299,56 +299,56 @@
                                 <i class="fas fa-lightbulb"></i>
                             </div>
                             <div class="stat-details">
-                                <span class="stat-label">Etkinlik Ã–nerileri</span>
+                                <span class="stat-label">Etkinlik Önerileri</span>
                                 <h3 class="stat-value" id="statSuggestionCount">0</h3>
-                                <span class="stat-sub">Ã–ÄŸrencilerden gelen</span>
+                                <span class="stat-sub">Öğrencilerden gelen</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- SÃœPER ADMÄ°N Ã–ZEL NOTU & YETKÄ°LENDÄ°RME REHBERÄ° (SADECE SÃœPER ADMÄ°N) -->
+                    <!-- SÜPER ADMİN ÖZEL NOTU & YETKİLENDİRME REHBERİ (SADECE SÜPER ADMİN) -->
                     <div class="superadmin-note-card superadmin-only" id="superAdminGuideCard">
                         <div class="note-card-header">
                             <div class="note-icon">
                                 <i class="fas fa-crown"></i>
                             </div>
                             <div>
-                                <h3>ğŸ‘‘ BaÅŸkanÄ±n Ã–zel Notu: Ekip Ãœyelerine Panel EriÅŸimi NasÄ±l Verilir? *</h3>
-                                <p>YÃ¶netim kurulundaki diÄŸer arkadaÅŸlarÄ±nÄ±zÄ±n siteyi kolayca yÃ¶netebilmesi iÃ§in pratik kÄ±lavuz</p>
+                                <h3>👑 Başkanın Özel Notu: Ekip Üyelerine Panel Erişimi Nasıl Verilir? *</h3>
+                                <p>Yönetim kurulundaki diğer arkadaşlarınızın siteyi kolayca yönetebilmesi için pratik kılavuz</p>
                             </div>
                         </div>
                         <div class="note-card-body">
                             <div class="superadmin-guide-grid">
                                 <div class="guide-item">
-                                    <span class="guide-badge">1. Linki PaylaÅŸÄ±n</span>
-                                    <h4>YÃ¶netici KaydÄ±</h4>
-                                    <p>Ekip arkadaÅŸÄ±nÄ±za bu sayfanÄ±n linkini verin (<code>admin.html</code>). GiriÅŸ ekranÄ±nda <em>"Yeni YÃ¶netim Ãœyesi KaydÄ±"</em> seÃ§eneÄŸinden adÄ±nÄ±, e-postasÄ±nÄ± ve kendi belirleyeceÄŸi ÅŸifreyi girerek kaydolsun.</p>
+                                    <span class="guide-badge">1. Linki Paylaşın</span>
+                                    <h4>Yönetici Kaydı</h4>
+                                    <p>Ekip arkadaşınıza bu sayfanın linkini verin (<code>admin.html</code>). Giriş ekranında <em>"Yeni Yönetim Üyesi Kaydı"</em> seçeneğinden adını, e-postasını ve kendi belirleyeceği şifreyi girerek kaydolsun.</p>
                                 </div>
                                 <div class="guide-item">
-                                    <span class="guide-badge">2. RolÃ¼nÃ¼ Belirleyin</span>
-                                    <h4>KullanÄ±cÄ±lar & Roller *</h4>
-                                    <p>ArkadaÅŸÄ±nÄ±z kaydolduÄŸunda, sol menÃ¼deki <strong>"KullanÄ±cÄ±lar & Roller *"</strong> sekmenize otomatik olarak dÃ¼ÅŸer. Oradaki aÃ§Ä±lÄ±r listeden rolÃ¼nÃ¼ <strong>Ä°Ã§erik EditÃ¶rÃ¼</strong> veya <strong>ModeratÃ¶r</strong> olarak seÃ§ebilirsiniz.</p>
+                                    <span class="guide-badge">2. Rolünü Belirleyin</span>
+                                    <h4>Kullanıcılar & Roller *</h4>
+                                    <p>Arkadaşınız kaydolduğunda, sol menüdeki <strong>"Kullanıcılar & Roller *"</strong> sekmenize otomatik olarak düşer. Oradaki açılır listeden rolünü <strong>İçerik Editörü</strong> veya <strong>Moderatör</strong> olarak seçebilirsiniz.</p>
                                 </div>
                                 <div class="guide-item">
-                                    <span class="guide-badge">3. GÃ¼venli Sade ArayÃ¼z</span>
-                                    <h4>KarmaÅŸÄ±k KÄ±sÄ±mlar Gizlenir</h4>
-                                    <p>EditÃ¶r veya ModeratÃ¶r giriÅŸ yaptÄ±ÄŸÄ±nda sistem sizin bu gÃ¶rdÃ¼ÄŸÃ¼nÃ¼z <strong>KullanÄ±cÄ± YÃ¶netimi *</strong> ve <strong>Yedekleme *</strong> sekmelerini onlara otomatik olarak tamamen gizler; sadece sade ve pratik kÄ±sÄ±mlarÄ± gÃ¶rÃ¼rler.</p>
+                                    <span class="guide-badge">3. Güvenli Sade Arayüz</span>
+                                    <h4>Karmaşık Kısımlar Gizlenir</h4>
+                                    <p>Editör veya Moderatör giriş yaptığında sistem sizin bu gördüğünüz <strong>Kullanıcı Yönetimi *</strong> ve <strong>Yedekleme *</strong> sekmelerini onlara otomatik olarak tamamen gizler; sadece sade ve pratik kısımları görürler.</p>
                                 </div>
                                 <div class="guide-item">
-                                    <span class="guide-badge">4. BaÅŸvuru Takibi</span>
-                                    <h4>Gelen BaÅŸvurular</h4>
-                                    <p>Siteden yapÄ±lan baÅŸvurular ve Ã¶neriler anÄ±nda sisteme kaydedilir. AyrÄ±ca Ã¶ÄŸrenciler butona tÄ±kladÄ±ÄŸÄ± an oluÅŸturulan hazÄ±r WhatsApp mesajÄ± ile doÄŸrudan size de ulaÅŸÄ±r.</p>
+                                    <span class="guide-badge">4. Başvuru Takibi</span>
+                                    <h4>Gelen Başvurular</h4>
+                                    <p>Siteden yapılan başvurular ve öneriler anında sisteme kaydedilir. Ayrıca öğrenciler butona tıkladığı an oluşturulan hazır WhatsApp mesajı ile doğrudan size de ulaşır.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- EKÄ°P ÃœYELERÄ°NDEN SÃœPER ADMÄ°NE GELEN MESAJLAR (SADECE SÃœPER ADMÄ°N) -->
+                    <!-- EKİP ÜYELERİNDEN SÜPER ADMİNE GELEN MESAJLAR (SADECE SÜPER ADMİN) -->
                     <div class="dashboard-card superadmin-only" id="devMessagesCard" style="margin-bottom: 24px;">
                         <div class="card-header">
                             <div>
-                                <h3><i class="fas fa-inbox"></i> Ekip Ãœyelerinden Gelen Notlar & Mesajlar (<span id="devMsgCount">0</span>) *</h3>
-                                <p class="card-desc">Ekip Ã¼yelerinin saÄŸ alttaki "GeliÅŸtiriciye Yaz" kutusundan size bÄ±raktÄ±ÄŸÄ± notlar.</p>
+                                <h3><i class="fas fa-inbox"></i> Ekip Üyelerinden Gelen Notlar & Mesajlar (<span id="devMsgCount">0</span>) *</h3>
+                                <p class="card-desc">Ekip üyelerinin sağ alttaki "Geliştiriciye Yaz" kutusundan size bıraktığı notlar.</p>
                             </div>
                         </div>
                         <div class="card-body">
@@ -356,11 +356,11 @@
                                 <table class="data-table" id="devMessagesTable">
                                     <thead>
                                         <tr>
-                                            <th>GÃ¶nderen</th>
+                                            <th>Gönderen</th>
                                             <th>Konu / Kategori</th>
                                             <th>Mesaj</th>
                                             <th>Tarih</th>
-                                            <th>Ä°ÅŸlem</th>
+                                            <th>İşlem</th>
                                         </tr>
                                     </thead>
                                     <tbody id="devMessagesTableBody">
@@ -371,17 +371,17 @@
                         </div>
                     </div>
 
-                    <!-- HÄ±zlÄ± Ä°ÅŸlemler KartlarÄ± -->
+                    <!-- Hızlı İşlemler Kartları -->
                     <div class="quick-actions-row">
                         <div class="dashboard-card">
                             <div class="card-header">
-                                <h3><i class="fas fa-bolt"></i> HÄ±zlÄ± Ä°ÅŸlemler</h3>
+                                <h3><i class="fas fa-bolt"></i> Hızlı İşlemler</h3>
                             </div>
                             <div class="card-body">
                                 <div class="action-buttons-grid">
                                     <button class="action-box" onclick="switchAdminTab('book')">
                                         <i class="fas fa-book"></i>
-                                        <span>KitabÄ± GÃ¼ncelle</span>
+                                        <span>Kitabı Güncelle</span>
                                     </button>
                                     <button class="action-box" onclick="switchAdminTab('events')">
                                         <i class="fas fa-calendar-plus"></i>
@@ -389,15 +389,15 @@
                                     </button>
                                     <button class="action-box" onclick="switchAdminTab('applications')">
                                         <i class="fas fa-user-check"></i>
-                                        <span>BaÅŸvurularÄ± GÃ¶r</span>
+                                        <span>Başvuruları Gör</span>
                                     </button>
                                     <button class="action-box" onclick="switchAdminTab('members')">
                                         <i class="fas fa-users"></i>
-                                        <span>Ãœyeler Listesi</span>
+                                        <span>Üyeler Listesi</span>
                                     </button>
                                     <button class="action-box" onclick="switchAdminTab('broadcast')">
                                         <i class="fab fa-whatsapp"></i>
-                                        <span>Duyuru HazÄ±rla</span>
+                                        <span>Duyuru Hazırla</span>
                                     </button>
                                 </div>
                             </div>
@@ -405,135 +405,135 @@
 
                         <div class="dashboard-card">
                             <div class="card-header">
-                                <h3><i class="fas fa-bullhorn"></i> WhatsApp Duyuru Ã–nizlemesi</h3>
+                                <h3><i class="fas fa-bullhorn"></i> WhatsApp Duyuru Önizlemesi</h3>
                             </div>
                             <div class="card-body">
                                 <p class="text-muted" style="margin-bottom: 12px; font-size: 0.9rem;">
-                                    Etkinlikler veya ayÄ±n kitabÄ± tahlili yaklaÅŸtÄ±ÄŸÄ±nda tek tÄ±kla topluluk grubuna ÅŸÄ±k duyuru gÃ¶nderebilirsiniz.
+                                    Etkinlikler veya ayın kitabı tahlili yaklaştığında tek tıkla topluluk grubuna şık duyuru gönderebilirsiniz.
                                 </p>
                                 <button class="btn-primary-sm" onclick="switchAdminTab('broadcast')">
-                                    <i class="fab fa-whatsapp"></i> WhatsApp BÃ¼lteni Sekmesine Git
+                                    <i class="fab fa-whatsapp"></i> WhatsApp Bülteni Sekmesine Git
                                 </button>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- 2. AYIN KÄ°TABI DÃœZENLEYÄ°CÄ° -->
+                <!-- 2. AYIN KİTABI DÜZENLEYİCİ -->
                 <section class="tab-pane" id="pane-book">
                     <div class="dashboard-card">
                         <div class="card-header">
                             <div>
-                                <h3><i class="fas fa-book-open"></i> AyÄ±n KitabÄ± Bilgilerini GÃ¼ncelle</h3>
-                                <p class="card-desc">Buradan yapacaÄŸÄ±nÄ±z deÄŸiÅŸiklikler ana sayfada canlÄ± olarak gÃ¼ncellenir.</p>
+                                <h3><i class="fas fa-book-open"></i> Ayın Kitabı Bilgilerini Güncelle</h3>
+                                <p class="card-desc">Buradan yapacağınız değişiklikler ana sayfada canlı olarak güncellenir.</p>
                             </div>
                             <button type="button" class="btn-primary-sm" id="saveBookBtn">
-                                <i class="fas fa-save"></i> DeÄŸiÅŸiklikleri Kaydet
+                                <i class="fas fa-save"></i> Değişiklikleri Kaydet
                             </button>
                         </div>
                         <div class="card-body">
                             <form id="bookForm" class="admin-form-grid">
                                 <div class="form-group">
-                                    <label for="bookMonthTag">SeÃ§ki DÃ¶nemi / Etiketi</label>
-                                    <input type="text" id="bookMonthTag" placeholder="Ã–rn: Ekim 2026 SeÃ§kisi" required>
+                                    <label for="bookMonthTag">Seçki Dönemi / Etiketi</label>
+                                    <input type="text" id="bookMonthTag" placeholder="Örn: Ekim 2026 Seçkisi" required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="bookTitle">Kitap AdÄ± *</label>
-                                    <input type="text" id="bookTitle" placeholder="Ã–rn: KÃ¼rk Mantolu Madonna" required>
+                                    <label for="bookTitle">Kitap Adı *</label>
+                                    <input type="text" id="bookTitle" placeholder="Örn: Kürk Mantolu Madonna" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="bookAuthor">Yazar *</label>
-                                    <input type="text" id="bookAuthor" placeholder="Ã–rn: Sabahattin Ali" required>
+                                    <input type="text" id="bookAuthor" placeholder="Örn: Sabahattin Ali" required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="bookGenre">TÃ¼r / Kategori</label>
-                                    <input type="text" id="bookGenre" placeholder="Ã–rn: TÃ¼rk Klasikleri">
+                                    <label for="bookGenre">Tür / Kategori</label>
+                                    <input type="text" id="bookGenre" placeholder="Örn: Türk Klasikleri">
                                 </div>
                                 <div class="form-group">
-                                    <label for="bookPages">Sayfa SayÄ±sÄ±</label>
-                                    <input type="text" id="bookPages" placeholder="Ã–rn: 160">
+                                    <label for="bookPages">Sayfa Sayısı</label>
+                                    <input type="text" id="bookPages" placeholder="Örn: 160">
                                 </div>
                                 <div class="form-group">
-                                    <label for="bookReaders">Okur SayÄ±sÄ± Rozeti</label>
-                                    <input type="text" id="bookReaders" placeholder="Ã–rn: 85 Okur">
+                                    <label for="bookReaders">Okur Sayısı Rozeti</label>
+                                    <input type="text" id="bookReaders" placeholder="Örn: 85 Okur">
                                 </div>
                                 <div class="form-group">
                                     <label for="bookMeetingDate">Tahlil Tarihi & Saati</label>
-                                    <input type="text" id="bookMeetingDate" placeholder="Ã–rn: 28 Ekim 2026, Ã‡arÅŸamba 17:00">
+                                    <input type="text" id="bookMeetingDate" placeholder="Örn: 28 Ekim 2026, Çarşamba 17:00">
                                 </div>
                                 <div class="form-group">
-                                    <label for="bookMeetingPlace">BuluÅŸma Yeri</label>
-                                    <input type="text" id="bookMeetingPlace" placeholder="Ã–rn: Merkez KÃ¼tÃ¼phane Kitap Kafe">
+                                    <label for="bookMeetingPlace">Buluşma Yeri</label>
+                                    <input type="text" id="bookMeetingPlace" placeholder="Örn: Merkez Kütüphane Kitap Kafe">
                                 </div>
                                 <div class="form-group full-width">
-                                    <label for="bookProgress">Topluluk Okuma Ä°lerlemesi (% <span id="progressValueDisplay">75</span>)</label>
+                                    <label for="bookProgress">Topluluk Okuma İlerlemesi (% <span id="progressValueDisplay">75</span>)</label>
                                     <input type="range" id="bookProgress" min="0" max="100" value="75" class="slider-input">
                                 </div>
                                 <div class="form-group full-width">
-                                    <label for="bookQuote">Kitaptan Ã–ne Ã‡Ä±kan AlÄ±ntÄ±</label>
-                                    <textarea id="bookQuote" rows="2" placeholder="Kitaptan etkileyici bir cÃ¼mle..."></textarea>
+                                    <label for="bookQuote">Kitaptan Öne Çıkan Alıntı</label>
+                                    <textarea id="bookQuote" rows="2" placeholder="Kitaptan etkileyici bir cümle..."></textarea>
                                 </div>
                                 <div class="form-group full-width">
-                                    <label for="bookSynopsis">Tahlil AÃ§Ä±klamasÄ± & TanÄ±tÄ±m</label>
-                                    <textarea id="bookSynopsis" rows="3" placeholder="KitabÄ±n konusu ve tahlil oturumunda ne konuÅŸulacaÄŸÄ±..."></textarea>
+                                    <label for="bookSynopsis">Tahlil Açıklaması & Tanıtım</label>
+                                    <textarea id="bookSynopsis" rows="3" placeholder="Kitabın konusu ve tahlil oturumunda ne konuşulacağı..."></textarea>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </section>
 
-                <!-- 3. ETKÄ°NLÄ°K YÃ–NETÄ°MÄ° SEKME -->
+                <!-- 3. ETKİNLİK YÖNETİMİ SEKME -->
                 <section class="tab-pane" id="pane-events">
-                    <!-- Yeni Etkinlik Ekleme KartÄ± -->
+                    <!-- Yeni Etkinlik Ekleme Kartı -->
                     <div class="dashboard-card" style="margin-bottom: 24px;">
                         <div class="card-header">
                             <div>
                                 <h3><i class="fas fa-plus-circle"></i> Yeni Etkinlik Ekle</h3>
-                                <p class="card-desc">Sitede yayÄ±nlanacak yeni bir sÃ¶yleÅŸi, kulÃ¼p buluÅŸmasÄ± veya gezi ekleyin.</p>
+                                <p class="card-desc">Sitede yayınlanacak yeni bir söyleşi, kulüp buluşması veya gezi ekleyin.</p>
                             </div>
                         </div>
                         <div class="card-body">
                             <form id="addEventForm" class="admin-form-grid">
                                 <div class="form-group">
-                                    <label for="eventTitle">Etkinlik BaÅŸlÄ±ÄŸÄ± *</label>
-                                    <input type="text" id="eventTitle" placeholder="Ã–rn: Åiir ve Edebiyat AkÅŸamÄ±" required>
+                                    <label for="eventTitle">Etkinlik Başlığı *</label>
+                                    <input type="text" id="eventTitle" placeholder="Örn: Şiir ve Edebiyat Akşamı" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="eventCategory">Kategori *</label>
                                     <select id="eventCategory" required>
-                                        <option value="kitap">Kitap KulÃ¼bÃ¼</option>
-                                        <option value="soylesi">SÃ¶yleÅŸi & Dinleti</option>
-                                        <option value="gezi">KÃ¼ltÃ¼r Gezisi</option>
+                                        <option value="kitap">Kitap Kulübü</option>
+                                        <option value="soylesi">Söyleşi & Dinleti</option>
+                                        <option value="gezi">Kültür Gezisi</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label for="eventDate">Tarih *</label>
-                                    <input type="text" id="eventDate" placeholder="Ã–rn: 18 KasÄ±m 2026" required>
+                                    <input type="text" id="eventDate" placeholder="Örn: 18 Kasım 2026" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="eventTime">Saat</label>
-                                    <input type="text" id="eventTime" placeholder="Ã–rn: 15:30" required>
+                                    <input type="text" id="eventTime" placeholder="Örn: 15:30" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="eventPlace">Mekan / Yer *</label>
-                                    <input type="text" id="eventPlace" placeholder="Ã–rn: Prof. Dr. M. LÃ¼tfÃ¼ Ã‡akmakÃ§Ä± KÃ¼ltÃ¼r Merkezi" required>
+                                    <input type="text" id="eventPlace" placeholder="Örn: Prof. Dr. M. Lütfü Çakmakçı Kültür Merkezi" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="eventBadge">Durum Rozeti</label>
                                     <select id="eventBadge">
-                                        <option value="YaklaÅŸan">YaklaÅŸan</option>
-                                        <option value="Ã–nÃ¼mÃ¼zdeki Ay">Ã–nÃ¼mÃ¼zdeki Ay</option>
-                                        <option value="KayÄ±t AÃ§Ä±k">KayÄ±t AÃ§Ä±k</option>
+                                        <option value="Yaklaşan">Yaklaşan</option>
+                                        <option value="Önümüzdeki Ay">Önümüzdeki Ay</option>
+                                        <option value="Kayıt Açık">Kayıt Açık</option>
                                         <option value="Kontenjan Doldu">Kontenjan Doldu</option>
                                     </select>
                                 </div>
                                 <div class="form-group full-width">
-                                    <label for="eventDesc">KÄ±sa AÃ§Ä±klama *</label>
-                                    <textarea id="eventDesc" rows="2" placeholder="EtkinliÄŸin iÃ§eriÄŸi hakkÄ±nda 1-2 cÃ¼mlelik bilgi..." required></textarea>
+                                    <label for="eventDesc">Kısa Açıklama *</label>
+                                    <textarea id="eventDesc" rows="2" placeholder="Etkinliğin içeriği hakkında 1-2 cümlelik bilgi..." required></textarea>
                                 </div>
                                 <div class="form-group full-width form-actions-right">
                                     <button type="submit" class="btn-primary-sm">
-                                        <i class="fas fa-check"></i> EtkinliÄŸi YayÄ±nla
+                                        <i class="fas fa-check"></i> Etkinliği Yayınla
                                     </button>
                                 </div>
                             </form>
@@ -544,8 +544,8 @@
                     <div class="dashboard-card">
                         <div class="card-header">
                             <div>
-                                <h3><i class="fas fa-list-ul"></i> YayÄ±ndaki Etkinlikler (<span id="eventListCount">0</span>)</h3>
-                                <p class="card-desc">Sitede aktif olarak gÃ¶rÃ¼nen etkinliklerin listesi.</p>
+                                <h3><i class="fas fa-list-ul"></i> Yayındaki Etkinlikler (<span id="eventListCount">0</span>)</h3>
+                                <p class="card-desc">Sitede aktif olarak görünen etkinliklerin listesi.</p>
                             </div>
                         </div>
                         <div class="card-body">
@@ -553,13 +553,13 @@
                                 <table class="data-table" id="eventsTable">
                                     <thead>
                                         <tr>
-                                            <th>Etkinlik BaÅŸlÄ±ÄŸÄ±</th>
+                                            <th>Etkinlik Başlığı</th>
                                             <th>Kategori</th>
                                             <th>Tarih & Saat</th>
                                             <th>Yer</th>
-                                            <th>KatÄ±lÄ±mcÄ± SayÄ±sÄ±</th>
+                                            <th>Katılımcı Sayısı</th>
                                             <th>Durum</th>
-                                            <th>Ä°ÅŸlem</th>
+                                            <th>İşlem</th>
                                         </tr>
                                     </thead>
                                     <tbody id="eventsTableBody">
@@ -571,16 +571,16 @@
                     </div>
                 </section>
 
-                <!-- 4. GELEN BAÅVURULAR SEKME -->
+                <!-- 4. GELEN BAŞVURULAR SEKME -->
                 <section class="tab-pane" id="pane-applications">
                     <div class="dashboard-card">
                         <div class="card-header">
                             <div>
-                                <h3><i class="fas fa-user-check"></i> Topluluk KatÄ±lÄ±m BaÅŸvurularÄ± (<span id="appTotalCount">0</span>)</h3>
-                                <p class="card-desc">Ana sitedeki "Bize KatÄ±l" formunu dolduran Ã¶ÄŸrencilerin kayÄ±tlarÄ±.</p>
+                                <h3><i class="fas fa-user-check"></i> Topluluk Katılım Başvuruları (<span id="appTotalCount">0</span>)</h3>
+                                <p class="card-desc">Ana sitedeki "Bize Katıl" formunu dolduran öğrencilerin kayıtları.</p>
                             </div>
                             <div class="table-filters">
-                                <input type="text" id="searchAppInput" placeholder="Ä°sim, bÃ¶lÃ¼m veya telefon ara..." class="search-input">
+                                <input type="text" id="searchAppInput" placeholder="İsim, bölüm veya telefon ara..." class="search-input">
                             </div>
                         </div>
                         <div class="card-body">
@@ -589,12 +589,12 @@
                                     <thead>
                                         <tr>
                                             <th>Ad Soyad</th>
-                                            <th>BÃ¶lÃ¼m & SÄ±nÄ±f</th>
+                                            <th>Bölüm & Sınıf</th>
                                             <th>Telefon / WhatsApp</th>
-                                            <th>Ä°lgi AlanÄ±</th>
+                                            <th>İlgi Alanı</th>
                                             <th>Tarih</th>
                                             <th>Durum</th>
-                                            <th>Ä°ÅŸlemler</th>
+                                            <th>İşlemler</th>
                                         </tr>
                                     </thead>
                                     <tbody id="applicationsTableBody">
@@ -606,16 +606,16 @@
                     </div>
                 </section>
 
-                <!-- 4.5. ÃœYELER SEKME -->
+                <!-- 4.5. ÜYELER SEKME -->
                 <section class="tab-pane" id="pane-members">
                     <div class="dashboard-card">
                         <div class="card-header">
                             <div>
-                                <h3><i class="fas fa-users"></i> Aktif Ãœyeler (<span id="memberTotalCount">0</span>)</h3>
-                                <p class="card-desc">Ana siteden "HÄ±zlÄ± KayÄ±t" ile hesap aÃ§an Ã¼yeler.</p>
+                                <h3><i class="fas fa-users"></i> Aktif Üyeler (<span id="memberTotalCount">0</span>)</h3>
+                                <p class="card-desc">Ana siteden "Hızlı Kayıt" ile hesap açan üyeler.</p>
                             </div>
                             <div class="table-filters">
-                                <input type="text" id="searchMemberInput" placeholder="Ä°sim veya e-posta ara..." class="search-input">
+                                <input type="text" id="searchMemberInput" placeholder="İsim veya e-posta ara..." class="search-input">
                             </div>
                         </div>
                         <div class="card-body">
@@ -625,10 +625,10 @@
                                         <tr>
                                             <th>Ad Soyad</th>
                                             <th>E-posta</th>
-                                            <th>BÃ¶lÃ¼m & SÄ±nÄ±f</th>
+                                            <th>Bölüm & Sınıf</th>
                                             <th>Tarih</th>
                                             <th>Rol</th>
-                                            <th>Ä°ÅŸlemler</th>
+                                            <th>İşlemler</th>
                                         </tr>
                                     </thead>
                                     <tbody id="membersTableBody">
@@ -640,36 +640,36 @@
                     </div>
                 </section>
 
-                <!-- === GALERÄ° PANE === -->
+                <!-- === GALERİ PANE === -->
                 <section class="tab-pane" id="pane-gallery">
                     <div class="dashboard-card">
                         <div class="card-header">
-                            <h2><i class="fas fa-images"></i> Galeri YÃ¶netimi</h2>
-                            <button class="btn-primary" id="btnUploadImage"><i class="fas fa-upload"></i> Yeni FotoÄŸraf YÃ¼kle</button>
+                            <h2><i class="fas fa-images"></i> Galeri Yönetimi</h2>
+                            <button class="btn-primary" id="btnUploadImage"><i class="fas fa-upload"></i> Yeni Fotoğraf Yükle</button>
                         </div>
                         <div class="card-body">
                             <div class="alert alert-info">
-                                <i class="fas fa-info-circle"></i> Sitenin Ã¶n yÃ¼zÃ¼ndeki <strong>"Galeri"</strong> bÃ¶lÃ¼mÃ¼nde gÃ¶rÃ¼nen etkinlik fotoÄŸraflarÄ±nÄ± buradan yÃ¶netebilirsiniz. <i>(Not: Åu an tasarÄ±m aÅŸamasÄ±nda olduÄŸu iÃ§in yÃ¼klenen fotoÄŸraflar tarayÄ±cÄ± Ã¶nbelleÄŸinde tutulmaktadÄ±r.)</i>
+                                <i class="fas fa-info-circle"></i> Sitenin ön yüzündeki <strong>"Galeri"</strong> bölümünde görünen etkinlik fotoğraflarını buradan yönetebilirsiniz. <i>(Not: Şu an tasarım aşamasında olduğu için yüklenen fotoğraflar tarayıcı önbelleğinde tutulmaktadır.)</i>
                             </div>
                             
                             <div class="gallery-admin-grid" id="adminGalleryGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-top: 24px;">
-                                <!-- Dinamik fotoÄŸraflar buraya gelecek -->
+                                <!-- Dinamik fotoğraflar buraya gelecek -->
                                 <div style="text-align: center; padding: 40px; background: #f8fafc; border-radius: 8px; border: 2px dashed #cbd5e1; grid-column: 1 / -1; color: #64748b;">
                                     <i class="fas fa-image" style="font-size: 3rem; margin-bottom: 12px; opacity: 0.5;"></i>
-                                    <p>HenÃ¼z galeriye fotoÄŸraf yÃ¼klenmedi. (GeliÅŸtirme AÅŸamasÄ±nda)</p>
+                                    <p>Henüz galeriye fotoğraf yüklenmedi. (Geliştirme Aşamasında)</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- 5. ETKÄ°NLÄ°K Ã–NERÄ°LERÄ° SEKME -->
+                <!-- 5. ETKİNLİK ÖNERİLERİ SEKME -->
                 <section class="tab-pane" id="pane-suggestions">
                     <div class="dashboard-card">
                         <div class="card-header">
                             <div>
-                                <h3><i class="fas fa-lightbulb"></i> Ã–ÄŸrencilerden Gelen Etkinlik Ã–nerileri (<span id="suggTotalCount">0</span>)</h3>
-                                <p class="card-desc">Sitedeki "Etkinlik Ã–ner" bÃ¶lÃ¼mÃ¼nden iletilen fikirler.</p>
+                                <h3><i class="fas fa-lightbulb"></i> Öğrencilerden Gelen Etkinlik Önerileri (<span id="suggTotalCount">0</span>)</h3>
+                                <p class="card-desc">Sitedeki "Etkinlik Öner" bölümünden iletilen fikirler.</p>
                             </div>
                         </div>
                         <div class="card-body">
@@ -677,13 +677,13 @@
                                 <table class="data-table" id="suggestionsTable">
                                     <thead>
                                         <tr>
-                                            <th>Ã–neren KiÅŸi</th>
-                                            <th>BÃ¶lÃ¼m</th>
-                                            <th>Ã–neri BaÅŸlÄ±ÄŸÄ±</th>
-                                            <th>Ã–neri DetayÄ±</th>
+                                            <th>Öneren Kişi</th>
+                                            <th>Bölüm</th>
+                                            <th>Öneri Başlığı</th>
+                                            <th>Öneri Detayı</th>
                                             <th>Tarih</th>
                                             <th>Durum</th>
-                                            <th>Ä°ÅŸlem</th>
+                                            <th>İşlem</th>
                                         </tr>
                                     </thead>
                                     <tbody id="suggestionsTableBody">
@@ -695,53 +695,53 @@
                     </div>
                 </section>
 
-                <!-- 6. WHATSAPP DUYURU BÃœLTENÄ° SEKME -->
+                <!-- 6. WHATSAPP DUYURU BÜLTENİ SEKME -->
                 <section class="tab-pane" id="pane-broadcast">
                     <div class="dashboard-card">
                         <div class="card-header">
                             <div>
-                                <h3><i class="fab fa-whatsapp"></i> WhatsApp Duyuru BÃ¼lteni HazÄ±rlayÄ±cÄ±</h3>
-                                <p class="card-desc">Topluluk WhatsApp grubuna atÄ±lacak hazÄ±r ÅŸablonlu, emojili duyuru oluÅŸturun.</p>
+                                <h3><i class="fab fa-whatsapp"></i> WhatsApp Duyuru Bülteni Hazırlayıcı</h3>
+                                <p class="card-desc">Topluluk WhatsApp grubuna atılacak hazır şablonlu, emojili duyuru oluşturun.</p>
                             </div>
                         </div>
                         <div class="card-body">
                             <div class="broadcast-builder-grid">
                                 <div class="broadcast-controls">
                                     <div class="form-group">
-                                        <label for="broadcastType">Duyuru TÃ¼rÃ¼</label>
+                                        <label for="broadcastType">Duyuru Türü</label>
                                         <select id="broadcastType">
-                                            <option value="book">ğŸ“– AyÄ±n KitabÄ± Tahlil Duyurusu</option>
-                                            <option value="event">ğŸ“… YaklaÅŸan Etkinlik Duyurusu</option>
-                                            <option value="welcome">ğŸ‰ Yeni Ãœyelere KarÅŸÄ±lama Duyurusu</option>
-                                            <option value="custom">âœï¸ Ã–zel Serbest Duyuru</option>
+                                            <option value="book">📖 Ayın Kitabı Tahlil Duyurusu</option>
+                                            <option value="event">📅 Yaklaşan Etkinlik Duyurusu</option>
+                                            <option value="welcome">🎉 Yeni Üyelere Karşılama Duyurusu</option>
+                                            <option value="custom">✍️ Özel Serbest Duyuru</option>
                                         </select>
                                     </div>
 
                                     <div class="form-group" id="broadcastEventSelectorGroup" style="display: none;">
-                                        <label for="broadcastEventSelect">Hangi Etkinlik Ä°Ã§in?</label>
+                                        <label for="broadcastEventSelect">Hangi Etkinlik İçin?</label>
                                         <select id="broadcastEventSelect"></select>
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="broadcastExtraNote">Ekstra Not veya Ã‡aÄŸrÄ± (Ä°steÄŸe BaÄŸlÄ±)</label>
-                                        <input type="text" id="broadcastExtraNote" placeholder="Ã–rn: Ã‡ay ve kahveler bizden! ArkadaÅŸlarÄ±nÄ±zÄ± da davet edebilirsiniz.">
+                                        <label for="broadcastExtraNote">Ekstra Not veya Çağrı (İsteğe Bağlı)</label>
+                                        <input type="text" id="broadcastExtraNote" placeholder="Örn: Çay ve kahveler bizden! Arkadaşlarınızı da davet edebilirsiniz.">
                                     </div>
 
                                     <button type="button" class="btn-primary-sm" id="generateBroadcastBtn">
-                                        <i class="fas fa-magic"></i> Duyuru Metnini OluÅŸtur
+                                        <i class="fas fa-magic"></i> Duyuru Metnini Oluştur
                                     </button>
                                 </div>
 
                                 <div class="broadcast-preview-box">
-                                    <label>OluÅŸturulan WhatsApp MesajÄ±</label>
-                                    <textarea id="broadcastOutput" rows="8" readonly placeholder="Duyuru metni burada gÃ¶rÃ¼ntÃ¼lenecektir..."></textarea>
+                                    <label>Oluşturulan WhatsApp Mesajı</label>
+                                    <textarea id="broadcastOutput" rows="8" readonly placeholder="Duyuru metni burada görüntülenecektir..."></textarea>
                                     
                                     <div class="broadcast-actions">
                                         <button type="button" class="btn-outline-sm" id="copyBroadcastBtn">
                                             <i class="far fa-copy"></i> Metni Kopyala
                                         </button>
                                         <button type="button" class="btn-whatsapp-sm" id="openWhatsAppBtn">
-                                            <i class="fab fa-whatsapp"></i> WhatsApp'ta AÃ§
+                                            <i class="fab fa-whatsapp"></i> WhatsApp'ta Aç
                                         </button>
                                     </div>
                                 </div>
@@ -750,17 +750,17 @@
                     </div>
                 </section>
 
-                <!-- 7. KULLANICILAR & ROLLER (YALNIZCA SÃœPER ADMÄ°N) -->
+                <!-- 7. KULLANICILAR & ROLLER (YALNIZCA SÜPER ADMİN) -->
                 <section class="tab-pane superadmin-only" id="pane-users">
                     
-                    <!-- ONAY BEKLEYEN YÃ–NETÄ°CÄ° BAÅVURULARI KARTI -->
+                    <!-- ONAY BEKLEYEN YÖNETİCİ BAŞVURULARI KARTI -->
                     <div class="dashboard-card" id="pendingUsersCard" style="border: 1.5px solid rgba(245, 158, 11, 0.4); margin-bottom: 24px;">
                         <div class="card-header" style="background: rgba(245, 158, 11, 0.06);">
                             <div>
-                                <h3><i class="fas fa-user-clock" style="color:var(--accent-gold);"></i> Onay Bekleyen YÃ¶netici KayÄ±tlarÄ± (<span id="pendingUsersCount">0</span>)</h3>
-                                <p class="card-desc">Sisteme kayÄ±t olan ve SÃ¼per Admin onayÄ± bekleyen adaylar. GÃ¼venlik gereÄŸi onay vermeden sisteme giremezler.</p>
+                                <h3><i class="fas fa-user-clock" style="color:var(--accent-gold);"></i> Onay Bekleyen Yönetici Kayıtları (<span id="pendingUsersCount">0</span>)</h3>
+                                <p class="card-desc">Sisteme kayıt olan ve Süper Admin onayı bekleyen adaylar. Güvenlik gereği onay vermeden sisteme giremezler.</p>
                             </div>
-                            <span class="badge-lock" style="background:rgba(245,158,11,0.2);"><i class="fas fa-shield-alt"></i> GÃ¼venlik Filtresi</span>
+                            <span class="badge-lock" style="background:rgba(245,158,11,0.2);"><i class="fas fa-shield-alt"></i> Güvenlik Filtresi</span>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -769,9 +769,9 @@
                                         <tr>
                                             <th>Ad Soyad</th>
                                             <th>E-Posta</th>
-                                            <th>Talep Edilen GÃ¶rev</th>
-                                            <th>KayÄ±t Tarihi</th>
-                                            <th>BaÅŸkan OnayÄ± / Ä°ÅŸlem</th>
+                                            <th>Talep Edilen Görev</th>
+                                            <th>Kayıt Tarihi</th>
+                                            <th>Başkan Onayı / İşlem</th>
                                         </tr>
                                     </thead>
                                     <tbody id="pendingUsersTableBody">
@@ -782,14 +782,14 @@
                         </div>
                     </div>
 
-                    <!-- AKTÄ°F VE ONAYLI KULLANICILAR -->
+                    <!-- AKTİF VE ONAYLI KULLANICILAR -->
                     <div class="dashboard-card">
                         <div class="card-header">
                             <div>
-                                <h3><i class="fas fa-users-cog"></i> Aktif Yetkili KullanÄ±cÄ±lar</h3>
-                                <p class="card-desc">Sadece SÃ¼per Admin gÃ¶rebilir. YÃ¶netim kurulundaki diÄŸer kiÅŸilerin rollerini belirleyin.</p>
+                                <h3><i class="fas fa-users-cog"></i> Aktif Yetkili Kullanıcılar</h3>
+                                <p class="card-desc">Sadece Süper Admin görebilir. Yönetim kurulundaki diğer kişilerin rollerini belirleyin.</p>
                             </div>
-                            <span class="badge-lock"><i class="fas fa-lock"></i> Ã–zel SÃ¼per Admin AlanÄ±</span>
+                            <span class="badge-lock"><i class="fas fa-lock"></i> Özel Süper Admin Alanı</span>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -799,8 +799,8 @@
                                             <th>Ad Soyad</th>
                                             <th>E-Posta</th>
                                             <th>Mevcut Rol</th>
-                                            <th>RolÃ¼ DeÄŸiÅŸtir</th>
-                                            <th>Ä°ÅŸlem</th>
+                                            <th>Rolü Değiştir</th>
+                                            <th>İşlem</th>
                                         </tr>
                                     </thead>
                                     <tbody id="usersTableBody">
@@ -812,43 +812,43 @@
                     </div>
                 </section>
 
-                <!-- 8. YEDEKLEME & SIFIRLAMA (YALNIZCA SÃœPER ADMÄ°N) -->
+                <!-- 8. YEDEKLEME & SIFIRLAMA (YALNIZCA SÜPER ADMİN) -->
                 <section class="tab-pane superadmin-only" id="pane-backup">
                     <div class="dashboard-card">
                         <div class="card-header">
                             <div>
                                 <h3><i class="fas fa-database"></i> Veri Yedekleme ve Senkronizasyon</h3>
-                                <p class="card-desc">Sitedeki tÃ¼m kitaplarÄ±, etkinlikleri, baÅŸvurularÄ± tek tÄ±kla dosya olarak indirin veya baÅŸka cihaza aktarÄ±n.</p>
+                                <p class="card-desc">Sitedeki tüm kitapları, etkinlikleri, başvuruları tek tıkla dosya olarak indirin veya başka cihaza aktarın.</p>
                             </div>
-                            <span class="badge-lock"><i class="fas fa-lock"></i> Ã–zel SÃ¼per Admin AlanÄ±</span>
+                            <span class="badge-lock"><i class="fas fa-lock"></i> Özel Süper Admin Alanı</span>
                         </div>
                         <div class="card-body">
                             <div class="backup-grid">
                                 <div class="backup-box">
                                     <div class="backup-box-icon"><i class="fas fa-file-download"></i></div>
-                                    <h4>YedeÄŸi Ä°ndir (JSON)</h4>
-                                    <p>TÃ¼m site verilerini bilgisayarÄ±nÄ±za gÃ¼venli bir `.json` dosyasÄ± olarak kaydedin.</p>
+                                    <h4>Yedeği İndir (JSON)</h4>
+                                    <p>Tüm site verilerini bilgisayarınıza güvenli bir `.json` dosyası olarak kaydedin.</p>
                                     <button type="button" class="btn-primary-sm" id="exportBackupBtn">
-                                        <i class="fas fa-download"></i> Verileri Ä°ndir
+                                        <i class="fas fa-download"></i> Verileri İndir
                                     </button>
                                 </div>
 
                                 <div class="backup-box">
                                     <div class="backup-box-icon"><i class="fas fa-file-upload"></i></div>
-                                    <h4>Yedek DosyasÄ± YÃ¼kle</h4>
-                                    <p>Daha Ã¶nce indirdiÄŸiniz JSON yedeÄŸini yÃ¼kleyerek tÃ¼m verileri geri yÃ¼kleyin.</p>
+                                    <h4>Yedek Dosyası Yükle</h4>
+                                    <p>Daha önce indirdiğiniz JSON yedeğini yükleyerek tüm verileri geri yükleyin.</p>
                                     <input type="file" id="importBackupInput" accept=".json" style="display: none;">
                                     <button type="button" class="btn-outline-sm" onclick="document.getElementById('importBackupInput').click()">
-                                        <i class="fas fa-upload"></i> Dosya SeÃ§ ve YÃ¼kle
+                                        <i class="fas fa-upload"></i> Dosya Seç ve Yükle
                                     </button>
                                 </div>
 
                                 <div class="backup-box danger-box">
                                     <div class="backup-box-icon danger-icon"><i class="fas fa-trash-restore"></i></div>
-                                    <h4>Fabrika AyarlarÄ±na DÃ¶n</h4>
-                                    <p>TÃ¼m yerel verileri silip varsayÄ±lan baÅŸlangÄ±Ã§ haline dÃ¶ndÃ¼rÃ¼r.</p>
+                                    <h4>Fabrika Ayarlarına Dön</h4>
+                                    <p>Tüm yerel verileri silip varsayılan başlangıç haline döndürür.</p>
                                     <button type="button" class="btn-danger-sm" id="resetDataBtn">
-                                        <i class="fas fa-exclamation-triangle"></i> VarsayÄ±lana SÄ±fÄ±rla
+                                        <i class="fas fa-exclamation-triangle"></i> Varsayılana Sıfırla
                                     </button>
                                 </div>
                             </div>
@@ -856,39 +856,39 @@
                     </div>
                 </section>
 
-                <!-- 9. KULLANIM REHBERÄ° SEKME -->
+                <!-- 9. KULLANIM REHBERİ SEKME -->
                 <section class="tab-pane" id="pane-guide">
                     <div class="dashboard-card">
                         <div class="card-header">
                             <div>
-                                <h3><i class="fas fa-info-circle"></i> YÃ¶netim Kurulu KullanÄ±m KÄ±lavuzu</h3>
-                                <p class="card-desc">Sistemi en verimli ve kolay ÅŸekilde kullanmanÄ±z iÃ§in hazÄ±rlanan pratik rehber.</p>
+                                <h3><i class="fas fa-info-circle"></i> Yönetim Kurulu Kullanım Kılavuzu</h3>
+                                <p class="card-desc">Sistemi en verimli ve kolay şekilde kullanmanız için hazırlanan pratik rehber.</p>
                             </div>
                         </div>
                         <div class="card-body">
                             <div class="guide-steps-grid">
                                 <div class="guide-step-card">
                                     <div class="step-num">1</div>
-                                    <h4>ğŸ“– AyÄ±n KitabÄ±nÄ± DeÄŸiÅŸtirme</h4>
-                                    <p>Her ayÄ±n baÅŸÄ±nda "AyÄ±n KitabÄ±" sekmesine girin. Yeni kitabÄ±n adÄ±nÄ±, yazarÄ±nÄ±, sayfasÄ±nÄ± ve tahlil tarihini girip <strong>"DeÄŸiÅŸiklikleri Kaydet"</strong> butonuna basÄ±n. Ana sitedeki 3D kitap kapaÄŸÄ± ve aÃ§Ä±klamalar hemen yenilenir.</p>
+                                    <h4>📖 Ayın Kitabını Değiştirme</h4>
+                                    <p>Her ayın başında "Ayın Kitabı" sekmesine girin. Yeni kitabın adını, yazarını, sayfasını ve tahlil tarihini girip <strong>"Değişiklikleri Kaydet"</strong> butonuna basın. Ana sitedeki 3D kitap kapağı ve açıklamalar hemen yenilenir.</p>
                                 </div>
 
                                 <div class="guide-step-card">
                                     <div class="step-num">2</div>
-                                    <h4>ğŸ“… Yeni Etkinlik Duyurma</h4>
-                                    <p>"Etkinlikler" sekmesine girin. BaÅŸlÄ±k, tarih, saat ve yeri yazÄ±p kaydedin. Etkinlik ana sayfada hem takvimde hem de etkinlik kartlarÄ±nda otomatik listelenir.</p>
+                                    <h4>📅 Yeni Etkinlik Duyurma</h4>
+                                    <p>"Etkinlikler" sekmesine girin. Başlık, tarih, saat ve yeri yazıp kaydedin. Etkinlik ana sayfada hem takvimde hem de etkinlik kartlarında otomatik listelenir.</p>
                                 </div>
 
                                 <div class="guide-step-card">
                                     <div class="step-num">3</div>
-                                    <h4>ğŸ“¥ BaÅŸvurularÄ± Takip Etme</h4>
-                                    <p>Ã–ÄŸrenciler sitedeki formu doldurduÄŸunda "Gelen BaÅŸvurular" sekmesine dÃ¼ÅŸer. Buradan tek tÄ±kla doÄŸrudan Ã¶ÄŸrencinin WhatsApp'Ä±na yazabilir ve durumu "OnaylandÄ±" yapabilirsiniz.</p>
+                                    <h4>📥 Başvuruları Takip Etme</h4>
+                                    <p>Öğrenciler sitedeki formu doldurduğunda "Gelen Başvurular" sekmesine düşer. Buradan tek tıkla doğrudan öğrencinin WhatsApp'ına yazabilir ve durumu "Onaylandı" yapabilirsiniz.</p>
                                 </div>
 
                                 <div class="guide-step-card">
                                     <div class="step-num">4</div>
-                                    <h4>ğŸ“¢ Tek TÄ±kla WhatsApp Duyurusu</h4>
-                                    <p>"WhatsApp BÃ¼lteni" sekmesinden yaklaÅŸan etkinliÄŸi seÃ§in. Sistem sizin yerinize emojili ve dÃ¼zenli bir mesaj hazÄ±rlar. "WhatsApp'ta AÃ§" diyerek doÄŸrudan topluluk grubuna atabilirsiniz.</p>
+                                    <h4>📢 Tek Tıkla WhatsApp Duyurusu</h4>
+                                    <p>"WhatsApp Bülteni" sekmesinden yaklaşan etkinliği seçin. Sistem sizin yerinize emojili ve düzenli bir mesaj hazırlar. "WhatsApp'ta Aç" diyerek doğrudan topluluk grubuna atabilirsiniz.</p>
                                 </div>
                             </div>
                         </div>
@@ -899,13 +899,13 @@
         </main>
     </div>
 
-    <!-- SAÄ ALT: GELÄ°ÅTÄ°RÄ°CÄ°YE / SÃœPER ADMÄ°NE YAZ BUTONU -->
-    <button class="dev-msg-fab" id="devMsgFab" title="SÃ¼per Admin / GeliÅŸtiriciye Not BÄ±rak">
+    <!-- SAĞ ALT: GELİŞTİRİCİYE / SÜPER ADMİNE YAZ BUTONU -->
+    <button class="dev-msg-fab" id="devMsgFab" title="Süper Admin / Geliştiriciye Not Bırak">
         <i class="fas fa-comment-dots"></i>
-        <span>GeliÅŸtiriciye Yaz</span>
+        <span>Geliştiriciye Yaz</span>
     </button>
 
-    <!-- GELÄ°ÅTÄ°RÄ°CÄ°YE YAZ MODAL -->
+    <!-- GELİŞTİRİCİYE YAZ MODAL -->
     <div class="dev-msg-modal" id="devMsgModal" style="display: none;">
         <div class="dev-msg-modal-overlay" id="devMsgModalOverlay"></div>
         <div class="dev-msg-modal-content">
@@ -913,33 +913,33 @@
                 <div class="dev-msg-title">
                     <i class="fas fa-paper-plane"></i>
                     <div>
-                        <h4>GeliÅŸtiriciye & BaÅŸkana Yaz</h4>
-                        <p>SÃ¼per Admin (Ä°lker M.) hesabÄ±na soru, Ã¶neri veya hata bildirimi iletin.</p>
+                        <h4>Geliştiriciye & Başkana Yaz</h4>
+                        <p>Süper Admin (İlker M.) hesabına soru, öneri veya hata bildirimi iletin.</p>
                     </div>
                 </div>
                 <button class="dev-msg-close-btn" id="closeDevMsgModal" aria-label="Kapat"><i class="fas fa-times"></i></button>
             </div>
             <form id="devMsgForm" class="dev-msg-form">
                 <div class="form-group">
-                    <label for="devSenderName"><i class="fas fa-user"></i> AdÄ±nÄ±z SoyadÄ±nÄ±z *</label>
+                    <label for="devSenderName"><i class="fas fa-user"></i> Adınız Soyadınız *</label>
                     <input type="text" id="devSenderName" placeholder="Ad Soyad" required>
                 </div>
                 <div class="form-group">
                     <label for="devMsgCategory"><i class="fas fa-tag"></i> Konu *</label>
                     <select id="devMsgCategory">
-                        <option value="Soru / YardÄ±m">â“ Soru / YardÄ±m Talebi</option>
-                        <option value="Hata Bildirimi">âš ï¸ Sitede / Panelde Hata Bildirimi</option>
-                        <option value="Yeni Ã–zellik">ğŸ’¡ Yeni Ã–zellik / Sayfa Ã–nerisi</option>
-                        <option value="Genel Not">ğŸ“ Genel Not / Bilgilendirme</option>
+                        <option value="Soru / Yardım">❓ Soru / Yardım Talebi</option>
+                        <option value="Hata Bildirimi">⚠️ Sitede / Panelde Hata Bildirimi</option>
+                        <option value="Yeni Özellik">💡 Yeni Özellik / Sayfa Önerisi</option>
+                        <option value="Genel Not">📝 Genel Not / Bilgilendirme</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="devMsgContent"><i class="fas fa-align-left"></i> MesajÄ±nÄ±z *</label>
-                    <textarea id="devMsgContent" rows="4" placeholder="Ä°lker BaÅŸkana veya geliÅŸtiriciye iletmek istediÄŸiniz not..." required></textarea>
+                    <label for="devMsgContent"><i class="fas fa-align-left"></i> Mesajınız *</label>
+                    <textarea id="devMsgContent" rows="4" placeholder="İlker Başkana veya geliştiriciye iletmek istediğiniz not..." required></textarea>
                 </div>
                 <div class="dev-msg-actions">
                     <button type="submit" class="btn-primary-sm">
-                        <i class="fas fa-paper-plane"></i> MesajÄ± Kaydet & Ä°let
+                        <i class="fas fa-paper-plane"></i> Mesajı Kaydet & İlet
                     </button>
                     <button type="button" class="btn-whatsapp-sm" id="devMsgWhatsAppBtn">
                         <i class="fab fa-whatsapp"></i> WhatsApp'tan Yaz
@@ -949,7 +949,7 @@
         </div>
     </div>
 
-    <!-- TOAST BÄ°LDÄ°RÄ°M KUTUSU -->
+    <!-- TOAST BİLDİRİM KUTUSU -->
     <div id="adminToastContainer" class="toast-container"></div>
 
     <script type="module" src="admin.js"></script>
