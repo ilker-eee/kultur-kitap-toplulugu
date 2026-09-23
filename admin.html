@@ -162,6 +162,11 @@
                     <span class="nav-counter" id="badgeMembers">0</span>
                 </button>
 
+                <button class="nav-item" data-tab="gallery" data-role="editor">
+                    <i class="fas fa-images"></i>
+                    <span>Galeri Yönetimi</span>
+                </button>
+
                 <button class="nav-item" data-tab="suggestions" data-role="moderator">
                     <i class="fas fa-lightbulb"></i>
                     <span>Etkinlik Önerileri</span>
@@ -630,6 +635,29 @@
                                         <!-- Dinamik doldurulacak -->
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- === GALERİ PANE === -->
+                <section class="tab-pane" id="pane-gallery">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-images"></i> Galeri Yönetimi</h2>
+                            <button class="btn-primary" id="btnUploadImage"><i class="fas fa-upload"></i> Yeni Fotoğraf Yükle</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> Sitenin ön yüzündeki <strong>"Galeri"</strong> bölümünde görünen etkinlik fotoğraflarını buradan yönetebilirsiniz. <i>(Not: Şu an tasarım aşamasında olduğu için yüklenen fotoğraflar tarayıcı önbelleğinde tutulmaktadır.)</i>
+                            </div>
+                            
+                            <div class="gallery-admin-grid" id="adminGalleryGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-top: 24px;">
+                                <!-- Dinamik fotoğraflar buraya gelecek -->
+                                <div style="text-align: center; padding: 40px; background: #f8fafc; border-radius: 8px; border: 2px dashed #cbd5e1; grid-column: 1 / -1; color: #64748b;">
+                                    <i class="fas fa-image" style="font-size: 3rem; margin-bottom: 12px; opacity: 0.5;"></i>
+                                    <p>Henüz galeriye fotoğraf yüklenmedi. (Geliştirme Aşamasında)</p>
+                                </div>
                             </div>
                         </div>
                     </div>
