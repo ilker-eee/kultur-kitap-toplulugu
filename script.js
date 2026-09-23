@@ -875,16 +875,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (raw) {
                 const member = JSON.parse(raw);
                 if (member && (member.role === 'member' || member.role === 'Üye')) {
-                    // Güvenlik Doğrulaması: Admin panelinden silinmiş üyenin oturumunu derhal kapat
-                    const dbRaw = localStorage.getItem('sdu_members_db');
-                    if (dbRaw) {
-                        const membersDb = JSON.parse(dbRaw);
-                        const exists = membersDb.some(m => (m.id && m.id === member.id) || (m.identifier && m.identifier.toLowerCase() === (member.identifier || '').toLowerCase()));
-                        if (!exists) {
-                            localStorage.removeItem('sdu_member_session');
-                            return { role: 'guest', name: 'Misafir Okur' };
-                        }
-                    }
                     if (!Array.isArray(member.attendedEvents)) member.attendedEvents = [];
                     return member;
                 }
