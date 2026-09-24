@@ -898,7 +898,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const raw = localStorage.getItem('sdu_member_session');
             if (raw) {
                 const member = JSON.parse(raw);
-                if (member && (member.role === 'member' || member.role === 'Üye')) {
+                if (member && ['member', 'üye', 'Üye', 'Ã¼ye'].includes(member.role)) {
+                    member.role = 'member'; // normalize everywhere
                     if (!Array.isArray(member.attendedEvents)) member.attendedEvents = [];
                     return member;
                 }
