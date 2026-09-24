@@ -179,7 +179,7 @@ export async function registerAdmin(adminData) {
         isMaster: false
     });
     
-    return { id: docRef.id, name: adminData.name, email: adminData.email, status: finalStatus, autoAccepted: isAutoAccept };
+    return { id: docRef.id, name: adminData.name, email: adminData.email, status: finalStatus, role: finalRole, title: finalTitle, autoAccepted: isAutoAccept };
 }
 
 export async function verifyAdmin(adminId) {

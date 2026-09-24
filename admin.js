@@ -360,12 +360,25 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
                 });
 
                 if (regError) regError.style.display = 'none';
+                if (res.autoAccepted) {
+                    const newUser = {
+                        id: res.id,
+                        name: res.name,
+                        email: res.email,
+                        role: res.role,
+                        title: res.title
+                    };
+                    localStorage.setItem('sdu_admin_session', JSON.stringify(newUser));
+                    authScreen.style.display = 'none';
+                    adminApp.style.display = 'block';
+                    initAdminDashboard(newUser);
+                    showToast('Otomatik onay ile giriş yapıldı.', 'fas fa-check-circle');
+                    registerForm.reset();
+                    return; // Return early, skip timeout
+                }
+
                 if (regSuccess) {
-                    if (res.autoAccepted) {
-                        regSuccess.innerHTML = '<i class="fas fa-check-circle"></i> <strong>Kaydınız başarıyla alındı ve otomatik onaylandı!</strong><br>Hemen giriş yapabilirsiniz.';
-                    } else {
-                        regSuccess.innerHTML = '<i class="fas fa-shield-alt"></i> <strong>Kaydınız başarıyla alındı!</strong><br>Güvenlik gereği Yönetici onayladıktan sonra hesabınız aktifleşecektir.';
-                    }
+                    regSuccess.innerHTML = '<i class="fas fa-shield-alt"></i> <strong>Kaydınız başarıyla alındı!</strong><br>Güvenlik gereği Yönetici onayladıktan sonra hesabınız aktifleşecektir.';
                     regSuccess.style.display = 'block';
                 }
                 registerForm.reset();
