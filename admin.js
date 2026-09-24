@@ -4,7 +4,7 @@
    Zero-cost static sync with LocalStorage & SessionStorage
    ========================================== */
 
-import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, getAdmins, approveAdmin, deleteAdmin as fbDeleteAdmin, getApplications, updateApplicationStatus, deleteApplication as fbDeleteApplication, getSuggestions, updateSuggestionStatus, deleteSuggestion as fbDeleteSuggestion } from './firebase-service.js';
+import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, getAdmins, approveAdmin, deleteAdmin as fbDeleteAdmin, getApplications, updateApplicationStatus, deleteApplication as fbDeleteApplication, getSuggestions, updateSuggestionStatus, deleteSuggestion as fbDeleteSuggestion, getAutoAcceptSetting, setAutoAcceptSetting } from './firebase-service.js';
 
 (function () {
     'use strict';
@@ -346,7 +346,7 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
             };
 
             try {
-                await registerAdmin({
+                const res = await registerAdmin({
                     name,
                     email,
                     password,
@@ -356,7 +356,11 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
 
                 if (regError) regError.style.display = 'none';
                 if (regSuccess) {
-                    regSuccess.innerHTML = '<i class="fas fa-shield-alt"></i> <strong>Kaydınız başarıyla alındı!</strong><br>Güvenlik gereği Yönetici onayladıktan sonra hesabınız aktifleşecektir.';
+                    if (res.autoAccepted) {
+                        regSuccess.innerHTML = '<i class="fas fa-check-circle"></i> <strong>Kaydınız başarıyla alındı ve otomatik onaylandı!</strong><br>Hemen giriş yapabilirsiniz.';
+                    } else {
+                        regSuccess.innerHTML = '<i class="fas fa-shield-alt"></i> <strong>Kaydınız başarıyla alındı!</strong><br>Güvenlik gereği Yönetici onayladıktan sonra hesabınız aktifleşecektir.';
+                    }
                     regSuccess.style.display = 'block';
                 }
                 registerForm.reset();
@@ -542,19 +546,37 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
         
         let apps = [];
         let suggs = [];
+        let members = [];
         try {
             apps = await getApplications();
             suggs = await getSuggestions();
+            members = await getMembers();
         } catch(e) {
             console.error('Error fetching stats for overview:', e);
         }
 
         const pendingCount = apps.filter(a => a.status === 'Beklemede').length;
-        document.getElementById('statApplicationCount').textContent = apps.length;
-        document.getElementById('statPendingApps').textContent = `${pendingCount} beklemede`;
+        const statAppCountEl = document.getElementById('statApplicationCount');
+        if (statAppCountEl) statAppCountEl.textContent = apps.length;
+        const statPendingEl = document.getElementById('statPendingApps');
+        if (statPendingEl) statPendingEl.textContent = `${pendingCount} beklemede`;
 
         const suggCount = suggs.length;
-        document.getElementById('statSuggestionCount').textContent = suggCount;
+        const statSuggEl = document.getElementById('statSuggestionCount');
+        if (statSuggEl) statSuggEl.textContent = suggCount;
+
+        const statMemCountEl = document.getElementById('statMemberCount');
+        const statNewMemEl = document.getElementById('statNewMembersToday');
+        if (statMemCountEl) {
+            statMemCountEl.textContent = members.length;
+            const today = new Date().toLocaleDateString('tr-TR');
+            const todayCount = members.filter(m => {
+                if (!m.registeredAt) return false;
+                const d = new Date(m.registeredAt);
+                return d.toLocaleDateString('tr-TR') === today;
+            }).length;
+            if (statNewMemEl) statNewMemEl.textContent = `${todayCount} bugün`;
+        }
 
         const devMsgCount = data.developer_messages ? data.developer_messages.length : 0;
         const devMsgCountEl = document.getElementById('devMsgCount');
@@ -1056,6 +1078,29 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
 
         if (tbody) tbody.innerHTML = '';
         if (pendingTbody) pendingTbody.innerHTML = '';
+
+        // Auto Accept Toggle State
+        const autoAcceptToggle = document.getElementById('autoAcceptToggle');
+        if (autoAcceptToggle) {
+            try {
+                autoAcceptToggle.checked = await getAutoAcceptSetting();
+            } catch (e) { console.error('Error fetching auto accept state:', e); }
+            
+            autoAcceptToggle.onchange = async (e) => {
+                const val = e.target.checked;
+                autoAcceptToggle.disabled = true;
+                try {
+                    await setAutoAcceptSetting(val);
+                    showToast(val ? 'Otomatik Onay sistemi AKTİF edildi.' : 'Güvenlik filtreli kayıt AKTİF edildi.', val ? 'fas fa-shield-virus' : 'fas fa-shield-alt');
+                } catch (err) {
+                    console.error('Error setting auto accept:', err);
+                    showToast('Ayarlar güncellenemedi!', 'fas fa-exclamation-triangle');
+                    autoAcceptToggle.checked = !val; // revert
+                } finally {
+                    autoAcceptToggle.disabled = false;
+                }
+            };
+        }
 
         const pendingUsers = adminUsers.filter(u => u.status === 'pending_approval');
         const activeUsers = adminUsers.filter(u => u.status !== 'pending_approval');

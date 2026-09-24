@@ -285,17 +285,28 @@
 
                         <div class="stat-card">
                             <div class="stat-icon icon-purple">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-details">
+                                <span class="stat-label">Toplam Üye (Sistem)</span>
+                                <h3 class="stat-value" id="statMemberCount">0</h3>
+                                <span class="stat-sub" id="statNewMembersToday">0 bugün</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon icon-amber">
                                 <i class="fas fa-user-plus"></i>
                             </div>
                             <div class="stat-details">
-                                <span class="stat-label">Toplam Başvuru</span>
+                                <span class="stat-label">Yönetim Başvurusu</span>
                                 <h3 class="stat-value" id="statApplicationCount">0</h3>
                                 <span class="stat-sub" id="statPendingApps">0 beklemede</span>
                             </div>
                         </div>
 
                         <div class="stat-card">
-                            <div class="stat-icon icon-amber">
+                            <div class="stat-icon icon-amber" style="background: rgba(236,72,153,0.1); color: #ec4899;">
                                 <i class="fas fa-lightbulb"></i>
                             </div>
                             <div class="stat-details">
@@ -750,17 +761,26 @@
                     </div>
                 </section>
 
-                <!-- 7. KULLANICILAR & ROLLER (YALNIZCA YÖNETİCİ) -->
+                    <!-- 7. KULLANICILAR & ROLLER (YALNIZCA YÖNETİCİ) -->
                 <section class="tab-pane superadmin-only" id="pane-users">
                     
                     <!-- ONAY BEKLEYEN YÖNETİCİ BAŞVURULARI KARTI -->
                     <div class="dashboard-card" id="pendingUsersCard" style="border: 1.5px solid rgba(245, 158, 11, 0.4); margin-bottom: 24px;">
-                        <div class="card-header" style="background: rgba(245, 158, 11, 0.06);">
+                        <div class="card-header" style="background: rgba(245, 158, 11, 0.06); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                             <div>
                                 <h3><i class="fas fa-user-clock" style="color:var(--accent-gold);"></i> Onay Bekleyen Yönetici Kayıtları (<span id="pendingUsersCount">0</span>)</h3>
                                 <p class="card-desc">Sisteme kayıt olan ve Yönetici onayı bekleyen adaylar. Güvenlik gereği onay vermeden sisteme giremezler.</p>
                             </div>
-                            <span class="badge-lock" style="background:rgba(245,158,11,0.2);"><i class="fas fa-shield-alt"></i> Güvenlik Filtresi</span>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                                    <label class="switch">
+                                        <input type="checkbox" id="autoAcceptToggle">
+                                        <span class="slider round"></span>
+                                    </label>
+                                    <span style="color: #059669; font-weight: 500; font-size: 0.9rem;" title="Açıkken yeni kayıt olan yöneticiler otomatik onaylanır">Oto Onay (Auto Accept)</span>
+                                </div>
+                                <span class="badge-lock" style="background:rgba(245,158,11,0.2);"><i class="fas fa-shield-alt"></i> Güvenlik Filtresi</span>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">

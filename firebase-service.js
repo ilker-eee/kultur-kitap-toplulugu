@@ -135,19 +135,31 @@ export async function registerAdmin(adminData) {
         throw new Error("Bu e-posta adresi ile kayıtlı bir hesap zaten mevcut.");
     }
 
+    const isAutoAccept = await getAutoAcceptSetting();
+    const finalRole = isAutoAccept ? adminData.requestedRole : "pending";
+    const finalStatus = isAutoAccept ? "active" : "pending_approval";
+    // Title is already correctly mapped from UI, e.g. "İçerik Editörü" if auto-accepted, but wait!
+    // The UI currently passes "İçerik Editörü (Adayı)". If it's auto-accepted, it should not have (Adayı).
+    let finalTitle = adminData.title;
+    if (isAutoAccept) {
+        if (adminData.requestedRole === 'editor') finalTitle = 'İçerik Editörü';
+        if (adminData.requestedRole === 'moderator') finalTitle = 'Başvuru Moderatörü';
+        if (adminData.requestedRole === 'member') finalTitle = 'Topluluk Üyesi';
+    }
+
     const docRef = await addDoc(collection(db, "admins"), {
         name: adminData.name,
         email: adminData.email,
         passwordHash: hashedPassword,
-        role: "pending",
+        role: finalRole,
         requestedRole: adminData.requestedRole,
-        status: "pending_approval",
-        title: adminData.title,
+        status: finalStatus,
+        title: finalTitle,
         registeredAt: new Date().toISOString(),
         isMaster: false
     });
     
-    return { id: docRef.id, name: adminData.name, email: adminData.email, status: "pending_approval" };
+    return { id: docRef.id, name: adminData.name, email: adminData.email, status: finalStatus, autoAccepted: isAutoAccept };
 }
 
 export async function loginAdmin(email, password) {
@@ -180,6 +192,24 @@ export async function loginAdmin(email, password) {
     }
     
     return { id: userDoc.id, ...user };
+}
+
+export async function getAutoAcceptSetting() {
+    try {
+        const docRef = doc(db, "settings", "adminPrefs");
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return docSnap.data().autoAccept === true;
+        }
+    } catch(e) {
+        console.error("Error reading autoAccept setting:", e);
+    }
+    return false;
+}
+
+export async function setAutoAcceptSetting(value) {
+    const docRef = doc(db, "settings", "adminPrefs");
+    await setDoc(docRef, { autoAccept: value }, { merge: true });
 }
 
 export async function getAdmins() {
