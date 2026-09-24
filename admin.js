@@ -168,7 +168,7 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
     // === AKTİF KULLANICI YÖNETİMİ ===
     function getLoggedInUser() {
         try {
-            const raw = sessionStorage.getItem(SESSION_USER_KEY);
+            const raw = localStorage.getItem(SESSION_USER_KEY);
             return raw ? JSON.parse(raw) : null;
         } catch (e) {
             return null;
@@ -177,9 +177,9 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
 
     function setLoggedInUser(user) {
         if (user) {
-            sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(user));
+            localStorage.setItem(SESSION_USER_KEY, JSON.stringify(user));
         } else {
-            sessionStorage.removeItem(SESSION_USER_KEY);
+            localStorage.removeItem(SESSION_USER_KEY);
         }
     }
 
@@ -719,16 +719,18 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
             const tr = document.createElement('tr');
             const cleanPhone = (app.phone || '').replace(/\D/g, '');
             const waPhone = cleanPhone.startsWith('90') ? cleanPhone : (cleanPhone.startsWith('0') ? '9' + cleanPhone : '90' + cleanPhone);
-            const waMsg = encodeURIComponent(`Merhaba ${app.fullName}! SDÜ Kültür ve Kitap Topluluğu yönetiminden yazıyorum. Aramıza katılım başvurunuz onaylandı, hoş geldiniz! 🎉`);
+            const magicLink = window.location.origin + window.location.pathname + '?token=' + app.id;
+            const waMsg = encodeURIComponent(`Merhaba ${app.fullName}! SDÜ Kültür ve Kitap Topluluğu yönetiminden yazıyorum. Aramıza katılım başvurunuz onaylandı, hoş geldiniz! 🎉\n\nYönetim paneline şifresiz direkt giriş linkin:\n${magicLink}`);
 
             tr.innerHTML = `
                 <td><strong>${app.fullName || '-'}</strong></td>
                 <td>${app.department || '-'} <span style="color:var(--text-muted);">(${app.grade || '-'})</span></td>
                 <td>
                     ${app.phone || '-'}
-                    ${app.phone ? `<a href="https://wa.me/${waPhone}?text=${waMsg}" target="_blank" class="btn-icon-action whatsapp" title="WhatsApp'tan Mesaj At">
+                    ${app.phone ? `<a href="https://wa.me/${waPhone}?text=${waMsg}" target="_blank" class="btn-icon-action whatsapp" title="WhatsApp'tan Mesaj At (Giriş Linki İçerir)">
                         <i class="fab fa-whatsapp"></i>
                     </a>` : ''}
+                    ${app.status === 'Onaylandı' ? `<button class="btn-icon-action" style="background:#f3f4f6; color:#4b5563; margin-left:4px;" title="Giriş Linkini Kopyala" onclick="copyMagicLink('${app.id}')"><i class="fas fa-link"></i></button>` : ''}
                 </td>
                 <td><small>${app.interest || 'Genel'}</small></td>
                 <td><small>${app.date || '-'}</small></td>
@@ -745,6 +747,16 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
                 </td>
             `;
             tbody.appendChild(tr);
+        });
+    }
+
+    window.copyMagicLink = function(id) {
+        const link = window.location.origin + window.location.pathname + '?token=' + id;
+        navigator.clipboard.writeText(link).then(() => {
+            showToast('Otomatik giriş linki kopyalandı! Üyeye gönderebilirsiniz.', 'fas fa-link');
+        }).catch(err => {
+            console.error('Could not copy text: ', err);
+            showToast('Link kopyalanamadı.', 'fas fa-exclamation-triangle');
         });
     }
 
@@ -824,9 +836,9 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
             tr.innerHTML = `
                 <td><strong>${m.name || 'İsimsiz'}</strong></td>
                 <td>${m.identifier || '-'}</td>
-                <td>${m.department || '-'}</td>
+                <td>${m.department || '-'} ${m.grade ? `<span style="color:var(--text-muted);">(${m.grade})</span>` : ''}</td>
                 <td>${dateStr}</td>
-                <td><span class="status-badge" style="background:#e0f2fe;color:#0284c7;">${m.role === 'member' || m.role === 'üye' ? 'Üye' : m.role}</span></td>
+                <td><span class="status-badge" style="background:#e0f2fe;color:#0284c7;">${['member', 'üye', 'Ã¼ye'].includes(m.role) ? 'Üye' : m.role}</span></td>
                 <td>
                     <button class="btn-action btn-delete" onclick="deleteMember('${m.id}')" title="Üyeyi Sil"><i class="fas fa-trash"></i></button>
                 </td>
@@ -1344,12 +1356,54 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
     // ==========================================
     // İLK YÜKLEME KONTROLÜ
     // ==========================================
-    const loggedUser = getLoggedInUser();
-    if (loggedUser) {
-        initAdminDashboard(loggedUser);
-    } else {
-        authScreen.style.display = 'flex';
-        adminApp.style.display = 'none';
-    }
+    (async function init() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        
+        if (token) {
+            authScreen.style.display = 'flex';
+            const authModal = document.querySelector('.auth-modal');
+            const originalHTML = authModal ? authModal.innerHTML : '';
+            if (authModal) authModal.innerHTML = '<div style="text-align:center; padding: 40px;"><i class="fas fa-spinner fa-spin fa-3x" style="color:var(--primary-color);"></i><p style="margin-top:16px;">Özel giriş bağlantısı kontrol ediliyor...</p></div>';
+            
+            try {
+                const apps = await getApplications();
+                const app = apps.find(a => a.id === token);
+                
+                if (app && app.status === 'Onaylandı') {
+                    const magicUser = {
+                        id: app.id,
+                        name: app.fullName,
+                        email: app.phone || 'Girilmedi',
+                        role: 'member',
+                        title: 'Topluluk Üyesi',
+                        isMaster: false
+                    };
+                    setLoggedInUser(magicUser);
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    if (authModal) authModal.innerHTML = originalHTML; // restore UI just in case
+                    initAdminDashboard(magicUser);
+                    showToast('Özel link ile başarıyla giriş yapıldı!', 'fas fa-check-circle');
+                    return;
+                } else {
+                    alert('Bu giriş bağlantısı geçersiz veya henüz yönetici tarafından onaylanmamış.');
+                    window.location.href = window.location.pathname;
+                    return;
+                }
+            } catch (e) {
+                console.error('Magic link error:', e);
+                window.location.href = window.location.pathname;
+                return;
+            }
+        }
+        
+        const loggedUser = getLoggedInUser();
+        if (loggedUser) {
+            initAdminDashboard(loggedUser);
+        } else {
+            authScreen.style.display = 'flex';
+            adminApp.style.display = 'none';
+        }
+    })();
 
 })();

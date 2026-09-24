@@ -44,11 +44,11 @@ export async function registerMember(memberData) {
         grade: memberData.grade || '',
         phone: memberData.phone || '',
         passwordHash: hashedPassword,
-        role: 'Ã¼ye',
+        role: 'member',
         registeredAt: new Date().toISOString()
     });
     
-    return { id: docRef.id, name: memberData.name, role: 'Ã¼ye', identifier: memberData.identifier };
+    return { id: docRef.id, name: memberData.name, role: 'member', identifier: memberData.identifier };
 }
 
 export async function loginMember(identifier, password) {
