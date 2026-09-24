@@ -3,7 +3,7 @@
    JavaScript: Navigation, Animations, Counters
    ========================================== */
 
-import { registerMember, loginMember, submitApplication, submitSuggestion } from './firebase-service.js';
+import { registerMember, loginMember, submitApplication, submitSuggestion, verifyMember } from './firebase-service.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -15,6 +15,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
     updateThemeIcon(savedTheme);
+
+    // Verify session in background without blocking UI
+    (async () => {
+        const currentUser = getCurrentMember();
+        if (currentUser && currentUser.id) {
+            try {
+                const isValid = await verifyMember(currentUser.id);
+                if (!isValid) {
+                    clearMemberSession();
+                    renderUserWidget();
+                    bindEventJoinButtons();
+                    showToast("Güvenlik: Hesabınız sistemden silinmiş. Oturumunuz sonlandırıldı.", "fas fa-exclamation-triangle");
+                }
+            } catch(e) { console.warn("Session verification failed", e); }
+        }
+    })();
 
     themeToggle.addEventListener('click', () => {
         const currentTheme = document.documentElement.getAttribute('data-theme');
@@ -949,7 +965,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Üye için Bize Katıl bölümünü gizle, Etkinlik Öner bölümünü aktif kıl
             if (bizeKatilSec) bizeKatilSec.style.display = 'none';
-            if (suggFormRow) suggFormRow.style.display = 'none'; // Üyeden isim/bölüm sormuyoruz
+            if (suggFormRow) {
+                suggFormRow.style.display = 'none'; // Üyeden isim/bölüm sormuyoruz
+                const sName = document.getElementById('suggName');
+                const sDept = document.getElementById('suggDept');
+                if (sName) sName.required = false;
+                if (sDept) sDept.required = false;
+            }
 
             if (navCtaBtn) {
                 navCtaBtn.innerHTML = '<i class="fas fa-lightbulb"></i> Etkinlik Öner';
@@ -1030,7 +1052,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Misafir için Bize Katıl bölümünü ve form alanlarını göster
             if (bizeKatilSec) bizeKatilSec.style.display = 'block';
-            if (suggFormRow) suggFormRow.style.display = 'flex';
+            if (suggFormRow) {
+                suggFormRow.style.display = 'flex';
+                const sName = document.getElementById('suggName');
+                const sDept = document.getElementById('suggDept');
+                if (sName) sName.required = true;
+                if (sDept) sDept.required = true;
+            }
 
             if (navCtaBtn) {
                 navCtaBtn.innerHTML = 'Bize Katıl';

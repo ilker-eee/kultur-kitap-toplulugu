@@ -80,6 +80,13 @@ export async function getMembers() {
     return members;
 }
 
+export async function verifyMember(memberId) {
+    if (!memberId) return false;
+    const docRef = doc(db, "members", memberId);
+    const docSnap = await getDoc(docRef);
+    return docSnap.exists();
+}
+
 export async function deleteMember(memberId) {
     const { deleteDoc, doc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
     await deleteDoc(doc(db, "members", memberId));
