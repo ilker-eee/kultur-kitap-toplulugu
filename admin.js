@@ -514,6 +514,14 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
         });
     }
 
+    const btnRefreshSuggs = document.getElementById('btnRefreshSuggs');
+    if (btnRefreshSuggs) {
+        btnRefreshSuggs.addEventListener('click', () => {
+            renderSuggestionsSection();
+            showToast('Öneriler listesi yenilendi.', 'fas fa-sync-alt');
+        });
+    }
+
     // Mobil Menü Aç/Kapat
     if (sidebarToggleBtn) {
         sidebarToggleBtn.addEventListener('click', () => sidebar.classList.toggle('open'));
