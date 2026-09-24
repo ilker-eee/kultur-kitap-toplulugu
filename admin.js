@@ -521,6 +521,11 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
         btn.addEventListener('click', () => {
             const tabKey = btn.dataset.tab;
             if (tabKey) switchAdminTab(tabKey);
+            
+            // Mobil uyumluluk: Telefondan sekmeye basınca menüyü kapat
+            if (window.innerWidth <= 992 && sidebar) {
+                sidebar.classList.remove('open');
+            }
         });
     });
 
