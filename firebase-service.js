@@ -21,6 +21,19 @@ export async function hashPassword(password) {
     }
 }
 
+export async function getPublicData() {
+    const docRef = doc(db, "settings", "publicData");
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        return docSnap.data();
+    }
+    return null;
+}
+
+export async function setPublicData(data) {
+    await setDoc(doc(db, "settings", "publicData"), data);
+}
+
 // ========================
 // MEMBER (FRONTEND) LOGIC
 // ========================
@@ -167,6 +180,15 @@ export async function registerAdmin(adminData) {
     });
     
     return { id: docRef.id, name: adminData.name, email: adminData.email, status: finalStatus, autoAccepted: isAutoAccept };
+}
+
+export async function verifyAdmin(adminId) {
+    if (!adminId) return false;
+    const docRef = doc(db, "admins", adminId);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) return false;
+    const data = docSnap.data();
+    return data.status === "active";
 }
 
 export async function loginAdmin(email, password) {

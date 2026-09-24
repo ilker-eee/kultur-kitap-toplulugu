@@ -3,9 +3,10 @@
    JavaScript: Navigation, Animations, Counters
    ========================================== */
 
-import { registerMember, loginMember, submitApplication, submitSuggestion, verifyMember } from './firebase-service.js';
+import { registerMember, loginMember, submitApplication, submitSuggestion, verifyMember, getPublicData, setPublicData } from './firebase-service.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    window.SduAppData = await getPublicData() || { events: [], book: {} };
 
     // === DARK THEME TOGGLE ===
     const themeToggle = document.getElementById('themeToggle');
@@ -642,39 +643,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function getAllEventsList() {
-        const defaultEvents = [
-            { id: 5, title: "Yazma Etkinliği", category: "kitap", date: "5 Mart 2026", time: "14:00", place: "Etkinlik Salonu", badge: "Tamamlandı", desc: "Workshop formatında gerçekleştirilen yazma etkinliğimiz." },
-            { id: 6, title: "Adem'den Önce Kitap Kritiği", category: "kitap", date: "10 Aralık 2025", time: "15:00", place: "Okuma Salonu", badge: "Tamamlandı", desc: "Adem'den Önce kitabı üzerine gerçekleştirdiğimiz söyleşi." },
-            { id: 7, title: "Matrix Film İzleme Etkinliği", category: "soylesi", date: "24 Ekim 2025", time: "19:00", place: "Sinema Salonu", badge: "Tamamlandı", desc: "Üyelerimizle birlikte gerçekleştirdiğimiz film izleme ve tahlil etkinliği." },
-            { id: 8, title: "Tanışma Toplantısı", category: "soylesi", date: "15 Ekim 2025", time: "17:00", place: "Merkez Kütüphane", badge: "Tamamlandı", desc: "SDÜ Kültür ve Kitap Topluluğu tanışma toplantısı." },
-            { id: 9, title: "Bir Zamanlar Anadolu'da Film İzleme", category: "soylesi", date: "20 Haziran 2025", time: "18:00", place: "Sinema Salonu", badge: "Tamamlandı", desc: "Anma programı kapsamında film gösterimi." },
-            { id: 10, title: "Sagalassos Antik Kenti Gezisi", category: "gezi", date: "30 Mayıs 2025", time: "09:00", place: "Sagalassos", badge: "Tamamlandı", desc: "Sosyal ve kültürel gezi." },
-            { id: 11, title: "Üç Anadolu Efsanesi Kitap İncelemesi", category: "kitap", date: "13 Mayıs 2025", time: "16:00", place: "Okuma Salonu", badge: "Tamamlandı", desc: "Kitap inceleme etkinliği." },
-            { id: 12, title: "Film Gösterimi: 12 Kızgın Adam", category: "soylesi", date: "02 Mayıs 2025", time: "19:00", place: "Sinema Salonu", badge: "Tamamlandı", desc: "Film gösterimi." }
-        ];
-
-        try {
-            const raw = localStorage.getItem('sdu_topluluk_data');
-            if (raw) {
-                const parsed = JSON.parse(raw);
-                if (parsed.events && parsed.events.length > 0) {
-                    // Check if past events are merged. If they don't have id 5, merge them.
-                    const hasPastEvents = parsed.events.find(e => e.id === 5 || e.title === "Yazma Etkinliği");
-                    if (!hasPastEvents) {
-                        const merged = [...parsed.events, ...defaultEvents.filter(e => e.id >= 5)];
-                        parsed.events = merged;
-                        localStorage.setItem('sdu_topluluk_data', JSON.stringify(parsed));
-                        return merged;
-                    }
-                    return parsed.events;
-                }
-            } else {
-                // Initialize default events in local storage
-                localStorage.setItem('sdu_topluluk_data', JSON.stringify({ events: defaultEvents, applications: [] }));
-            }
-        } catch (e) {}
-
-        return defaultEvents;
+        if (window.SduAppData && window.SduAppData.events && window.SduAppData.events.length > 0) {
+            return window.SduAppData.events;
+        }
+        return [];
     }
 
     function renderCalendar(month, year) {
@@ -758,12 +730,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // DİNAMİK VERİ SENKRONİZASYONU (LOCALSTORAGE)
     function syncDynamicSiteContent() {
         try {
-            // First ensure data is initialized/merged with defaults
-            getAllEventsList();
-            
-            const raw = localStorage.getItem('sdu_topluluk_data');
-            if (!raw) return;
-            const data = JSON.parse(raw);
+            const data = window.SduAppData || {};
 
             // Ayın Kitabı Senkronizasyonu
             if (data.book) {
@@ -884,6 +851,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 bindEventCalButtons();
                 bindEventJoinButtons();
+            }
+            // Galeri Senkronizasyonu
+            if (data.gallery && Array.isArray(data.gallery) && data.gallery.length > 0) {
+                const publicGrid = document.getElementById('publicGalleryGrid');
+                if (publicGrid) {
+                    publicGrid.innerHTML = '';
+                    data.gallery.forEach((img, idx) => {
+                        const div = document.createElement('div');
+                        div.className = idx === 0 ? 'gallery-item gallery-item-large' : 'gallery-item';
+                        div.innerHTML = `
+                            <img src="${img.src}" alt="${img.title}" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+                            <div class="gallery-overlay">
+                                <span>${img.title}</span>
+                            </div>
+                        `;
+                        publicGrid.appendChild(div);
+                    });
+                }
             }
         } catch (e) {
             console.warn('Dinamik senkronizasyon hatası:', e);
@@ -1264,23 +1249,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     };
                 }
 
-                // Hem Yönetim Paneli Gelen Başvurular sekmesine düşsün hem de giriş yapılsın
-                const rawData = localStorage.getItem('sdu_topluluk_data');
-                if (rawData) {
-                    const data = JSON.parse(rawData);
-                    if (!data.applications) data.applications = [];
-                    data.applications.push({
-                        id: Date.now(),
-                        fullName: name,
-                        studentId: identifier.split('@')[0],
-                        department: department,
-                        grade: grade,
-                        phone: phone,
-                        status: 'Onaylandı',
-                        date: new Date().toLocaleDateString('tr-TR')
-                    });
-                    localStorage.setItem('sdu_topluluk_data', JSON.stringify(data));
-                }
+                // Legacy sync removed
 
                 // Rolü normalize et ve oturumu kaydet
                 newMember.role = 'member';
@@ -1358,15 +1327,14 @@ document.addEventListener('DOMContentLoaded', () => {
         executeEventJoin(evId, title, btn, member);
     }
 
-    function executeEventJoin(evId, title, btn, member) {
+    async function executeEventJoin(evId, title, btn, member) {
         if (!member || member.role !== 'member') return;
 
         if (!Array.isArray(member.attendedEvents)) member.attendedEvents = [];
         const isAlreadyJoined = member.attendedEvents.includes(evId);
 
         try {
-            const raw = localStorage.getItem('sdu_topluluk_data');
-            let data = raw ? JSON.parse(raw) : { events: [] };
+            let data = window.SduAppData || { events: [] };
             if (!data.events) data.events = [];
 
             let ev = data.events.find(e => e.id === evId);
@@ -1378,7 +1346,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (ev && Array.isArray(ev.participants)) {
                     ev.participants = ev.participants.filter(p => p.memberId !== member.id);
-                    localStorage.setItem('sdu_topluluk_data', JSON.stringify(data));
+                    await setPublicData(data);
                 }
 
                 // Sayacı güncelle
@@ -1413,7 +1381,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     joinedAt: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
                 });
 
-                localStorage.setItem('sdu_topluluk_data', JSON.stringify(data));
+                await setPublicData(data);
 
                 // Sayacı güncelle
                 const card = btn.closest('.event-card');

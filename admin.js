@@ -4,7 +4,7 @@
    Zero-cost static sync with LocalStorage & SessionStorage
    ========================================== */
 
-import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, getAdmins, approveAdmin, deleteAdmin as fbDeleteAdmin, getApplications, updateApplicationStatus, deleteApplication as fbDeleteApplication, getSuggestions, updateSuggestionStatus, deleteSuggestion as fbDeleteSuggestion, getAutoAcceptSetting, setAutoAcceptSetting } from './firebase-service.js';
+import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, getAdmins, approveAdmin, deleteAdmin as fbDeleteAdmin, getApplications, updateApplicationStatus, deleteApplication as fbDeleteApplication, getSuggestions, updateSuggestionStatus, deleteSuggestion as fbDeleteSuggestion, getAutoAcceptSetting, setAutoAcceptSetting, getPublicData, setPublicData, verifyAdmin } from './firebase-service.js';
 
 (function () {
     'use strict';
@@ -144,25 +144,30 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
     }
 
     // === VERİ GETİR / KAYDET ===
-    function getData() {
+    let globalDataCache = null;
+
+    async function initData() {
         try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            if (!raw) {
-                const initial = ensureCompleteData({});
-                saveData(initial);
-                return initial;
+            const fbData = await getPublicData();
+            if (fbData) {
+                globalDataCache = ensureCompleteData(fbData);
+            } else {
+                globalDataCache = ensureCompleteData({});
+                await setPublicData(globalDataCache);
             }
-            const parsed = JSON.parse(raw);
-            const complete = ensureCompleteData(parsed);
-            return complete;
         } catch (e) {
             console.error('Veri yükleme hatası:', e);
-            return ensureCompleteData({});
+            globalDataCache = ensureCompleteData({});
         }
     }
 
+    function getData() {
+        return globalDataCache || ensureCompleteData({});
+    }
+
     function saveData(data) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        globalDataCache = data;
+        setPublicData(data).catch(e => console.error("Firebase kaydetme hatası:", e));
     }
 
     // === AKTİF KULLANICI YÖNETİMİ ===
@@ -396,7 +401,17 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
     // ==========================================
     // YÖNETİM PANELİ BAŞLATMA & ROL YETKİLENDİRME
     // ==========================================
-    function initAdminDashboard(user) {
+    async function initAdminDashboard(user) {
+        authScreen.style.display = 'none';
+        
+        // Yükleniyor...
+        adminApp.style.display = 'none';
+        authScreen.style.display = 'flex';
+        authScreen.innerHTML = '<div style="text-align:center; padding: 40px;"><i class="fas fa-spinner fa-spin fa-3x" style="color:var(--primary-color);"></i><p style="margin-top:16px;">Veriler senkronize ediliyor...</p></div>';
+        
+        await initData();
+        
+        // Restore auth screen if we log out later (hacky but works)
         authScreen.style.display = 'none';
         adminApp.style.display = 'flex';
 
@@ -544,6 +559,7 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
         renderBroadcastSection(data);
         renderUsersSection(data);
         renderDevMessagesSection(data);
+        renderGallerySection(data);
     }
 
     // 1. GENEL BAKIŞ
@@ -1239,8 +1255,8 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
     // 8. YEDEKLEME & SIFIRLAMA (SADECE SÜPER ADMİN)
     const exportBackupBtn = document.getElementById('exportBackupBtn');
     if (exportBackupBtn) {
-        exportBackupBtn.addEventListener('click', () => {
-            const data = getData();
+        exportBackupBtn.addEventListener('click', async () => {
+            const data = await getData();
             const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
             const dlAnchor = document.createElement('a');
             dlAnchor.setAttribute("href", str);
@@ -1258,12 +1274,12 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = (event) => {
+            reader.onload = async (event) => {
                 try {
                     const imported = JSON.parse(event.target.result);
                     if (imported.book && imported.events) {
-                        saveData(imported);
-                        renderAllSections();
+                        await saveData(imported);
+                        await renderAllSections();
                         showToast('✅ Veriler yedek dosyasından başarıyla yüklendi!', 'fas fa-check-double');
                     } else {
                         alert('Geçersiz yedek dosyası formatı!');
@@ -1278,10 +1294,10 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
 
     const resetDataBtn = document.getElementById('resetDataBtn');
     if (resetDataBtn) {
-        resetDataBtn.addEventListener('click', () => {
+        resetDataBtn.addEventListener('click', async () => {
             if (!confirm('DİKKAT: Tüm veriler varsayılan haline döndürülecektir. Devam etmek istiyor musunuz?')) return;
-            saveData(DEFAULT_DATA);
-            renderAllSections();
+            await saveData(DEFAULT_DATA);
+            await renderAllSections();
             showToast('Sistem varsayılan verilere sıfırlandı.', 'fas fa-redo');
         });
     }
@@ -1319,13 +1335,13 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
         });
     }
 
-    window.deleteDevMessage = function(id) {
+    window.deleteDevMessage = async function(id) {
         if (!confirm('Bu notu silmek istediğinize emin misiniz?')) return;
-        const data = getData();
+        const data = await getData();
         data.developer_messages = (data.developer_messages || []).filter(m => m.id !== id);
-        saveData(data);
+        await saveData(data);
         renderDevMessagesSection(data);
-        renderOverview(data);
+        await renderOverview(data);
         showToast('Not silindi.', 'fas fa-trash-alt');
     };
 
@@ -1361,13 +1377,13 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
     }
 
     if (devMsgForm) {
-        devMsgForm.addEventListener('submit', (e) => {
+        devMsgForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const sender = document.getElementById('devSenderName').value.trim();
             const category = document.getElementById('devMsgCategory').value;
             const content = document.getElementById('devMsgContent').value.trim();
 
-            const data = getData();
+            const data = await getData();
             if (!data.developer_messages) data.developer_messages = [];
             data.developer_messages.unshift({
                 id: Date.now(),
@@ -1376,9 +1392,9 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
                 content,
                 date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
             });
-            saveData(data);
+            await saveData(data);
             renderDevMessagesSection(data);
-            renderOverview(data);
+            await renderOverview(data);
 
             devMsgModal.style.display = 'none';
             devMsgForm.reset();
@@ -1405,6 +1421,125 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
             showToast('🔔 Yeni başvuru veya veri senkronize edildi!', 'fas fa-bell');
         }
     });
+
+    // ==========================================
+    // 10. GALERİ YÖNETİMİ
+    // ==========================================
+    const btnUploadImage = document.getElementById('btnUploadImage');
+    const galleryFileInput = document.getElementById('galleryFileInput');
+    
+    if (btnUploadImage && galleryFileInput) {
+        btnUploadImage.addEventListener('click', () => {
+            galleryFileInput.click();
+        });
+        
+        galleryFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // Sadece resimler
+            if (!file.type.startsWith('image/')) {
+                alert('Lütfen geçerli bir resim dosyası seçin.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const img = new Image();
+                img.onload = async () => {
+                    // Resmi sıkıştır (maksimum boyut ~800px)
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const MAX_SIZE = 800;
+                    
+                    if (width > height) {
+                        if (width > MAX_SIZE) {
+                            height *= MAX_SIZE / width;
+                            width = MAX_SIZE;
+                        }
+                    } else {
+                        if (height > MAX_SIZE) {
+                            width *= MAX_SIZE / height;
+                            height = MAX_SIZE;
+                        }
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    const base64Str = canvas.toDataURL('image/jpeg', 0.7); // 70% quality JPEG
+                    
+                    const data = await getData();
+                    if (!data.gallery) data.gallery = [];
+                    
+                    const title = prompt("Fotoğraf için kısa bir açıklama/başlık girin:") || "Etkinlik Fotoğrafı";
+                    
+                    data.gallery.push({
+                        id: Date.now(),
+                        src: base64Str,
+                        title: title,
+                        date: new Date().toLocaleDateString('tr-TR')
+                    });
+                    
+                    await saveData(data);
+                    renderGallerySection(data);
+                    showToast('📸 Fotoğraf galeriye eklendi!', 'fas fa-camera');
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+            galleryFileInput.value = '';
+        });
+    }
+    
+    function renderGallerySection(data) {
+        const grid = document.getElementById('adminGalleryGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        
+        const gallery = data.gallery || [];
+        
+        if (gallery.length === 0) {
+            grid.innerHTML = `
+                <div style="text-align: center; padding: 40px; background: #f8fafc; border-radius: 8px; border: 2px dashed #cbd5e1; grid-column: 1 / -1; color: #64748b;">
+                    <i class="fas fa-image" style="font-size: 3rem; margin-bottom: 12px; opacity: 0.5;"></i>
+                    <p>Henüz galeriye fotoğraf yüklenmedi.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        gallery.forEach(item => {
+            const div = document.createElement('div');
+            div.style.position = 'relative';
+            div.style.borderRadius = '8px';
+            div.style.overflow = 'hidden';
+            div.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+            div.style.backgroundColor = '#fff';
+            
+            div.innerHTML = `
+                <img src="${item.src}" alt="${item.title}" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+                <div style="padding: 12px;">
+                    <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.title}</div>
+                    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">${item.date}</div>
+                    <button class="btn-primary" style="width: 100%; background: #ef4444; padding: 8px; font-size: 13px;" onclick="deleteGalleryImage(${item.id})"><i class="fas fa-trash-alt"></i> Sil</button>
+                </div>
+            `;
+            grid.appendChild(div);
+        });
+    }
+    
+    window.deleteGalleryImage = async function(id) {
+        if (!confirm('Bu fotoğrafı galeriden silmek istediğinize emin misiniz?')) return;
+        const data = await getData();
+        data.gallery = (data.gallery || []).filter(img => img.id !== id);
+        await saveData(data);
+        renderGallerySection(data);
+        showToast('Fotoğraf galeriden silindi.', 'fas fa-trash-alt');
+    };
 
     // ==========================================
     // İLK YÜKLEME KONTROLÜ
@@ -1452,7 +1587,20 @@ import { getMembers, deleteMember as fbDeleteMember, registerAdmin, loginAdmin, 
         
         const loggedUser = getLoggedInUser();
         if (loggedUser) {
-            initAdminDashboard(loggedUser);
+            let isValid = true;
+            if (loggedUser.email !== "ilkerm946@gmail.com") {
+                try {
+                    isValid = await verifyAdmin(loggedUser.id);
+                } catch(e) { console.error("Admin doğrulama hatası:", e); }
+            }
+            if (isValid) {
+                initAdminDashboard(loggedUser);
+            } else {
+                localStorage.removeItem('sdu_admin_session');
+                authScreen.style.display = 'flex';
+                adminApp.style.display = 'none';
+                showToast("Güvenlik: Hesabınız askıya alınmış veya silinmiş. Lütfen tekrar giriş yapın.", "fas fa-exclamation-triangle");
+            }
         } else {
             authScreen.style.display = 'flex';
             adminApp.style.display = 'none';
